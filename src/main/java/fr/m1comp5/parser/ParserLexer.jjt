@@ -1,0 +1,70 @@
+options
+{
+    LOOKAHEAD=2;
+    STATIC=false;
+}
+PARSER_BEGIN(ParserLexer)
+
+package fr.m1comp5.parser;
+
+import java.io.StringReader;
+
+public class ParserLexer
+{
+}
+
+PARSER_END(ParserLexer)
+
+SKIP :
+{
+    " "
+|   "\r"
+|   "\t"
+}
+
+TOKEN:
+{
+    < NUMBER: (<DIGIT>)+ ( "." (<DIGIT>)+ )? >
+|   < DIGIT: ["0"-"9"] >
+|   < EOL: "\n" >
+}
+
+int parseOneLine():
+{
+    int a;
+}
+{
+    a=expr() <EOL>      { return a; }
+  | <EOL>               { return 0; }
+  | <EOF>               { return 0; }
+}
+int expr():
+{
+    int a;
+    int b;
+}
+{
+    a=unary()
+    (
+        "+" b=expr()    { a += b; }
+    |   "-" b=expr()    { a -= b; }
+    )*
+                        { return a; }
+}
+int unary():
+{
+    int a;
+}
+{
+    "-" a=element()     { return -a; }
+|   a=element()         { return a; }
+}
+int element():
+{
+    Token t;
+    int  a;
+}
+{
+    t=<NUMBER>          { return Integer.valueOf(t.toString()); }
+|   "(" a=expr() ")"    { return a; }
+}
