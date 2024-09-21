@@ -3,9 +3,10 @@ options {
 }
 
 PARSER_BEGIN(MiniJajaParser)
+package fr.m1comp5.LexerParserGenerator.MiniJajaParser;
 
-import java.text.ParseException;public class MiniJajaParser {
-    public static void main(String[] args) throws ParseException {
+public class MiniJajaParser {
+    public static void main(String[] args) {
         MiniJajaParser parser = new MiniJajaParser(System.in);
         System.out.println("Entrez une déclaration de variable suivie de ENTER:");
         try {

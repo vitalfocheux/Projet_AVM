@@ -5,16 +5,16 @@ import java.io.StringReader;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
-import fr.m1comp5.parser.ParserLexer;
-import fr.m1comp5.parser.ParseException;
-import fr.m1comp5.parser.TokenMgrError;
+import fr.m1comp5.LexerParserGenerator.MiniJajaParser.MiniJajaParser;
+import fr.m1comp5.LexerParserGenerator.MiniJajaParser.ParseException;
+import fr.m1comp5.LexerParserGenerator.MiniJajaParser.TokenMgrError;
 
 public class ParserLexerTest
 {
     private void assertResult(String input, int expected) throws ParseException, IOException {
         final Reader r = new StringReader(input + "\n");
         try {
-            assertEquals(expected, new ParserLexer(r).parseOneLine());
+            assertEquals(expected, new MiniJajaParser(r).parseOneLine());
         } finally {
             r.close();
         }
