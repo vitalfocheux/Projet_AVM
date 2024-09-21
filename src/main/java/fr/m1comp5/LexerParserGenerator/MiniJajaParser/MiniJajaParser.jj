@@ -1,0 +1,51 @@
+options {
+    STATIC = false;
+}
+
+PARSER_BEGIN(MiniJajaParser)
+
+import java.text.ParseException;public class MiniJajaParser {
+    public static void main(String[] args) throws ParseException {
+        MiniJajaParser parser = new MiniJajaParser(System.in);
+        System.out.println("Entrez une déclaration de variable suivie de ENTER:");
+        try {
+            parser.declaration();
+            System.out.println("Déclaration correcte !");
+        } catch (ParseException e) {
+            System.out.println("Erreur de syntaxe : " + e.getMessage());
+        }
+    }
+}
+PARSER_END(MiniJajaParser)
+
+TOKEN : {
+    <KEYWORD: "int"> |
+    <INDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])*> |
+    <ASSIGN_OPERATOR: "="> |
+    <ADD_OPERATOR: "+"> |
+    <SUB_OPERATOR: "-"> |
+    <MULTIPLY_OPERATOR: "*"> |
+    <NUMBER: (["0"-"9"])+> |
+    <SEPARATOR: ";">
+}
+void declaration() : {}
+{
+    <KEYWORD> <INDENTIFIER> <ASSIGN_OPERATOR> expression() <SEPARATOR>
+}
+void add() : {}
+{
+    <KEYWORD> <INDENTIFIER> <ASSIGN_OPERATOR> expression() <SEPARATOR>
+}
+void sub() : {}
+{
+    <KEYWORD> <INDENTIFIER> <ASSIGN_OPERATOR> expression() <SEPARATOR>
+}
+void multiply() : {}
+{
+    <KEYWORD> <INDENTIFIER> <ASSIGN_OPERATOR> expression() <SEPARATOR>
+}
+
+void expression() : {}
+{
+    <NUMBER>
+}
