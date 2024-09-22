@@ -30,7 +30,12 @@ PARSER_END(MiniJajaParser)
     <FINAL: "final">     |
     <TRUE: "true">       |
     <FALSE: "false">     |
-    <LENGTH: "length">
+    <LENGTH: "length">   |
+    <WHILE: "while">     |
+    <RETURN: "return">   |
+    <WRITE: "write">     |
+    <WRITELN: "writeln"> |
+    <IF> : "if">         
 }
 
 <DEFAULT> TOKEN : {
@@ -38,9 +43,16 @@ PARSER_END(MiniJajaParser)
     <ASSIGN_OPERATOR: "="> |
     <ADD_OPERATOR: "+"> |
     <SUB_OPERATOR: "-"> |
+    <DIV_OPERATOR: "/"> |
     <MULTIPLY_OPERATOR: "*"> |
-    <NUMBER: (["0"-"9"])+> |
-    <SEPARATOR: ";">
+    <NUMBER: (["0"-"9"])+>   |
+    <SEPARATOR: ";">         |
+    <SUP : ">">              |
+    <INF : "<" >             |
+    <AND_LOGIC : "&&">       | 
+    <OR_LOGIC  : "||">       |
+    <NEGATION  : "!">        |
+    <VIRGULE  : ",">   
 }
 
 
@@ -56,42 +68,54 @@ void ident() : {}
 
 void decls() : {}
 {
-    decl() ";" decls() |
+    decl() SEPARATOR decls() |
     empty()
 }
 
 void decl() : {}
 {
     typemeth() ident() decl2()     |
-    <FINAL> type() ident() vexp()
+    <FINAL> type() ident() vexp()| empty()
 }
 
 void decl2() : {}
 {
-    {}
+    var2() | "(" entetes() ")" "{" vars() instrs() "}"
+}
+
+void vars() : {}
+{
+    var() SEPARATOR vars() | empty()
+
+}
+
+void var()  : {}
+{
+    typemeth() ident() var2() |  <FINAL>  type ident() vexp()
 }
 
 void vexp() : {}
 {
-    "=" exp()
+    <ASSIGN_OPERATOR> exp()| 
+    empty()
 }
 
 void exp() : {}
 {
-    "!" exp1() exp5() | exp1() exp5()
+    <NEGATION> exp1() exp5() | exp1() exp5()
 }
 
 void exp5() : {}
 {
-    "&&" exp1() exp52() |
-    "||" exp1() exp52() |
+    <AND_LOGIC> exp1() exp52() |
+    <OR_LOGIC>exp1() exp52() |
     empty()
 }
 
 void exp52() : {}
 {
-    "&&" exp1() exp52() |
-    "||" exp1() exp52() |
+    <AND_LOGIC> exp1() exp52() |
+    <OR_LOGIC> exp1() exp52() |
     empty()
 }
 
@@ -102,8 +126,8 @@ void exp1() : {}
 
 void exp42() : {}
 {
-    "==" exp2() exp42() |
-    ">" exp2() exp42()  |
+    <ASSIGN_OPERATOR><ASSIGN_OPERATOR> exp2() exp42() |
+    <SUP> exp2() exp42()  |
     empty()
 }
 
@@ -114,8 +138,8 @@ void exp2() : {}
 
 void exp32() : {}
 {
-    "+" terme() exp32() |
-    "-" terme() exp32() |
+    <ADD_OPERATOR> terme() exp32() |
+    <SUB_OPERATOR> terme() exp32() |
     empty()
 }
 
@@ -126,18 +150,24 @@ void terme() : {}
 
 void terme22() : {}
 {
-    "*" fact() terme22() |
-    "/" fact() terme22() |
+    <MULTIPLY_OPERATOR> fact() terme22() |
+    <DIV_OPERATOR> fact() terme22() |
     empty()
 }
 
 void fact() : {}
-{
+{   
+    ident() fact2()|
+    <LENGTH> "(" ident ")"
     "(" exp() ")" |
     <NUMBER>      |
     <TRUE>        |
     <FALSE>       |
-    ident1()
+}
+
+void fact2() : {}
+{
+    "(" listexp() ")" | empty()
 }
 
 void ident1() : {}
@@ -170,9 +200,75 @@ void empty() : {}
     {}
 }
 
+void methode() : {} 
+{
+    typemeth() ident() "(" entetes() ")" vars() instrs() | empty()
+
+}
 void methmain() : {}
 {
-    <MAIN>
+    <MAIN> "{" vars() instrs() "}"
 }
 
+void entetes() : {}
+{
+    entete() entetes2() | empty()
+}
 
+void entetes2() : {}
+{
+    <VIRGULE> entetes | empty()
+}
+
+void entete() {}
+{
+    type() ident()
+}
+
+void instrs() : {}
+{
+ instr() SEPARATOR instrs() | empty()
+}
+void instr() : {}
+{
+    ident() instr2() |
+    <RETURN> exp() |
+    <WRITE> "(" I() ")" |
+    <WRITELN> "(" I() ")" |
+    <IF> "(" exp() ")" "{" instrs() "}" ELSE() |
+    <WHILE> "(" exp() ")" "{" instrs() "}"
+}
+
+void instr2(): {}
+{
+    instru() | "(" listexp() ")"
+}
+
+void instru() : {}
+{
+    <ASSIGN_OPERATOR> exp |
+    <ADD_OPERATOR> <ASSIGN_OPERATOR> exp()|
+    <ADD_OPERATOR> <ADD_OPERATOR> 
+}
+
+void ELSE() : {}
+{
+    else "{" instrs() "}" | empty()
+}
+
+void I() : {}
+{
+    ident() | <IDENTIFIER> 
+}
+void listexp(){}
+{
+    exp() listexp2() | empty()
+
+}
+
+void listexp2() : {}
+{
+    <VIRGULE> listexp() |
+    empty()
+
+}
