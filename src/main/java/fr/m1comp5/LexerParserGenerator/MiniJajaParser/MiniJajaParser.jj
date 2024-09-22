@@ -10,8 +10,7 @@ public class MiniJajaParser {
         MiniJajaParser parser = new MiniJajaParser(System.in);
         System.out.println("Entrez une déclaration de variable suivie de ENTER:");
         try {
-            parser.declaration();
-            System.out.println("Déclaration correcte !");
+            parser.classe();
         } catch (ParseException e) {
             System.out.println("Erreur de syntaxe : " + e.getMessage());
         }
@@ -19,9 +18,23 @@ public class MiniJajaParser {
 }
 PARSER_END(MiniJajaParser)
 
-TOKEN : {
-    <KEYWORD: "int"> |
-    <INDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])*> |
+
+/* MiniJaja reserved keywords */
+<DEFAULT> TOKEN :
+{
+    <CLASS: "class">     |
+    <MAIN: "main">       |
+    <VOID: "void">       |
+    <INT: "int">         |
+    <BOOLEAN: "boolean"> |
+    <FINAL: "final">     |
+    <TRUE: "true">       |
+    <FALSE: "false">     |
+    <LENGTH: "length">
+}
+
+<DEFAULT> TOKEN : {
+    <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])*> |
     <ASSIGN_OPERATOR: "="> |
     <ADD_OPERATOR: "+"> |
     <SUB_OPERATOR: "-"> |
@@ -29,24 +42,137 @@ TOKEN : {
     <NUMBER: (["0"-"9"])+> |
     <SEPARATOR: ";">
 }
-void declaration() : {}
+
+
+void classe() : {}
 {
-    <KEYWORD> <INDENTIFIER> <ASSIGN_OPERATOR> expression() <SEPARATOR>
-}
-void add() : {}
-{
-    <KEYWORD> <INDENTIFIER> <ASSIGN_OPERATOR> expression() <SEPARATOR>
-}
-void sub() : {}
-{
-    <KEYWORD> <INDENTIFIER> <ASSIGN_OPERATOR> expression() <SEPARATOR>
-}
-void multiply() : {}
-{
-    <KEYWORD> <INDENTIFIER> <ASSIGN_OPERATOR> expression() <SEPARATOR>
+    <CLASS> ident() "{" decls() methmain() "}"
 }
 
-void expression() : {}
+void ident() : {}
 {
-    <NUMBER>
+    <IDENTIFIER>
 }
+
+void decls() : {}
+{
+    decl() ";" decls() |
+    empty()
+}
+
+void decl() : {}
+{
+    typemeth() ident() decl2()     |
+    <FINAL> type() ident() vexp()
+}
+
+void decl2() : {}
+{
+    {}
+}
+
+void vexp() : {}
+{
+    "=" exp()
+}
+
+void exp() : {}
+{
+    "!" exp1() exp5() | exp1() exp5()
+}
+
+void exp5() : {}
+{
+    "&&" exp1() exp52() |
+    "||" exp1() exp52() |
+    empty()
+}
+
+void exp52() : {}
+{
+    "&&" exp1() exp52() |
+    "||" exp1() exp52() |
+    empty()
+}
+
+void exp1() : {}
+{
+    exp2() exp42()
+}
+
+void exp42() : {}
+{
+    "==" exp2() exp42() |
+    ">" exp2() exp42()  |
+    empty()
+}
+
+void exp2() : {}
+{
+    terme() exp32()
+}
+
+void exp32() : {}
+{
+    "+" terme() exp32() |
+    "-" terme() exp32() |
+    empty()
+}
+
+void terme() : {}
+{
+    fact() terme22()
+}
+
+void terme22() : {}
+{
+    "*" fact() terme22() |
+    "/" fact() terme22() |
+    empty()
+}
+
+void fact() : {}
+{
+    "(" exp() ")" |
+    <NUMBER>      |
+    <TRUE>        |
+    <FALSE>       |
+    ident1()
+}
+
+void ident1() : {}
+{
+    ident()
+}
+
+void ident2() : {}
+{
+    ident() "[" exp() "]"
+}
+
+void typemeth() : {}
+{
+    <VOID> |
+    type()
+}
+
+void type() : {}
+{
+    <INT>      |
+    <BOOLEAN>
+}
+
+/**
+* Empty production rule
+*/
+void empty() : {}
+{
+    {}
+}
+
+void methmain() : {}
+{
+    <MAIN>
+}
+
+
