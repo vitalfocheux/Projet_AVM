@@ -44,7 +44,7 @@ public class Stack
             base = 0;
         }
         stackList.add(top++, object);
-        return stackList.getLast();
+        return stackList.get(top);
     }
 
     public MemoryObject pop() throws StackException

@@ -25,6 +25,14 @@ public class MiniJajaParser
 }
 PARSER_END(MiniJajaParser)
 
+/* To skip */
+SKIP :
+{
+    " "  |
+    "\t" |
+    "\r" |
+    "\n"
+ }
 
 /* MiniJaja reserved keywords */
 <DEFAULT> TOKEN :
@@ -46,23 +54,29 @@ PARSER_END(MiniJajaParser)
     <ELSE : "else">
 }
 
+/* MiniJaja operator */
+<DEFAULT> TOKEN :
+{
+    <ADD: "+">  |
+    <SUB: "-">  |
+    <SUP: ">">  |
+    <INF: "<">  |
+    <AND: "&&"> |
+    <OR: "||">  |
+    <NOT: "!"> 
+}
+
 <DEFAULT> TOKEN : {
     <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])*> |
     <ASSIGN_OPERATOR: "="> |
-    <ADD_OPERATOR: "+"> |
-    <SUB_OPERATOR: "-"> |
+    <INCREMENT : "++">  |
     <DIV_OPERATOR: "/"> |
     <MULTIPLY_OPERATOR: "*"> |
     <NUMBER: (["0"-"9"])+>   |
-    <SEPARATOR: ";">         |
-    <SUP : ">">              |
-    <INF : "<" >             |
-    <AND_LOGIC : "&&">       | 
-    <OR_LOGIC  : "||">       |
-    <NEGATION  : "!">        |
-    <VIRGULE  : ",">   
+    <SEMICOLON: ";">         |
+    <VIRGULE  : ",">         |
+    <STRING :  "\"" (~["\""])* "\"">
 }
-
 
 void classe() : {}
 {
@@ -76,7 +90,7 @@ void ident() : {}
 
 void decls() : {}
 {
-    decl() <SEPARATOR> decls() | empty()
+    decl() <SEMICOLON> decls() | empty()
 }
 
 void decl() : {}
@@ -88,23 +102,23 @@ void decl() : {}
 
 void decl2() : {}
 {
-    var2() | "(" entetes() ")" "{" vars() instrs() "}"
+     "(" entetes() ")" "{" vars() instrs() "}" | var2()
 }
 
 void vars() : {}
 {
-    var() <SEPARATOR> vars() | empty()
+    var() <SEMICOLON> vars() | empty()
 
 }
 
 void var() : {}
 {
-    typemeth() ident() var2() |  <FINAL>  type() ident() vexp()
+    typemeth() ident() var2() | <FINAL> type() ident() vexp()
 }
 
 void var2() : {}
 {
-    vexp() | "[" exp() "]"
+     "[" exp() "]" | vexp()
 }
 
 void vexp() : {}
@@ -114,20 +128,20 @@ void vexp() : {}
 
 void exp() : {}
 {
-    <NEGATION> exp1() exp5() | exp1() exp5()
+    <NOT> exp1() exp5() | exp1() exp5()
 }
 
 void exp5() : {}
 {
-    <AND_LOGIC> exp1() exp52() |
-    <OR_LOGIC>exp1() exp52()   |
+    <AND> exp1() exp52() |
+    <OR>exp1() exp52()   |
     empty()
 }
 
 void exp52() : {}
 {
-    <AND_LOGIC> exp1() exp52() |
-    <OR_LOGIC> exp1() exp52()  |
+    <AND> exp1() exp52() |
+    <OR> exp1() exp52()  |
     empty()
 }
 
@@ -150,8 +164,8 @@ void exp2() : {}
 
 void exp32() : {}
 {
-    <ADD_OPERATOR> terme() exp32() |
-    <SUB_OPERATOR> terme() exp32() |
+    <ADD> terme() exp32() |
+    <SUB> terme() exp32() |
     empty()
 }
 
@@ -182,16 +196,6 @@ void fact2() : {}
     "(" listexp() ")" | empty()
 }
 
-void ident1() : {}
-{
-    ident()
-}
-
-void ident2() : {}
-{
-    ident() "[" exp() "]"
-}
-
 void typemeth() : {}
 {
     <VOID> | type()
@@ -212,11 +216,6 @@ void empty() : {}
     {}
 }
 
-void methode() : {} 
-{
-    typemeth() ident() "(" entetes() ")" vars() instrs() | empty()
-
-}
 void methmain() : {}
 {
     <MAIN> "{" vars() instrs() "}"
@@ -239,7 +238,7 @@ void entete() : {}
 
 void instrs() : {}
 {
- instr() <SEPARATOR> instrs() | empty()
+ instr() <SEMICOLON> instrs() | empty()
 }
 void instr() : {}
 {
@@ -258,9 +257,9 @@ void instr2(): {}
 
 void instru() : {}
 {
-    <ASSIGN_OPERATOR> exp()                              |
-    <ADD_OPERATOR><ASSIGN_OPERATOR> exp() |
-    <ADD_OPERATOR><ADD_OPERATOR>
+    <ASSIGN_OPERATOR> exp()               |
+    <ADD><ASSIGN_OPERATOR> exp() |
+    <INCREMENT>
 }
 
 void ELSE() : {}
@@ -270,12 +269,11 @@ void ELSE() : {}
 
 void I() : {}
 {
-    ident() | <IDENTIFIER> 
+    ident() | <STRING>
 }
 void listexp() : {}
 {
     exp() listexp2() | empty()
-
 }
 
 void listexp2() : {}
