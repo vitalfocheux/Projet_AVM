@@ -17,4 +17,24 @@ public class MemoryObject
         this.nature = nature;
         this.type = type;
     }
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public Object getValue()
+    {
+        return value;
+    }
+
+    public ObjectNature getNature()
+    {
+        return nature;
+    }
+
+    public ObjectType getType()
+    {
+        return type;
+    }
 }
