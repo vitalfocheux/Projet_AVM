@@ -4,16 +4,23 @@ options {
 
 PARSER_BEGIN(MiniJajaParser)
 package fr.m1comp5.LexerParserGenerator.MiniJajaParser;
+import java.io.FileReader;
 
-public class MiniJajaParser {
-    public static void main(String[] args) {
-        MiniJajaParser parser = new MiniJajaParser(System.in);
-        System.out.println("Entrez une déclaration de variable suivie de ENTER:");
-        try {
-            parser.classe();
-        } catch (ParseException e) {
-            System.out.println("Erreur de syntaxe : " + e.getMessage());
+public class MiniJajaParser
+{
+    public static MiniJajaParser getInstance(String filename)
+    {
+        FileReader reader = null;
+        try
+        {
+            reader = new FileReader(filename);
         }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+        return new MiniJajaParser(reader);
     }
 }
 PARSER_END(MiniJajaParser)
@@ -35,7 +42,8 @@ PARSER_END(MiniJajaParser)
     <RETURN: "return">   |
     <WRITE: "write">     |
     <WRITELN: "writeln"> |
-    <IF> : "if">         
+    <IF : "if">          |
+    <ELSE : "else">
 }
 
 <DEFAULT> TOKEN : {
@@ -68,14 +76,14 @@ void ident() : {}
 
 void decls() : {}
 {
-    decl() SEPARATOR decls() |
-    empty()
+    decl() <SEPARATOR> decls() | empty()
 }
 
 void decl() : {}
 {
-    typemeth() ident() decl2()     |
-    <FINAL> type() ident() vexp()| empty()
+    typemeth() ident() decl2()    |
+    <FINAL> type() ident() vexp() |
+    empty()
 }
 
 void decl2() : {}
@@ -85,19 +93,23 @@ void decl2() : {}
 
 void vars() : {}
 {
-    var() SEPARATOR vars() | empty()
+    var() <SEPARATOR> vars() | empty()
 
 }
 
-void var()  : {}
+void var() : {}
 {
-    typemeth() ident() var2() |  <FINAL>  type ident() vexp()
+    typemeth() ident() var2() |  <FINAL>  type() ident() vexp()
+}
+
+void var2() : {}
+{
+    vexp() | "[" exp() "]"
 }
 
 void vexp() : {}
 {
-    <ASSIGN_OPERATOR> exp()| 
-    empty()
+    <ASSIGN_OPERATOR> exp() | empty()
 }
 
 void exp() : {}
@@ -108,14 +120,14 @@ void exp() : {}
 void exp5() : {}
 {
     <AND_LOGIC> exp1() exp52() |
-    <OR_LOGIC>exp1() exp52() |
+    <OR_LOGIC>exp1() exp52()   |
     empty()
 }
 
 void exp52() : {}
 {
     <AND_LOGIC> exp1() exp52() |
-    <OR_LOGIC> exp1() exp52() |
+    <OR_LOGIC> exp1() exp52()  |
     empty()
 }
 
@@ -127,7 +139,7 @@ void exp1() : {}
 void exp42() : {}
 {
     <ASSIGN_OPERATOR><ASSIGN_OPERATOR> exp2() exp42() |
-    <SUP> exp2() exp42()  |
+    <SUP> exp2() exp42()                              |
     empty()
 }
 
@@ -151,18 +163,18 @@ void terme() : {}
 void terme22() : {}
 {
     <MULTIPLY_OPERATOR> fact() terme22() |
-    <DIV_OPERATOR> fact() terme22() |
+    <DIV_OPERATOR> fact() terme22()      |
     empty()
 }
 
 void fact() : {}
 {   
     ident() fact2()|
-    <LENGTH> "(" ident ")"
+    <LENGTH> "(" ident() ")" |
     "(" exp() ")" |
     <NUMBER>      |
     <TRUE>        |
-    <FALSE>       |
+    <FALSE>
 }
 
 void fact2() : {}
@@ -182,14 +194,14 @@ void ident2() : {}
 
 void typemeth() : {}
 {
-    <VOID> |
-    type()
+    <VOID> | type()
+
 }
 
 void type() : {}
 {
-    <INT>      |
-    <BOOLEAN>
+    <INT> | <BOOLEAN>
+
 }
 
 /**
@@ -217,17 +229,17 @@ void entetes() : {}
 
 void entetes2() : {}
 {
-    <VIRGULE> entetes | empty()
+    <VIRGULE> entetes() | empty()
 }
 
-void entete() {}
+void entete() : {}
 {
     type() ident()
 }
 
 void instrs() : {}
 {
- instr() SEPARATOR instrs() | empty()
+ instr() <SEPARATOR> instrs() | empty()
 }
 void instr() : {}
 {
@@ -246,21 +258,21 @@ void instr2(): {}
 
 void instru() : {}
 {
-    <ASSIGN_OPERATOR> exp |
-    <ADD_OPERATOR> <ASSIGN_OPERATOR> exp()|
-    <ADD_OPERATOR> <ADD_OPERATOR> 
+    <ASSIGN_OPERATOR> exp()                              |
+    <ADD_OPERATOR><ASSIGN_OPERATOR> exp() |
+    <ADD_OPERATOR><ADD_OPERATOR>
 }
 
 void ELSE() : {}
 {
-    else "{" instrs() "}" | empty()
+    <ELSE> "{" instrs() "}" | empty()
 }
 
 void I() : {}
 {
     ident() | <IDENTIFIER> 
 }
-void listexp(){}
+void listexp() : {}
 {
     exp() listexp2() | empty()
 
@@ -270,5 +282,4 @@ void listexp2() : {}
 {
     <VIRGULE> listexp() |
     empty()
-
 }
