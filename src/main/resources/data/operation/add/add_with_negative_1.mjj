@@ -2,7 +2,7 @@ class add {
 
     main {
 
-        return 12 + -30; // return -18
+        return 12 + (-30); // -18
 
     }
 

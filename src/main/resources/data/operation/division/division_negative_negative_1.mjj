@@ -2,7 +2,7 @@ class division {
 
     main {
 
-        return -42 / -3;
+        return -(42) / (-3);
 
     }
 

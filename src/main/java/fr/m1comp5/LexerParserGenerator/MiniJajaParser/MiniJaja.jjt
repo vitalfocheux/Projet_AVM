@@ -1,0 +1,286 @@
+options {
+    STATIC = false;
+}
+
+PARSER_BEGIN(MiniJaja)
+package fr.m1comp5.LexerParserGenerator.MiniJajaParser;
+import java.io.FileReader;
+
+public class MiniJaja
+{
+    public static MiniJaja getInstance(String filename)
+    {
+        FileReader reader = null;
+        try
+        {
+            reader = new FileReader(filename);
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+        return new MiniJaja(reader);
+    }
+}
+PARSER_END(MiniJaja)
+
+/* To skip */
+SKIP :
+{
+    " "                                              |
+    "\t"                                             |
+    "\r"                                             |
+    "\n"                                             |
+    <"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>        |
+    <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+
+ }
+
+/* MiniJaja reserved keywords */
+<DEFAULT> TOKEN :
+{
+    <CLASS: "class">     |
+    <MAIN: "main">       |
+    <VOID: "void">       |
+    <INT: "int">         |
+    <BOOLEAN: "boolean"> |
+    <FINAL: "final">     |
+    <TRUE: "true">       |
+    <FALSE: "false">     |
+    <LENGTH: "length">   |
+    <WHILE: "while">     |
+    <RETURN: "return">   |
+    <WRITE: "write">     |
+    <WRITELN: "writeln"> |
+    <IF : "if">          |
+    <ELSE : "else">
+}
+
+/* MiniJaja operator */
+<DEFAULT> TOKEN :
+{
+    <ADD: "+">          |
+    <SUB: "-">          |
+    <SUP: ">">          |
+    <INF: "<">          |
+    <AND: "&&">         |
+    <OR: "||">          |
+    <NOT: "!">          |
+    <INCREMENT : "++">  |
+    <DIV: "/">          |
+    <MUL: "*">          |
+    <ASSIGN: "=">
+}
+
+<DEFAULT> TOKEN : {
+    <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])*> |
+    <NUMBER: (["0"-"9"])+>   |
+    <SEMICOLON: ";">         |
+    <VIRGULE  : ",">         |
+    <STRING :  "\"" (~["\""])* "\"">
+}
+
+void classe() : {}
+{
+    <CLASS> ident() "{" decls() methmain() "}"
+}
+
+void ident() : {}
+{
+    <IDENTIFIER>
+}
+
+void decls() : {}
+{
+    decl() <SEMICOLON> decls() | empty()
+}
+
+void decl() : {}
+{
+    typemeth() ident() decl2()    |
+    <FINAL> type() ident() vexp() |
+    empty()
+}
+
+void decl2() : {}
+{
+     "(" entetes() ")" "{" vars() instrs() "}" | var2()
+}
+
+void vars() : {}
+{
+    var() <SEMICOLON> vars() | empty()
+
+}
+
+void var() : {}
+{
+    typemeth() ident() var2() | <FINAL> type() ident() vexp()
+}
+
+void var2() : {}
+{
+     "[" exp() "]" | vexp()
+}
+
+void vexp() : {}
+{
+    <ASSIGN> exp() | empty()
+}
+
+void exp() : {}
+{
+    <NOT> exp1() exp5() | exp1() exp5()
+}
+
+void exp5() : {}
+{
+    <AND> exp1() exp52() |
+    <OR>exp1() exp52()   |
+    empty()
+}
+
+void exp52() : {}
+{
+    <AND> exp1() exp52() |
+    <OR> exp1() exp52()  |
+    empty()
+}
+
+void exp1() : {}
+{
+    exp2() exp42()
+}
+
+void exp42() : {}
+{
+    <ASSIGN><ASSIGN> exp2() exp42() |
+    <SUP> exp2() exp42()            |
+    empty()
+}
+
+void exp2() : {}
+{
+    terme() exp32()
+}
+
+void exp32() : {}
+{
+    <ADD> terme() exp32() |
+    <SUB> terme() exp32() |
+    empty()
+}
+
+void terme() : {}
+{
+    fact() terme22()
+}
+
+void terme22() : {}
+{
+    <MUL> fact() terme22() |
+    <DIV> fact() terme22()      |
+    empty()
+}
+
+void fact() : {}
+{
+    ident() fact2()|
+    <LENGTH> "(" ident() ")" |
+    "(" exp() ")" |
+    <NUMBER>      |
+    <TRUE>        |
+    <FALSE>
+}
+
+void fact2() : {}
+{
+    "(" listexp() ")" | empty()
+}
+
+void typemeth() : {}
+{
+    <VOID> | type()
+
+}
+
+void type() : {}
+{
+    <INT> | <BOOLEAN>
+
+}
+
+/**
+* Empty production rule
+*/
+void empty() : {}
+{
+    {}
+}
+
+void methmain() : {}
+{
+    <MAIN> "{" vars() instrs() "}"
+}
+
+void entetes() : {}
+{
+    entete() entetes2() | empty()
+}
+
+void entetes2() : {}
+{
+    <VIRGULE> entetes() | empty()
+}
+
+void entete() : {}
+{
+    type() ident()
+}
+
+void instrs() : {}
+{
+ instr() <SEMICOLON> instrs() | empty()
+}
+void instr() : {}
+{
+    ident() instr2() |
+    <RETURN> exp() |
+    <WRITE> "(" I() ")" |
+    <WRITELN> "(" I() ")" |
+    <IF> "(" exp() ")" "{" instrs() "}" ELSE() |
+    <WHILE> "(" exp() ")" "{" instrs() "}"
+}
+
+void instr2(): {}
+{
+    instru() | "(" listexp() ")"
+}
+
+void instru() : {}
+{
+    <ASSIGN> exp()               |
+    <ADD><ASSIGN> exp() |
+    <INCREMENT>
+}
+
+void ELSE() : {}
+{
+    <ELSE> "{" instrs() "}" | empty()
+}
+
+void I() : {}
+{
+    ident() | <STRING>
+}
+void listexp() : {}
+{
+    exp() listexp2() | empty()
+}
+
+void listexp2() : {}
+{
+    <VIRGULE> listexp() |
+    empty()
+}

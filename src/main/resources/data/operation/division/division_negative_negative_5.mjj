@@ -1,9 +1,0 @@
-class division {
-
-    main {
-
-        return -(42) / -(3);
-
-    }
-
-}

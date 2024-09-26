@@ -19,8 +19,19 @@
             <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.11.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.mikemybytes</groupId>
+            <artifactId>junit5-formatted-source</artifactId>
+            <version>1.0.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
 
     <build>
         <plugins>
@@ -35,7 +46,7 @@
                             <goal>jjtree-javacc</goal>
                         </goals>
                         <configuration>
-                            <sourceDirectory>${basedir}/src/main/java/fr/m1comp5/parser</sourceDirectory>
+                            <sourceDirectory>${basedir}/src/main/java/fr/m1comp5/LexerParserGenerator/MiniJajaParser</sourceDirectory>
                         </configuration>
                     </execution>
                 </executions>
