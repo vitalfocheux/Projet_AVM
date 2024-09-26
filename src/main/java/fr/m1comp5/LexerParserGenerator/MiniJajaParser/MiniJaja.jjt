@@ -57,21 +57,21 @@ SKIP :
 /* MiniJaja operator */
 <DEFAULT> TOKEN :
 {
-    <ADD: "+">  |
-    <SUB: "-">  |
-    <SUP: ">">  |
-    <INF: "<">  |
-    <AND: "&&"> |
-    <OR: "||">  |
-    <NOT: "!"> 
+    <ADD: "+">          |
+    <SUB: "-">          |
+    <SUP: ">">          |
+    <INF: "<">          |
+    <AND: "&&">         |
+    <OR: "||">          |
+    <NOT: "!">          |
+    <INCREMENT : "++">  |
+    <DIV: "/">          |
+    <MUL: "*">          |
+    <ASSIGN: "=">
 }
 
 <DEFAULT> TOKEN : {
     <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])*> |
-    <ASSIGN_OPERATOR: "="> |
-    <INCREMENT : "++">  |
-    <DIV_OPERATOR: "/"> |
-    <MULTIPLY_OPERATOR: "*"> |
     <NUMBER: (["0"-"9"])+>   |
     <SEMICOLON: ";">         |
     <VIRGULE  : ",">         |
@@ -123,7 +123,7 @@ void var2() : {}
 
 void vexp() : {}
 {
-    <ASSIGN_OPERATOR> exp() | empty()
+    <ASSIGN> exp() | empty()
 }
 
 void exp() : {}
@@ -152,7 +152,7 @@ void exp1() : {}
 
 void exp42() : {}
 {
-    <ASSIGN_OPERATOR><ASSIGN_OPERATOR> exp2() exp42() |
+    <ASSIGN><ASSIGN> exp2() exp42() |
     <SUP> exp2() exp42()                              |
     empty()
 }
@@ -176,13 +176,13 @@ void terme() : {}
 
 void terme22() : {}
 {
-    <MULTIPLY_OPERATOR> fact() terme22() |
-    <DIV_OPERATOR> fact() terme22()      |
+    <MUL> fact() terme22() |
+    <DIV> fact() terme22()      |
     empty()
 }
 
 void fact() : {}
-{   
+{
     ident() fact2()|
     <LENGTH> "(" ident() ")" |
     "(" exp() ")" |
@@ -257,8 +257,8 @@ void instr2(): {}
 
 void instru() : {}
 {
-    <ASSIGN_OPERATOR> exp()               |
-    <ADD><ASSIGN_OPERATOR> exp() |
+    <ASSIGN> exp()               |
+    <ADD><ASSIGN> exp() |
     <INCREMENT>
 }
 

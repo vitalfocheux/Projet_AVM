@@ -31,7 +31,7 @@
                     <execution>
                         <id>parserlexer</id>
                         <goals>
-                            <goal>javacc</goal>
+                            <goal>jjtree-javacc</goal>
                         </goals>
                         <configuration>
                             <sourceDirectory>${basedir}/src/main/java/fr/m1comp5/LexerParserGenerator/MiniJajaParser</sourceDirectory>

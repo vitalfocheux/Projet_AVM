@@ -11,7 +11,7 @@ public class ParserLexerTest
 
     public void basic() throws ParseException
     {
-        MiniJajaParser mjjparser = MiniJajaParser.getInstance("data/1.mjj");
+        MiniJaja mjjparser = MiniJaja.getInstance("data/1.mjj");
         if (mjjparser != null)
         {
             mjjparser.classe();
