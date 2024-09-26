@@ -77,13 +77,19 @@ SKIP :
     <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])*> |
     <NUMBER: (["0"-"9"])+>   |
     <SEMICOLON: ";">         |
-    <VIRGULE  : ",">         |
-    <STRING :  "\"" (~["\""])* "\"">
+    <VIRGULE: ",">           |
+    <<LCBRACKET>: "{">       |
+    <<RCBRACKET>: "}">       |
+    <LPAR: "(">              |
+    <RPAR: ")">              |
+    <LBRACKET: "[">          |
+    <RBRACKET: "]">          |
+    <STRING:  "\"" (~["\""])* "\"">
 }
 
 void classe() : {}
 {
-    <CLASS> ident() "{" decls() methmain() "}"
+    <CLASS> ident() <<LCBRACKET>> decls() methmain() <<RCBRACKET>>
 }
 
 void ident() : {}
@@ -105,7 +111,7 @@ void decl() : {}
 
 void decl2() : {}
 {
-     "(" entetes() ")" "{" vars() instrs() "}" | var2()
+     <LPAR> entetes() <RPAR> <<LCBRACKET>> vars() instrs() <<RCBRACKET>> | var2()
 }
 
 void vars() : {}
@@ -121,7 +127,7 @@ void var() : {}
 
 void var2() : {}
 {
-     "[" exp() "]" | vexp()
+     <LBRACKET> exp() <RBRACKET> | vexp()
 }
 
 void vexp() : {}
@@ -187,8 +193,8 @@ void terme22() : {}
 void fact() : {}
 {
     ident() fact2()|
-    <LENGTH> "(" ident() ")" |
-    "(" exp() ")" |
+    <LENGTH> <LPAR> ident() <RPAR> |
+    <LPAR> exp() <RPAR> |
     <NUMBER>      |
     <TRUE>        |
     <FALSE>
@@ -196,7 +202,7 @@ void fact() : {}
 
 void fact2() : {}
 {
-    "(" listexp() ")" | empty()
+    <LPAR> listexp() <RPAR> | empty()
 }
 
 void typemeth() : {}
@@ -221,7 +227,7 @@ void empty() : {}
 
 void methmain() : {}
 {
-    <MAIN> "{" vars() instrs() "}"
+    <MAIN> <<LCBRACKET>> vars() instrs() <<RCBRACKET>>
 }
 
 void entetes() : {}
@@ -247,15 +253,15 @@ void instr() : {}
 {
     ident() instr2() |
     <RETURN> exp() |
-    <WRITE> "(" I() ")" |
-    <WRITELN> "(" I() ")" |
-    <IF> "(" exp() ")" "{" instrs() "}" ELSE() |
-    <WHILE> "(" exp() ")" "{" instrs() "}"
+    <WRITE> <LPAR> I() <RPAR> |
+    <WRITELN> <LPAR> I() <RPAR> |
+    <IF> <LPAR> exp() <RPAR> <<LCBRACKET>> instrs() <<RCBRACKET>> ELSE() |
+    <WHILE> <LPAR> exp() <RPAR> <<LCBRACKET>> instrs() <<RCBRACKET>>
 }
 
 void instr2(): {}
 {
-    instru() | "(" listexp() ")"
+    instru() | <LPAR> listexp() <RPAR>
 }
 
 void instru() : {}
@@ -267,7 +273,7 @@ void instru() : {}
 
 void ELSE() : {}
 {
-    <ELSE> "{" instrs() "}" | empty()
+    <ELSE> <<LCBRACKET>> instrs() <<RCBRACKET>> | empty()
 }
 
 void I() : {}
