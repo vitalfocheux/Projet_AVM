@@ -1,5 +1,5 @@
 package fr.m1comp5;
-import fr.m1comp5.LexerParserGenerator.MiniJajaParser.MiniJajaParser;
+import fr.m1comp5.LexerParserGenerator.MiniJajaParser.MiniJaja;
 
 import java.io.FileReader;
 

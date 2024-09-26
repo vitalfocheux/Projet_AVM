@@ -2,13 +2,13 @@ options {
     STATIC = false;
 }
 
-PARSER_BEGIN(MiniJajaParser)
+PARSER_BEGIN(MiniJaja)
 package fr.m1comp5.LexerParserGenerator.MiniJajaParser;
 import java.io.FileReader;
 
-public class MiniJajaParser
+public class MiniJaja
 {
-    public static MiniJajaParser getInstance(String filename)
+    public static MiniJaja getInstance(String filename)
     {
         FileReader reader = null;
         try
@@ -20,18 +20,21 @@ public class MiniJajaParser
             System.out.println(e.getMessage());
             return null;
         }
-        return new MiniJajaParser(reader);
+        return new MiniJaja(reader);
     }
 }
-PARSER_END(MiniJajaParser)
+PARSER_END(MiniJaja)
 
 /* To skip */
 SKIP :
 {
-    " "  |
-    "\t" |
-    "\r" |
-    "\n"
+    " "                                              |
+    "\t"                                             |
+    "\r"                                             |
+    "\n"                                             |
+    <"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>        |
+    <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+
  }
 
 /* MiniJaja reserved keywords */
@@ -153,7 +156,7 @@ void exp1() : {}
 void exp42() : {}
 {
     <ASSIGN><ASSIGN> exp2() exp42() |
-    <SUP> exp2() exp42()                              |
+    <SUP> exp2() exp42()            |
     empty()
 }
 
