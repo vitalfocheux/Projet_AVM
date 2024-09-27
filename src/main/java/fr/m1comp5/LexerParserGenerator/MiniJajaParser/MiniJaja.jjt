@@ -60,29 +60,31 @@ SKIP :
 /* MiniJaja operator */
 <DEFAULT> TOKEN :
 {
-    <ADD: "+">          |
-    <SUB: "-">          |
-    <SUP: ">">          |
-    <INF: "<">          |
-    <AND: "&&">         |
-    <OR: "||">          |
-    <NOT: "!">          |
-    <INCREMENT : "++">  |
-    <DIV: "/">          |
-    <MUL: "*">          |
+    <ADD: "+">                  |
+    <SUB: "-">                  |
+    <DIV: "/">                  |
+    <MUL: "*">                  |
+    <SUP: ">">                  |
+    <INF: "<">                  |
+    <AND: "&&">                 |
+    <OR: "||">                  |
+    <EQUAL: "==">                  |
+    <NOT: "!">                  |
+    <INCREMENT : "++">          |
+    <ASSIGN_INCREMENT : "+=">   |
     <ASSIGN: "=">
 }
 
 /* MiniJaja Separator */
 <DEFAULT> TOKEN :
 {
-    <SEMICOLON: ";">         |
-    <VIRGULE: ",">           |
-    <LCBRACKET: "{">       |
-    <RCBRACKET: "}">       |
-    <LPAR: "(">              |
-    <RPAR: ")">              |
-    <LBRACKET: "[">          |
+    <SEMICOLON: ";">    |
+    <COMMA: "," >       |
+    <LCBRACKET: "{">    |
+    <RCBRACKET: "}">    |
+    <LPAR: "(">         |
+    <RPAR: ")">         |
+    <LBRACKET: "[">     |
     <RBRACKET: "]">
 }
 
@@ -104,131 +106,52 @@ void ident() : {}
 
 void decls() : {}
 {
-    decl() <SEMICOLON> decls() | empty()
+    decl() <SEMICOLON> decls() |
+    empty()
 }
 
 void decl() : {}
 {
-    typemeth() ident() decl2()    |
-    <FINAL> type() ident() vexp() |
-    empty()
-}
-
-void decl2() : {}
-{
-     <LPAR> entetes() <RPAR> <LCBRACKET> vars() instrs() <RCBRACKET> | var2()
+    methode() |
+    <FINAL> type() ident() vexp()
 }
 
 void vars() : {}
 {
-    var() <SEMICOLON> vars() | empty()
+    var() <SEMICOLON> vars() |
+    empty()
 
 }
 
 void var() : {}
 {
-    typemeth() ident() var2() | <FINAL> type() ident() vexp()
+    typemeth() ident() var1() |
+    <FINAL> type() ident() vexp()
 }
 
-void var2() : {}
+void var1() : {}
 {
-     <LBRACKET> exp() <RBRACKET> | vexp()
+     <LBRACKET> exp() <RBRACKET> |
+     vexp()
 }
 
 void vexp() : {}
 {
-    <ASSIGN> exp() | empty()
-}
-
-void exp() : {}
-{
-    <NOT> exp1() exp5() | exp1() exp5()
-}
-
-void exp5() : {}
-{
-    <AND> exp1() exp52() |
-    <OR>exp1() exp52()   |
+    <ASSIGN> exp() |
     empty()
 }
 
-void exp52() : {}
+void methode() : {}
 {
-    <AND> exp1() exp52() |
-    <OR> exp1() exp52()  |
-    empty()
+    typemeth() ident() methode1()
 }
 
-void exp1() : {}
+void methode1() : {}
 {
-    exp2() exp42()
+     <LPAR> entetes() <RPAR> <LCBRACKET> vars() instrs() <RCBRACKET> |
+     var1()
 }
 
-void exp42() : {}
-{
-    <ASSIGN><ASSIGN> exp2() exp42() |
-    <SUP> exp2() exp42()            |
-    empty()
-}
-
-void exp2() : {}
-{
-    terme() exp32()
-}
-
-void exp32() : {}
-{
-    <ADD> terme() exp32() |
-    <SUB> terme() exp32() |
-    empty()
-}
-
-void terme() : {}
-{
-    fact() terme22()
-}
-
-void terme22() : {}
-{
-    <MUL> fact() terme22() |
-    <DIV> fact() terme22()      |
-    empty()
-}
-
-void fact() : {}
-{
-    ident() fact2()|
-    <LENGTH> <LPAR> ident() <RPAR> |
-    <LPAR> exp() <RPAR> |
-    <NUMBER>      |
-    <TRUE>        |
-    <FALSE>
-}
-
-void fact2() : {}
-{
-    <LPAR> listexp() <RPAR> | empty()
-}
-
-void typemeth() : {}
-{
-    <VOID> | type()
-
-}
-
-void type() : {}
-{
-    <INT> | <BOOLEAN>
-
-}
-
-/**
-* Empty production rule
-*/
-void empty() : {}
-{
-    {}
-}
 
 void methmain() : {}
 {
@@ -237,12 +160,14 @@ void methmain() : {}
 
 void entetes() : {}
 {
-    entete() entetes2() | empty()
+    entete() entetes1() |
+    empty()
 }
 
-void entetes2() : {}
+void entetes1() : {}
 {
-    <VIRGULE> entetes() | empty()
+    <COMMA> entetes() |
+    empty()
 }
 
 void entete() : {}
@@ -252,46 +177,146 @@ void entete() : {}
 
 void instrs() : {}
 {
- instr() <SEMICOLON> instrs() | empty()
+    instr() <SEMICOLON> instrs() |
+    empty()
 }
+
 void instr() : {}
 {
-    ident() instr2() |
-    <RETURN> exp() |
-    <WRITE> <LPAR> I() <RPAR> |
-    <WRITELN> <LPAR> I() <RPAR> |
-    <IF> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> ELSE() |
+    ident() instr2()                                                    |
+    <RETURN> exp()                                                      |
+    <WRITE> <LPAR> instr3() <RPAR>                                      |
+    <WRITELN> <LPAR> instr3() <RPAR>                                    |
+    <IF> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> <ELSE>    |
     <WHILE> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET>
 }
 
-void instr2(): {}
+void instr1() : {}
 {
-    instru() | <LPAR> listexp() <RPAR>
+    <ASSIGN> exp()              |
+    <ASSIGN_INCREMENT> exp()    |
+    <INCREMENT> exp()
 }
 
-void instru() : {}
+void instr2() : {}
 {
-    <ASSIGN> exp()               |
-    <ADD><ASSIGN> exp() |
-    <INCREMENT>
+    ident2() instr1() |
+    <LPAR> listexp() <RPAR>
+}
+
+void instr3() : {}
+{
+    ident() |
+    <STRING>
 }
 
 void ELSE() : {}
 {
-    <ELSE> <LCBRACKET> instrs() <RCBRACKET> | empty()
+    <ELSE> <LCBRACKET> instrs() <RCBRACKET> |
+    empty()
 }
 
-void I() : {}
-{
-    ident() | <STRING>
-}
 void listexp() : {}
 {
-    exp() listexp2() | empty()
+    exp() listexp1() |
+    empty()
 }
 
-void listexp2() : {}
+void listexp1() : {}
 {
-    <VIRGULE> listexp() |
+    <COMMA> listexp() |
     empty()
+}
+
+void exp() : {}
+{
+    <NOT> exp1()            |
+    <SUB> exp1() exp3()     |
+    exp1() exp3()
+}
+
+void exp1() : {}
+{
+    exp2() exp4()
+}
+
+void exp2() : {}
+{
+    terme() exp5()
+}
+
+void exp3() : {}
+{
+    <AND> exp1() exp3() |
+    <OR> exp1() exp3()  |
+    empty()
+}
+
+void exp4() : {}
+{
+    <EQUAL> exp2() exp4()   |
+    <SUP> exp2() exp4()     |
+    empty()
+}
+
+void exp5() : {}
+{
+    <ADD> terme() exp5() |
+    <SUB> terme() exp5() |
+    empty()
+}
+
+void terme() : {}
+{
+    fact() terme1()
+}
+
+void terme1() : {}
+{
+    <MUL> fact() terme1() |
+    <DIV> fact() terme1() |
+    empty()
+}
+
+void fact() : {}
+{
+    ident() fact1()                 |
+    <LENGTH> <LPAR> ident() <RPAR>  |
+    <TRUE>                          |
+    <FALSE>                         |
+    <NUMBER>                        |
+    <LPAR> exp() <RPAR>
+}
+
+void fact1() : {}
+{
+    ident2() |
+    <LPAR> listexp() <RPAR>
+}
+
+void ident1() : {}
+{
+    ident() ident2()
+}
+
+void ident2() : {}
+{
+    <LBRACKET> exp() <RBRACKET> |
+    empty()
+}
+
+void typemeth() : {}
+{
+    <VOID> |
+    type()
+}
+
+void type() : {}
+{
+    <INT> |
+    <BOOLEAN> 
+}
+
+vois empty() : {}
+{
 }
