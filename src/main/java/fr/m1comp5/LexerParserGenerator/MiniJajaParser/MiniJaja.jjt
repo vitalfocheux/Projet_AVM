@@ -317,6 +317,7 @@ void type() : {}
     <BOOLEAN>
 }
 
-vois empty() : {}
+void empty() : {}
 {
+    {}
 }
