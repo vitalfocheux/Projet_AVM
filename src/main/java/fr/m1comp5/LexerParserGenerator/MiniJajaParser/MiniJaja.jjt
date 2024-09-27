@@ -73,23 +73,28 @@ SKIP :
     <ASSIGN: "=">
 }
 
-<DEFAULT> TOKEN : {
-    <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])*> |
-    <NUMBER: (["0"-"9"])+>   |
+/* MiniJaja Separator */
+<DEFAULT> TOKEN :
+{
     <SEMICOLON: ";">         |
     <VIRGULE: ",">           |
-    <<LCBRACKET>: "{">       |
-    <<RCBRACKET>: "}">       |
+    <LCBRACKET: "{">       |
+    <RCBRACKET: "}">       |
     <LPAR: "(">              |
     <RPAR: ")">              |
     <LBRACKET: "[">          |
-    <RBRACKET: "]">          |
+    <RBRACKET: "]">
+}
+
+<DEFAULT> TOKEN : {
+    <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])*> |
+    <NUMBER: (["0"-"9"])+>   |
     <STRING:  "\"" (~["\""])* "\"">
 }
 
 void classe() : {}
 {
-    <CLASS> ident() <<LCBRACKET>> decls() methmain() <<RCBRACKET>>
+    <CLASS> ident() <LCBRACKET> decls() methmain() <RCBRACKET>
 }
 
 void ident() : {}
@@ -111,7 +116,7 @@ void decl() : {}
 
 void decl2() : {}
 {
-     <LPAR> entetes() <RPAR> <<LCBRACKET>> vars() instrs() <<RCBRACKET>> | var2()
+     <LPAR> entetes() <RPAR> <LCBRACKET> vars() instrs() <RCBRACKET> | var2()
 }
 
 void vars() : {}
@@ -227,7 +232,7 @@ void empty() : {}
 
 void methmain() : {}
 {
-    <MAIN> <<LCBRACKET>> vars() instrs() <<RCBRACKET>>
+    <MAIN> <LCBRACKET> vars() instrs() <RCBRACKET>
 }
 
 void entetes() : {}
@@ -255,8 +260,8 @@ void instr() : {}
     <RETURN> exp() |
     <WRITE> <LPAR> I() <RPAR> |
     <WRITELN> <LPAR> I() <RPAR> |
-    <IF> <LPAR> exp() <RPAR> <<LCBRACKET>> instrs() <<RCBRACKET>> ELSE() |
-    <WHILE> <LPAR> exp() <RPAR> <<LCBRACKET>> instrs() <<RCBRACKET>>
+    <IF> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> ELSE() |
+    <WHILE> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET>
 }
 
 void instr2(): {}
@@ -273,7 +278,7 @@ void instru() : {}
 
 void ELSE() : {}
 {
-    <ELSE> <<LCBRACKET>> instrs() <<RCBRACKET>> | empty()
+    <ELSE> <LCBRACKET> instrs() <RCBRACKET> | empty()
 }
 
 void I() : {}
