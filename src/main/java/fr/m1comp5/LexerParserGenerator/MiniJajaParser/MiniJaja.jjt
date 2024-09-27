@@ -314,7 +314,7 @@ void typemeth() : {}
 void type() : {}
 {
     <INT> |
-    <BOOLEAN> 
+    <BOOLEAN>
 }
 
 vois empty() : {}
