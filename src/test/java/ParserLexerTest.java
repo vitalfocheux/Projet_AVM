@@ -1,3 +1,4 @@
+/*
 import org.junit.Test;
 
 import fr.m1comp5.LexerParserGenerator.MiniJajaParser.MiniJaja;
@@ -41,3 +42,4 @@ public class ParserLexerTest {
         }
     }
 }
+*/

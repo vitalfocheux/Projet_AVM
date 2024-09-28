@@ -68,7 +68,7 @@ SKIP :
     <INF: "<">                  |
     <AND: "&&">                 |
     <OR: "||">                  |
-    <EQUAL: "==">                  |
+    <EQUAL: "==">               |
     <NOT: "!">                  |
     <INCREMENT : "++">          |
     <ASSIGN_INCREMENT : "+=">   |
@@ -90,7 +90,7 @@ SKIP :
 
 <DEFAULT> TOKEN : {
     <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])*> |
-    <NUMBER: (["0"-"9"])+>   |
+    <NUMBER: (["0"-"9"])+>                                          |
     <STRING:  "\"" (~["\""])* "\"">
 }
 
@@ -183,19 +183,19 @@ void instrs() : {}
 
 void instr() : {}
 {
-    ident() instr2()                                                    |
-    <RETURN> exp()                                                      |
-    <WRITE> <LPAR> instr3() <RPAR>                                      |
-    <WRITELN> <LPAR> instr3() <RPAR>                                    |
-    <IF> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> <ELSE>    |
+    ident() instr2()                           |
+    <RETURN> exp()                             |
+    <WRITE> <LPAR> instr3() <RPAR>                   |
+    <WRITELN> <LPAR> instr3() <RPAR>                 |
+    <IF> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> ELSE() |
     <WHILE> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET>
 }
 
 void instr1() : {}
 {
-    <ASSIGN> exp()              |
-    <ASSIGN_INCREMENT> exp()    |
-    <INCREMENT> exp()
+    <ASSIGN> exp()                  |
+    <ASSIGN_INCREMENT> exp()   |
+    <INCREMENT>
 }
 
 void instr2() : {}
