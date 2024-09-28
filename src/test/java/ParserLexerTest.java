@@ -2,6 +2,11 @@ import fr.m1comp5.LexerParserGenerator.MiniJajaParser.MiniJaja;
 import fr.m1comp5.LexerParserGenerator.MiniJajaParser.ParseException;
 
 import org.junit.Test;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.IOException;
+import static org.junit.Assert.*;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -17,6 +22,30 @@ import java.util.stream.Stream;
 
 public class ParserLexerTest
 {
+
+    /*@Test
+    public void testParser() throws ParseException{
+        try {
+            String path = "target/classes/data/tas.mjj";
+            displayFileContents(path);
+            MiniJaja parser = MiniJaja.getInstance(path);
+            parser.classe();
+        } catch (ParseException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    private void displayFileContents(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            System.out.println("Contents of " + filePath + ":");
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading the file: " + e.getMessage());
+        }
+    }*/
 
     @ParameterizedTest
     @MethodSource("fileProvider")

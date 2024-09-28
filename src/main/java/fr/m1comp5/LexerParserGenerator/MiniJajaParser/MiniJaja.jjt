@@ -106,14 +106,25 @@ void ident() : {}
 
 void decls() : {}
 {
-    decl() <SEMICOLON> decls() |
+    decl() decls1() |
     empty()
+}
+
+void decls1() : {}
+{
+    <SEMICOLON> decls()
 }
 
 void decl() : {}
 {
-    methode() |
+    typemeth() ident() decl1() |
     <FINAL> type() ident() vexp()
+}
+
+void decl1() : {}
+{
+    <LPAR> entetes() <RPAR> <LCBRACKET> vars() instrs() <RCBRACKET> |
+    var1()
 }
 
 void vars() : {}
@@ -141,17 +152,6 @@ void vexp() : {}
     empty()
 }
 
-void methode() : {}
-{
-    typemeth() ident() methode1()
-}
-
-void methode1() : {}
-{
-     <LPAR> entetes() <RPAR> <LCBRACKET> vars() instrs() <RCBRACKET> |
-     var1()
-}
-
 
 void methmain() : {}
 {
@@ -177,8 +177,13 @@ void entete() : {}
 
 void instrs() : {}
 {
-    instr() <SEMICOLON> instrs() |
+    instr() instrs1() |
     empty()
+}
+
+void instrs1() : {}
+{
+    <SEMICOLON> instrs()
 }
 
 void instr() : {}
@@ -200,8 +205,8 @@ void instr1() : {}
 
 void instr2() : {}
 {
-    ident2() instr1() |
-    <LPAR> listexp() <RPAR>
+    <LPAR> listexp() <RPAR> |
+    ident2() instr1()
 }
 
 void instr3() : {}
@@ -290,8 +295,8 @@ void fact() : {}
 
 void fact1() : {}
 {
-    ident2() |
-    <LPAR> listexp() <RPAR>
+    <LPAR> listexp() <RPAR> |
+    ident2()
 }
 
 void ident1() : {}
