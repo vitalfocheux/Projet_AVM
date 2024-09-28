@@ -1,6 +1,3 @@
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-
 import fr.m1comp5.LexerParserGenerator.MiniJajaParser.MiniJaja;
 import fr.m1comp5.LexerParserGenerator.MiniJajaParser.ParseException;
 
@@ -18,9 +15,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
 public class ParserLexerTest
 {
+
     @ParameterizedTest
     @MethodSource("fileProvider")
     void testParser(String filepath) throws ParseException {
@@ -33,6 +30,7 @@ public class ParserLexerTest
         }catch (IOException e){
             e.printStackTrace();
         }
+    }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> fileProvider() throws IOException {
         Stream.Builder<org.junit.jupiter.params.provider.Arguments> builder = Stream.builder();
@@ -55,3 +53,4 @@ public class ParserLexerTest
         return filepaths;
     }
 
+}
