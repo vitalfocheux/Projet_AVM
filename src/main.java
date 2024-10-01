@@ -1,7 +1,12 @@
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class main {
     public static void main(String[] args) {
@@ -19,35 +24,35 @@ public class main {
         JMenu viewMenu = new JMenu("View");
         JMenu helpMenu = new JMenu("Help");
 
-        //  des éléments dans le menu "File" avec des icônes redimensionnées
+        // Ajouter des éléments dans le menu "File" avec des icônes redimensionnées
         JMenuItem newFileItem = new JMenuItem("New File", resizeIcon("C:/Users/HP/IdeaProjects/Projet VM/src/icon/new-file.png", 22, 22));
         JMenuItem openFileItem = new JMenuItem("Open File", resizeIcon("C:/Users/HP/IdeaProjects/Projet VM/src/icon/open.png", 22, 22));
-        JMenuItem saveFileItem = new JMenuItem("Save File", resizeIcon("C:/Users/HP/IdeaProjects/Projet VM/src/icon/code.png", 22, 22));
+        JMenuItem saveFileItem = new JMenuItem("Save File", resizeIcon("C:/Users/HP/IdeaProjects/Projet VM/src/icon/save.png", 22, 22));
         fileMenu.add(newFileItem);
         fileMenu.add(openFileItem);
         fileMenu.add(saveFileItem);
 
-        //  menu "Edit" avec des icônes
+        // Ajouter des éléments dans le menu "Edit" avec des icônes
         JMenuItem undoItem = new JMenuItem("Undo", resizeIcon("C:/Users/HP/IdeaProjects/Projet VM/src/icon/undo.png", 22, 22));
         JMenuItem redoItem = new JMenuItem("Redo", resizeIcon("C:/Users/HP/IdeaProjects/Projet VM/src/icon/redo.png", 22, 22));
         editMenu.add(undoItem);
         editMenu.add(redoItem);
 
-        //  les menus à la barre de menu
+        // Ajouter les menus à la barre de menu
         menuBar.add(fileMenu);
         menuBar.add(editMenu);
         menuBar.add(viewMenu);
         menuBar.add(helpMenu);
 
-        //   panneau principal avec BorderLayout
+        // Créer un panneau principal avec BorderLayout
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        //  zone de texte
+        // Créer une zone de texte
         JTextArea editorArea = new JTextArea();
         editorArea.setFont(new Font("Consolas", Font.PLAIN, 14));
         JScrollPane editorScrollPane = new JScrollPane(editorArea);
 
-        // une console en bas de la fenêtre
+        // Créer une console en bas de la fenêtre
         JTextArea consoleArea = new JTextArea(8, 40);  // Console avec 8 lignes visibles
         consoleArea.setEditable(false);  // La console ne doit pas être modifiable
         JScrollPane consoleScrollPane = new JScrollPane(consoleArea);
@@ -71,7 +76,7 @@ public class main {
             }
         });
 
-        //  une barre d'icônes (JToolBar)
+        // Créer une barre d'icônes (JToolBar)
         JToolBar toolBar = new JToolBar();
         JButton newFileButton = new JButton(resizeIcon("C:/Users/HP/IdeaProjects/Projet VM/src/icon/new-file.png", 22, 22));
         newFileButton.setToolTipText("New File");
@@ -82,47 +87,126 @@ public class main {
         JButton runButton = new JButton(resizeIcon("C:/Users/HP/IdeaProjects/Projet VM/src/icon/code.png", 22, 22));
         runButton.setToolTipText("Run Code");
 
-        //  des actions pour les boutons de la barre d'icônes
-        newFileButton.addActionListener(e -> editorArea.setText(""));  // Nouveau fichier, vide l'éditeur
-        openFileButton.addActionListener(e -> JOptionPane.showMessageDialog(frame, "Open File Clicked"));  // Action pour ouvrir un fichier
-        saveFileButton.addActionListener(e -> JOptionPane.showMessageDialog(frame, "Save File Clicked"));  // Action pour sauvegarder un fichier
+        // Ajouter des actions pour les boutons de la barre d'icônes
+        newFileButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Utiliser JFileChooser pour permettre à l'utilisateur de créer un nouveau fichier
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Create a New File");
+                int userSelection = fileChooser.showSaveDialog(frame);
+
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File newFile = fileChooser.getSelectedFile();
+
+                    try {
+                        if (newFile.createNewFile()) {
+                            JOptionPane.showMessageDialog(frame, "New file created: " + newFile.getName());
+                        } else {
+                            JOptionPane.showMessageDialog(frame, "File already exists.");
+                        }
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(frame, "Error creating file.");
+                    }
+                }
+            }
+        });
+
+        // Action pour ouvrir un fichier avec l'extension .mjj
+        openFileButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Open File");
+
+                // Filtre pour les fichiers avec l'extension .mjj
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("MiniJaja Files", "mjj");
+                fileChooser.setFileFilter(filter);
+
+                int userSelection = fileChooser.showOpenDialog(frame);
+
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File fileToOpen = fileChooser.getSelectedFile();
+
+                    try (FileReader reader = new FileReader(fileToOpen)) {
+                        editorArea.read(reader, fileToOpen);
+                        JOptionPane.showMessageDialog(frame, "Opened file: " + fileToOpen.getName());
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(frame, "Error opening file.");
+                    }
+                }
+            }
+        });
+
+        // Action pour enregistrer un fichier
+        saveFileButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Save File");
+
+                // Filtre pour enregistrer avec l'extension .mjj
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("MiniJaja Files", "mjj");
+                fileChooser.setFileFilter(filter);
+
+                int userSelection = fileChooser.showSaveDialog(frame);
+
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File fileToSave = fileChooser.getSelectedFile();
+                    String path = fileToSave.getAbsolutePath();
+
+                    // Vérifie si le fichier a l'extension .mjj, sinon l'ajoute
+                    if (!path.endsWith(".mjj")) {
+                        fileToSave = new File(path + ".mjj");
+                    }
+
+                    try (FileWriter writer = new FileWriter(fileToSave)) {
+                        editorArea.write(writer);
+                       /* JOptionPane.showMessageDialog(frame, "File saved: " + fileToSave.getName()); */
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(frame, "Error saving file.");
+                    }
+                }
+            }
+        });
+
         runButton.addActionListener(e -> executeButton.doClick());  // Exécuter le code via le bouton "Run Code"
 
-        //  les boutons à la barre d'outils
+        // Ajouter les boutons à la barre d'outils
         toolBar.add(newFileButton);
         toolBar.add(openFileButton);
         toolBar.add(saveFileButton);
         toolBar.add(runButton);
 
-        //  un panneau pour la console et le bouton "Run Code"
+        // Créer un panneau pour la console et le bouton "Run Code"
         JPanel consolePanel = new JPanel(new BorderLayout());
         consolePanel.add(executeButton, BorderLayout.NORTH);  // Ajouter le bouton "Run Code" au-dessus de la console
         consolePanel.add(consoleScrollPane, BorderLayout.CENTER);  // Ajouter la console en dessous
 
-        //  l'éditeur de texte à la partie centrale
+        // Ajouter l'éditeur de texte à la partie centrale
         mainPanel.add(editorScrollPane, BorderLayout.CENTER);
 
-        //  le panneau de la console en bas
+        // Ajouter le panneau de la console en bas
         mainPanel.add(consolePanel, BorderLayout.SOUTH);
 
-        //  la barre de menu à la fenêtre
-        frame.setJMenuBar(menuBar);
-
-        //  la barre d'outils en haut
+        // Ajouter la barre d'icônes en haut
         frame.add(toolBar, BorderLayout.NORTH);
 
-        //  le panneau principal à la fenêtre
+        // Ajouter le panneau principal à la fenêtre
         frame.add(mainPanel);
 
-        // Afficher la fenêtre
+        // Ajouter la barre de menu
+        frame.setJMenuBar(menuBar);
+
+        // Rendre la fenêtre visible
         frame.setVisible(true);
     }
 
-    //  redimensionner une icône
-    static ImageIcon resizeIcon(String path, int width, int height) {
-        ImageIcon icon = new ImageIcon(path);
-        Image img = icon.getImage();
-        Image resizedImg = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        return new ImageIcon(resizedImg);
+    // Méthode pour redimensionner une icône
+    public static ImageIcon resizeIcon(String iconPath, int width, int height) {
+        ImageIcon icon = new ImageIcon(iconPath);
+        Image image = icon.getImage();
+        Image resizedImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        return new ImageIcon(resizedImage);
     }
 }
