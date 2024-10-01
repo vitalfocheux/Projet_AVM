@@ -1,0 +1,328 @@
+options {
+    STATIC = false;
+}
+
+PARSER_BEGIN(MiniJaja)
+package fr.m1comp5.LexerParserGenerator.MiniJajaParser;
+import java.io.FileReader;
+
+public class MiniJaja
+{
+    public static MiniJaja getInstance(String filename)
+    {
+        FileReader reader = null;
+        try
+        {
+            reader = new FileReader(filename);
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+        return new MiniJaja(reader);
+    }
+}
+PARSER_END(MiniJaja)
+
+/* To skip */
+SKIP :
+{
+    " "                                              |
+    "\t"                                             |
+    "\r"                                             |
+    "\n"                                             |
+    <"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>        |
+    <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+
+ }
+
+/* MiniJaja reserved keywords */
+<DEFAULT> TOKEN :
+{
+    <CLASS: "class">     |
+    <MAIN: "main">       |
+    <VOID: "void">       |
+    <INT: "int">         |
+    <BOOLEAN: "boolean"> |
+    <FINAL: "final">     |
+    <TRUE: "true">       |
+    <FALSE: "false">     |
+    <LENGTH: "length">   |
+    <WHILE: "while">     |
+    <RETURN: "return">   |
+    <WRITE: "write">     |
+    <WRITELN: "writeln"> |
+    <IF : "if">          |
+    <ELSE : "else">
+}
+
+/* MiniJaja operator */
+<DEFAULT> TOKEN :
+{
+    <ADD: "+">                  |
+    <SUB: "-">                  |
+    <DIV: "/">                  |
+    <MUL: "*">                  |
+    <SUP: ">">                  |
+    <INF: "<">                  |
+    <AND: "&&">                 |
+    <OR: "||">                  |
+    <EQUAL: "==">               |
+    <NOT: "!">                  |
+    <INCREMENT : "++">          |
+    <ASSIGN_INCREMENT : "+=">   |
+    <ASSIGN: "=">
+}
+
+/* MiniJaja Separator */
+<DEFAULT> TOKEN :
+{
+    <SEMICOLON: ";">    |
+    <COMMA: "," >       |
+    <LCBRACKET: "{">    |
+    <RCBRACKET: "}">    |
+    <LPAR: "(">         |
+    <RPAR: ")">         |
+    <LBRACKET: "[">     |
+    <RBRACKET: "]">
+}
+
+<DEFAULT> TOKEN : {
+    <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])*> |
+    <NUMBER: (["0"-"9"])+>                                          |
+    <STRING:  "\"" (~["\""])* "\"">
+}
+
+void classe() : {}
+{
+    <CLASS> ident() <LCBRACKET> decls() methmain() <RCBRACKET>
+}
+
+void ident() : {}
+{
+    <IDENTIFIER>
+}
+
+void decls() : {}
+{
+    decl() decls1() |
+    empty()
+}
+
+void decls1() : {}
+{
+    <SEMICOLON> decls()
+}
+
+void decl() : {}
+{
+    typemeth() ident() decl1() |
+    <FINAL> type() ident() vexp()
+}
+
+void decl1() : {}
+{
+    <LPAR> entetes() <RPAR> <LCBRACKET> vars() instrs() <RCBRACKET> |
+    var1()
+}
+
+void vars() : {}
+{
+    var() <SEMICOLON> vars() |
+    empty()
+
+}
+
+void var() : {}
+{
+    typemeth() ident() var1() |
+    <FINAL> type() ident() vexp()
+}
+
+void var1() : {}
+{
+     <LBRACKET> exp() <RBRACKET> |
+     vexp()
+}
+
+void vexp() : {}
+{
+    <ASSIGN> exp() |
+    empty()
+}
+
+
+void methmain() : {}
+{
+    <MAIN> <LCBRACKET> vars() instrs() <RCBRACKET>
+}
+
+void entetes() : {}
+{
+    entete() entetes1() |
+    empty()
+}
+
+void entetes1() : {}
+{
+    <COMMA> entetes() |
+    empty()
+}
+
+void entete() : {}
+{
+    type() ident()
+}
+
+void instrs() : {}
+{
+    instr() instrs1() |
+    empty()
+}
+
+void instrs1() : {}
+{
+    <SEMICOLON> instrs()
+}
+
+void instr() : {}
+{
+    ident() instr2()                           |
+    <RETURN> exp()                             |
+    <WRITE> <LPAR> instr3() <RPAR>                   |
+    <WRITELN> <LPAR> instr3() <RPAR>                 |
+    <IF> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> ELSE() |
+    <WHILE> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET>
+}
+
+void instr1() : {}
+{
+    <ASSIGN> exp()                  |
+    <ASSIGN_INCREMENT> exp()   |
+    <INCREMENT>
+}
+
+void instr2() : {}
+{
+    <LPAR> listexp() <RPAR> |
+    ident2() instr1()
+}
+
+void instr3() : {}
+{
+    ident() |
+    <STRING>
+}
+
+void ELSE() : {}
+{
+    <ELSE> <LCBRACKET> instrs() <RCBRACKET> |
+    empty()
+}
+
+void listexp() : {}
+{
+    exp() listexp1() |
+    empty()
+}
+
+void listexp1() : {}
+{
+    <COMMA> listexp() |
+    empty()
+}
+
+void exp() : {}
+{
+    <NOT> exp1()            |
+    <SUB> exp1() exp3()     |
+    exp1() exp3()
+}
+
+void exp1() : {}
+{
+    exp2() exp4()
+}
+
+void exp2() : {}
+{
+    terme() exp5()
+}
+
+void exp3() : {}
+{
+    <AND> exp1() exp3() |
+    <OR> exp1() exp3()  |
+    empty()
+}
+
+void exp4() : {}
+{
+    <EQUAL> exp2() exp4()   |
+    <SUP> exp2() exp4()     |
+    empty()
+}
+
+void exp5() : {}
+{
+    <ADD> terme() exp5() |
+    <SUB> terme() exp5() |
+    empty()
+}
+
+void terme() : {}
+{
+    fact() terme1()
+}
+
+void terme1() : {}
+{
+    <MUL> fact() terme1() |
+    <DIV> fact() terme1() |
+    empty()
+}
+
+void fact() : {}
+{
+    ident() fact1()                 |
+    <LENGTH> <LPAR> ident() <RPAR>  |
+    <TRUE>                          |
+    <FALSE>                         |
+    <NUMBER>                        |
+    <LPAR> exp() <RPAR>
+}
+
+void fact1() : {}
+{
+    <LPAR> listexp() <RPAR> |
+    ident2()
+}
+
+void ident1() : {}
+{
+    ident() ident2()
+}
+
+void ident2() : {}
+{
+    <LBRACKET> exp() <RBRACKET> |
+    empty()
+}
+
+void typemeth() : {}
+{
+    <VOID> |
+    type()
+}
+
+void type() : {}
+{
+    <INT> |
+    <BOOLEAN>
+}
+
+void empty() : {}
+{
+    {}
+}
