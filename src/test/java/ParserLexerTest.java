@@ -1,52 +1,85 @@
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import fr.m1comp5.LexerParserGenerator.MiniJajaParser.MiniJaja;
+import fr.m1comp5.LexerParserGenerator.MiniJajaParser.ParseException;
 
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.IOException;
+import static org.junit.Assert.*;
 
-import fr.m1comp5.parser.ParserLexer;
-import fr.m1comp5.parser.ParseException;
-import fr.m1comp5.parser.TokenMgrError;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ParserLexerTest
 {
-    private void assertResult(String input, int expected) throws ParseException, IOException {
-        final Reader r = new StringReader(input + "\n");
+
+    /*@Test
+    public void testParser() throws ParseException{
         try {
-            assertEquals(expected, new ParserLexer(r).parseOneLine());
-        } finally {
-            r.close();
+            String path = "target/classes/data/tas.mjj";
+            displayFileContents(path);
+            MiniJaja parser = MiniJaja.getInstance(path);
+            parser.classe();
+        } catch (ParseException e) {
+            fail(e.getMessage());
         }
     }
 
-    @Test
-    public void add() throws ParseException, IOException {
-        assertResult("2+2", 4);
+    private void displayFileContents(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            System.out.println("Contents of " + filePath + ":");
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading the file: " + e.getMessage());
+        }
+    }*/
+
+    @ParameterizedTest
+    @MethodSource("fileProvider")
+    void testParser(String filepath) throws ParseException {
+        try(InputStream is = new FileInputStream(filepath)){
+            Reader reader = new InputStreamReader(is);
+            MiniJaja mjjparser = new MiniJaja(reader);
+            mjjparser.classe();
+        }catch (FileNotFoundException e){
+            System.out.println("File: "+filepath+" not found");
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
-    @Test
-    public void unary() throws ParseException, IOException {
-        assertResult("-2 + 5", 3);
+    static Stream<org.junit.jupiter.params.provider.Arguments> fileProvider() throws IOException {
+        Stream.Builder<org.junit.jupiter.params.provider.Arguments> builder = Stream.builder();
+        List<String> filepaths = getAllFilePaths("src/main/resources/data");
+        for(String filepath : filepaths){
+            builder.add(Arguments.of(filepath));
+        }
+        return builder.build();
     }
 
-    @Test
-    public void whitespace() throws ParseException, IOException {
-        assertResult("\t\r- 12 \t + -25\t", -37);
+    private static List<String> getAllFilePaths(String directory) throws IOException {
+        List<String> filepaths = new ArrayList<>();
+        try(Stream<Path> paths = Files.walk(Paths.get(directory))){
+            paths.forEach(path -> {
+                if(Files.isRegularFile(path)){
+                    filepaths.add(path.toString());
+                }
+            });
+        }
+        return filepaths;
     }
 
-    @Test
-    public void empty() throws ParseException, IOException {
-        assertResult("", 0);
-    }
-
-    @Test(expected=TokenMgrError.class)
-    public void invalidToken() throws ParseException, IOException {
-        assertResult("caneva12pas", -37);
-    }
-
-    @Test(expected=ParseException.class)
-    public void invalidSyntax() throws ParseException, IOException {
-        assertResult("11 41", -37);
-    }
 }
