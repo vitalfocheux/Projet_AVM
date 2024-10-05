@@ -2,7 +2,7 @@ class equal {
 
     main {
 
-        return -42 == -42;
+        return -42 == (-42);
 
     }
 
