@@ -88,105 +88,111 @@ SKIP :
     <RBRACKET: "]">
 }
 
-<DEFAULT> TOKEN : {
+<DEFAULT> TOKEN :
+{
     <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])*> |
     <NUMBER: (["0"-"9"])+>                                          |
     <STRING:  "\"" (~["\""])* "\"">
 }
 
-void classe() : {}
+SimpleNode start() : {}
+{
+    classe() {return jjtThis;}
+}
+
+void classe() #classe : {}
 {
     <CLASS> ident() <LCBRACKET> decls() methmain() <RCBRACKET>
 }
 
-void ident() : {}
+private void ident() #ident : {}
 {
     <IDENTIFIER>
 }
 
-void decls() : {}
+private void decls() : {}
 {
-    decl() decls1() |
-    empty()
+    decl() decls1() #decls(2) |
+    empty() #vnil
 }
 
-void decls1() : {}
+private void decls1() : {}
 {
     <SEMICOLON> decls()
 }
 
-void decl() : {}
+private void decl() : {}
 {
     typemeth() ident() decl1() |
     <FINAL> type() ident() vexp()
 }
 
-void decl1() : {}
+private void decl1() : {}
 {
     <LPAR> entetes() <RPAR> <LCBRACKET> vars() instrs() <RCBRACKET> |
     var1()
 }
 
-void vars() : {}
+private void vars() : {}
 {
     var() <SEMICOLON> vars() |
     empty()
 
 }
 
-void var() : {}
+private void var() : {}
 {
     typemeth() ident() var1() |
     <FINAL> type() ident() vexp()
 }
 
-void var1() : {}
+private void var1() : {}
 {
      <LBRACKET> exp() <RBRACKET> |
      vexp()
 }
 
-void vexp() : {}
+private void vexp() : {}
 {
     <ASSIGN> exp() |
     empty()
 }
 
 
-void methmain() : {}
+private void methmain() : {}
 {
     <MAIN> <LCBRACKET> vars() instrs() <RCBRACKET>
 }
 
-void entetes() : {}
+private void entetes() : {}
 {
     entete() entetes1() |
     empty()
 }
 
-void entetes1() : {}
+private void entetes1() : {}
 {
     <COMMA> entetes() |
     empty()
 }
 
-void entete() : {}
+private void entete() : {}
 {
     type() ident()
 }
 
-void instrs() : {}
+private void instrs() : {}
 {
     instr() instrs1() |
     empty()
 }
 
-void instrs1() : {}
+private void instrs1() : {}
 {
     <SEMICOLON> instrs()
 }
 
-void instr() : {}
+private void instr() : {}
 {
     ident() instr2()                           |
     <RETURN> exp()                             |
@@ -196,94 +202,94 @@ void instr() : {}
     <WHILE> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET>
 }
 
-void instr1() : {}
+private void instr1() : {}
 {
     <ASSIGN> exp()                  |
     <ASSIGN_INCREMENT> exp()   |
     <INCREMENT>
 }
 
-void instr2() : {}
+private void instr2() : {}
 {
     <LPAR> listexp() <RPAR> |
     ident2() instr1()
 }
 
-void instr3() : {}
+private void instr3() : {}
 {
     ident() |
     <STRING>
 }
 
-void ELSE() : {}
+private void ELSE() : {}
 {
     <ELSE> <LCBRACKET> instrs() <RCBRACKET> |
     empty()
 }
 
-void listexp() : {}
+private void listexp() : {}
 {
     exp() listexp1() |
     empty()
 }
 
-void listexp1() : {}
+private void listexp1() : {}
 {
     <COMMA> listexp() |
     empty()
 }
 
-void exp() : {}
+private void exp() : {}
 {
     <NOT> exp1()            |
     <SUB> exp1() exp3()     |
     exp1() exp3()
 }
 
-void exp1() : {}
+private void exp1() : {}
 {
     exp2() exp4()
 }
 
-void exp2() : {}
+private void exp2() : {}
 {
     terme() exp5()
 }
 
-void exp3() : {}
+private void exp3() : {}
 {
     <AND> exp1() exp3() |
     <OR> exp1() exp3()  |
     empty()
 }
 
-void exp4() : {}
+private void exp4() : {}
 {
     <EQUAL> exp2() exp4()   |
     <SUP> exp2() exp4()     |
     empty()
 }
 
-void exp5() : {}
+private void exp5() : {}
 {
     <ADD> terme() exp5() |
     <SUB> terme() exp5() |
     empty()
 }
 
-void terme() : {}
+private void terme() : {}
 {
     fact() terme1()
 }
 
-void terme1() : {}
+private void terme1() : {}
 {
     <MUL> fact() terme1() |
     <DIV> fact() terme1() |
     empty()
 }
 
-void fact() : {}
+private void fact() : {}
 {
     ident() fact1()                 |
     <LENGTH> <LPAR> ident() <RPAR>  |
@@ -293,36 +299,36 @@ void fact() : {}
     <LPAR> exp() <RPAR>
 }
 
-void fact1() : {}
+private void fact1() : {}
 {
     <LPAR> listexp() <RPAR> |
     ident2()
 }
 
-void ident1() : {}
+private void ident1() : {}
 {
     ident() ident2()
 }
 
-void ident2() : {}
+private void ident2() : {}
 {
     <LBRACKET> exp() <RBRACKET> |
     empty()
 }
 
-void typemeth() : {}
+private void typemeth() : {}
 {
     <VOID> |
     type()
 }
 
-void type() : {}
+private void type() : {}
 {
     <INT> |
     <BOOLEAN>
 }
 
-void empty() : {}
+private void empty() : {}
 {
     {}
 }
