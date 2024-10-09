@@ -3,7 +3,8 @@ class increment {
     main {
 
         int a = 41;
-        return a++;
+        a++;
+        return a; // Grammaire refuse d'incrementer a avec le return
 
     }
 

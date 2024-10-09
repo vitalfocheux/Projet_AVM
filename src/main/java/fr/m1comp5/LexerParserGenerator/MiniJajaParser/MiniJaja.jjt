@@ -89,7 +89,7 @@ SKIP :
 }
 
 <DEFAULT> TOKEN : {
-    <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])*> |
+    <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])*> |
     <NUMBER: (["0"-"9"])+>                                          |
     <STRING:  "\"" (~["\""])* "\"">
 }
@@ -235,8 +235,8 @@ void listexp1() : {}
 
 void exp() : {}
 {
-    <NOT> exp1()            |
-    <SUB> exp1() exp3()     |
+    //<NOT> exp1()            |
+    <NOT> exp1() exp3()     |
     exp1() exp3()
 }
 
@@ -247,7 +247,8 @@ void exp1() : {}
 
 void exp2() : {}
 {
-    terme() exp5()
+    terme() exp5() |
+    <SUB> terme() exp5()
 }
 
 void exp3() : {}
