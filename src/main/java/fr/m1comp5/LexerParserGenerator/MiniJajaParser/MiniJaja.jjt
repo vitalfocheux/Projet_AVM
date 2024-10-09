@@ -105,114 +105,115 @@ void classe() #classe : {}
     <CLASS> ident() <LCBRACKET> decls() methmain() <RCBRACKET>
 }
 
-private void ident() #ident : {}
+private void ident() #ident :
+{Token t;}
 {
-    <IDENTIFIER>
+    t = <IDENTIFIER> {jjtThis.value = t.image;}
 }
 
-private void decls() : {}
+private void decls() #void : {}
 {
     decl() decls1() #decls(2) |
     empty() #vnil
 }
 
-private void decls1() : {}
+private void decls1() #void : {}
 {
     <SEMICOLON> decls()
 }
 
 private void decl() : {}
 {
-    typemeth() ident() decl1() |
+    typemeth() ident() decl1()    |
     <FINAL> type() ident() vexp()
 }
 
 private void decl1() : {}
 {
-    <LPAR> entetes() <RPAR> <LCBRACKET> vars() instrs() <RCBRACKET> |
-    var1()
+    <LPAR> entetes() <RPAR> <LCBRACKET> vars() instrs() <RCBRACKET> #methode(5) |
+    var1() #var(1)
 }
 
 private void vars() : {}
 {
-    var() <SEMICOLON> vars() |
-    empty()
+    var() <SEMICOLON> vars() #vars(2) |
+    empty() #vnil
 
 }
 
-private void var() : {}
+private void var() #var : {}
 {
-    typemeth() ident() var1() |
-    <FINAL> type() ident() vexp()
+    typemeth() ident() var1()            |
+    <FINAL> type() ident() vexp() #cst(3)
 }
 
 private void var1() : {}
 {
-     <LBRACKET> exp() <RBRACKET> |
-     vexp()
+     <LBRACKET> exp() <RBRACKET> #tab(3) |
+     vexp() #var(3)
 }
 
 private void vexp() : {}
 {
     <ASSIGN> exp() |
-    empty()
+    empty() #omega
 }
 
 
-private void methmain() : {}
+private void methmain() #void : {}
 {
-    <MAIN> <LCBRACKET> vars() instrs() <RCBRACKET>
+    <MAIN> <LCBRACKET> vars() instrs() <RCBRACKET> #main(2)
 }
 
-private void entetes() : {}
+private void entetes() #void : {}
 {
     entete() entetes1() |
-    empty()
+    empty() #enil
 }
 
-private void entetes1() : {}
+private void entetes1() #void : {}
 {
-    <COMMA> entetes() |
-    empty()
+    <COMMA> entetes() #entetes(2) |
+    empty() #entetes(2)
 }
 
-private void entete() : {}
+private void entete() #void : {}
 {
-    type() ident()
+    type() ident() #entete(2)
 }
 
 private void instrs() : {}
 {
     instr() instrs1() |
-    empty()
+    empty() #inil
 }
 
 private void instrs1() : {}
 {
-    <SEMICOLON> instrs()
+    <SEMICOLON> instrs() #instrs(2)
 }
 
 private void instr() : {}
 {
-    ident() instr2()                           |
-    <RETURN> exp()                             |
-    <WRITE> <LPAR> instr3() <RPAR>                   |
-    <WRITELN> <LPAR> instr3() <RPAR>                 |
-    <IF> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> ELSE() |
-    <WHILE> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET>
+    ident() instr2()                                                 |
+    <RETURN> exp() #retour(1)                                        |
+    <WRITE> <LPAR> instr3() <RPAR>                                   |
+    <WRITELN> <LPAR> instr3() <RPAR>                                 |
+    <IF> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> ELSE() #si(3) |
+    <WHILE> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> #tantque(2)
 }
 
-private void instr1() : {}
+private void instr1() #void : {}
 {
-    <ASSIGN> exp()                  |
-    <ASSIGN_INCREMENT> exp()   |
-    <INCREMENT>
+    <ASSIGN> exp() #affectation(2)     |
+    <ASSIGN_INCREMENT> exp() #somme(2) |
+    <INCREMENT> #increment(1)
 }
 
-private void instr2() : {}
+private void instr2() #void : {}
 {
-    <LPAR> listexp() <RPAR> |
-    ident2() instr1()
+    <LPAR> listexp() <RPAR> #appelI(2) |
+    [ ident2() ] instr1()
 }
 
 private void instr3() : {}
@@ -224,7 +225,7 @@ private void instr3() : {}
 private void ELSE() : {}
 {
     <ELSE> <LCBRACKET> instrs() <RCBRACKET> |
-    empty()
+    empty() #inil
 }
 
 private void listexp() : {}
@@ -233,31 +234,30 @@ private void listexp() : {}
     empty()
 }
 
-private void listexp1() : {}
+private void listexp1() #void : {}
 {
     <COMMA> listexp() |
     empty()
 }
 
-private void exp() : {}
+private void exp() #void : {}
 {
-    //<NOT> exp1()            |
     <NOT> exp1() exp3()     |
     exp1() exp3()
 }
 
-private void exp1() : {}
+private void exp1() #void : {}
 {
     exp2() exp4()
 }
 
-private void exp2() : {}
+private void exp2() #void : {}
 {
     terme() exp5() |
     <SUB> terme() exp5()
 }
 
-private void exp3() : {}
+private void exp3() #void : {}
 {
     <AND> exp1() exp3() |
     <OR> exp1() exp3()  |
@@ -311,10 +311,9 @@ private void ident1() : {}
     ident() ident2()
 }
 
-private void ident2() : {}
+private void ident2() #void : {}
 {
-    <LBRACKET> exp() <RBRACKET> |
-    empty()
+    <LBRACKET> exp() <RBRACKET> #tab(2)
 }
 
 private void typemeth() : {}
