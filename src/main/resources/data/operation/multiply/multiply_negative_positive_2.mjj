@@ -1,9 +1,0 @@
-class multiply {
-
-    main {
-
-        return -(6) * 7;
-
-    }
-
-}

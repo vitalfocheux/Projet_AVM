@@ -1,9 +1,0 @@
-class equal {
-
-    main {
-
-        return 42 == -42;
-
-    }
-
-}

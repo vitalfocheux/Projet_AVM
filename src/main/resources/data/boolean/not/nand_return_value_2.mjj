@@ -1,9 +1,0 @@
-class Boolean {
-
-    main {
-
-        return !(false && true);
-
-    }
-
-}
