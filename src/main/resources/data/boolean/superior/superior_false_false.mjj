@@ -1,9 +1,0 @@
-class superior {
-
-    main {
-
-        return false > false;
-
-    }
-
-}

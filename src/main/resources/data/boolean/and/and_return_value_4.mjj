@@ -1,9 +1,0 @@
-class and {
-
-    main {
-
-        return true && true;
-
-    }
-
-}
