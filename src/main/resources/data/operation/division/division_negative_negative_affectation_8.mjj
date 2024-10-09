@@ -4,7 +4,7 @@ class division {
 
         int a = (-42);
         int b = -(3);
-        return a / b);
+        return a / b;
 
     }
 

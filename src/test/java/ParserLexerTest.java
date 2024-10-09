@@ -23,30 +23,6 @@ import java.util.stream.Stream;
 public class ParserLexerTest
 {
 
-    /*@Test
-    public void testParser() throws ParseException{
-        try {
-            String path = "target/classes/data/tas.mjj";
-            displayFileContents(path);
-            MiniJaja parser = MiniJaja.getInstance(path);
-            parser.classe();
-        } catch (ParseException e) {
-            fail(e.getMessage());
-        }
-    }
-
-    private void displayFileContents(String filePath) {
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            System.out.println("Contents of " + filePath + ":");
-            while ((line = br.readLine()) != null) {
-                System.out.println(line);
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading the file: " + e.getMessage());
-        }
-    }*/
-
     @ParameterizedTest
     @MethodSource("fileProvider")
     void testParser(String filepath) throws ParseException {
