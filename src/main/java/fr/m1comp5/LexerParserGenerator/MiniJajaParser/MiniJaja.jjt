@@ -1,5 +1,8 @@
 options {
     STATIC = false;
+    NODE_DEFAULT_VOID = true;
+    MULTI = true;
+    VISITOR = true;
 }
 
 PARSER_BEGIN(MiniJaja)
@@ -88,242 +91,258 @@ SKIP :
     <RBRACKET: "]">
 }
 
-<DEFAULT> TOKEN : {
+<DEFAULT> TOKEN :
+{
     <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])*> |
     <NUMBER: (["0"-"9"])+>                                          |
     <STRING:  "\"" (~["\""])* "\"">
 }
 
-void classe() : {}
+SimpleNode start() #root : {}
+{
+    classe() {return jjtThis;}
+}
+
+private void classe() #classe(3) : {}
 {
     <CLASS> ident() <LCBRACKET> decls() methmain() <RCBRACKET>
 }
 
-void ident() : {}
+private void ident() #ident : {Token t;}
 {
-    <IDENTIFIER>
+    t = <IDENTIFIER> {jjtThis.value = t.image;}
 }
 
-void decls() : {}
+private void decls() : {}
 {
     decl() decls1() |
-    empty()
+    empty() #vnil
 }
 
-void decls1() : {}
+private void decls1() : {}
 {
-    <SEMICOLON> decls()
+    <SEMICOLON> decls() #decls(2)
 }
 
-void decl() : {}
+private void decl() : {}
 {
-    typemeth() ident() decl1() |
-    <FINAL> type() ident() vexp()
+    typemeth() ident() decl1()           |
+    <FINAL> type() ident() vexp() #cst(3)
 }
 
-void decl1() : {}
+private void decl1() : {}
 {
-    <LPAR> entetes() <RPAR> <LCBRACKET> vars() instrs() <RCBRACKET> |
+    <LPAR> entetes() <RPAR> <LCBRACKET> vars() instrs() <RCBRACKET> #methode(5) |
     var1()
 }
 
-void vars() : {}
+private void vars() : {}
 {
-    var() <SEMICOLON> vars() |
-    empty()
+    var() <SEMICOLON> vars() #vars(2) |
+    empty() #vnil
 
 }
 
-void var() : {}
+private void var() : {}
 {
-    typemeth() ident() var1() |
-    <FINAL> type() ident() vexp()
+    typemeth() ident() var1()            |
+    <FINAL> type() ident() vexp() #cst(3)
 }
 
-void var1() : {}
+private void var1() : {}
 {
-     <LBRACKET> exp() <RBRACKET> |
-     vexp()
+     <LBRACKET> exp() <RBRACKET> #tableau(3) |
+     vexp() #var(3)
 }
 
-void vexp() : {}
+private void vexp() : {}
 {
     <ASSIGN> exp() |
-    empty()
+    empty() #omega
 }
 
 
-void methmain() : {}
+private void methmain() #main(2) : {}
 {
     <MAIN> <LCBRACKET> vars() instrs() <RCBRACKET>
 }
 
-void entetes() : {}
+private void entetes() : {}
 {
     entete() entetes1() |
-    empty()
+    empty() #enil
 }
 
-void entetes1() : {}
+private void entetes1() : {}
 {
-    <COMMA> entetes() |
-    empty()
+    <COMMA> entetes() #entetes(2) |
+    empty() #enil
 }
 
-void entete() : {}
+private void entete() : {}
 {
-    type() ident()
+    type() ident() #entete(2)
 }
 
-void instrs() : {}
+private void instrs() : {}
 {
     instr() instrs1() |
-    empty()
+    empty() #inil
 }
 
-void instrs1() : {}
+private void instrs1() : {}
 {
-    <SEMICOLON> instrs()
+    <SEMICOLON> instrs() #instrs(2)
 }
 
-void instr() : {}
+private void instr() : {}
 {
-    ident() instr2()                           |
-    <RETURN> exp()                             |
-    <WRITE> <LPAR> instr3() <RPAR>                   |
-    <WRITELN> <LPAR> instr3() <RPAR>                 |
-    <IF> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> ELSE() |
-    <WHILE> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET>
+    ident() instr2()                                           |
+    <RETURN> exp() #retour                                     |
+    <WRITE> <LPAR> instr3() <RPAR> #ecrire(1)                  |
+    <WRITELN> <LPAR> instr3() <RPAR> #ecrireln(1)              |
+    <IF> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> ELSE() #si(3) |
+    <WHILE> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> #tantque(2)
 }
 
-void instr1() : {}
+private void instr1() : {}
 {
-    <ASSIGN> exp()                  |
-    <ASSIGN_INCREMENT> exp()   |
-    <INCREMENT>
+    <ASSIGN> exp() #affectation(2)     |
+    <ASSIGN_INCREMENT> exp() #somme(2) |
+    <INCREMENT> #increment(1)
 }
 
-void instr2() : {}
+private void instr2() : {}
 {
-    <LPAR> listexp() <RPAR> |
+    <LPAR> listexp() <RPAR> #appelI(2) |
     ident2() instr1()
 }
 
-void instr3() : {}
+private void instr3() : {}
 {
     ident() |
-    <STRING>
+    chaine()
 }
 
-void ELSE() : {}
+private void ELSE() : {}
 {
     <ELSE> <LCBRACKET> instrs() <RCBRACKET> |
-    empty()
+    empty() #inil
 }
 
-void listexp() : {}
+private void listexp() : {}
 {
-    exp() listexp1() |
-    empty()
+    exp() listexp1() #listexp(2) |
+    empty() #exnil
 }
 
-void listexp1() : {}
+private void listexp1() : {}
 {
-    <COMMA> listexp() |
-    empty()
+    <COMMA> exp() listexp1() #listexp(2) |
+    empty() #exnil
 }
 
-void exp() : {}
+private void exp() : {}
 {
-    //<NOT> exp1()            |
-    <NOT> exp1() exp3()     |
+    <NOT> exp1() exp3() #not(1) |
     exp1() exp3()
 }
 
-void exp1() : {}
+private void exp1() : {}
 {
     exp2() exp4()
 }
 
-void exp2() : {}
+private void exp2() : {}
 {
     terme() exp5() |
     <SUB> terme() exp5()
 }
 
-void exp3() : {}
+private void exp3() : {}
 {
-    <AND> exp1() exp3() |
-    <OR> exp1() exp3()  |
+    <AND> exp1() exp3() #et(2) |
+    <OR> exp1() exp3() #ou(2)  |
     empty()
 }
 
-void exp4() : {}
+private void exp4() : {}
 {
-    <EQUAL> exp2() exp4()   |
-    <SUP> exp2() exp4()     |
+    <EQUAL> exp2() exp4() #eq(2) |
+    <SUP> exp2() exp4() #sup(2)  |
     empty()
 }
 
-void exp5() : {}
+private void exp5() : {}
 {
-    <ADD> terme() exp5() |
-    <SUB> terme() exp5() |
+    <ADD> terme() exp5() #add(2) |
+    <SUB> terme() exp5() #sub(2) |
     empty()
 }
 
-void terme() : {}
+private void terme() : {}
 {
     fact() terme1()
 }
 
-void terme1() : {}
+private void terme1() : {}
 {
-    <MUL> fact() terme1() |
-    <DIV> fact() terme1() |
+    <MUL> fact() terme1() #mul(2) |
+    <DIV> fact() terme1() #div(2) |
     empty()
 }
 
-void fact() : {}
+private void fact() : {}
 {
     ident() fact1()                 |
-    <LENGTH> <LPAR> ident() <RPAR>  |
-    <TRUE>                          |
-    <FALSE>                         |
-    <NUMBER>                        |
-    <LPAR> exp() <RPAR>
+    <LENGTH> <LPAR> ident() <RPAR>  #longeur(1) |
+    <TRUE> #vrai                      |
+    <FALSE> #faux                     |
+    nbre()                            |
+    <LPAR> exp() <RPAR> #exp(1)
 }
 
-void fact1() : {}
+private void fact1() : {}
 {
-    <LPAR> listexp() <RPAR> |
+    <LPAR> listexp() <RPAR> #appelE(2) |
     ident2()
 }
 
-void ident1() : {}
+private void ident2() : {}
 {
-    ident() ident2()
-}
-
-void ident2() : {}
-{
-    <LBRACKET> exp() <RBRACKET> |
+    <LBRACKET> exp() <RBRACKET> #tab(2) |
     empty()
 }
 
-void typemeth() : {}
+private void typemeth() : {}
 {
-    <VOID> |
+    <VOID> #rien |
     type()
 }
 
-void type() : {}
+private void type() : {}
 {
-    <INT> |
-    <BOOLEAN>
+    <INT> #entier     |
+    <BOOLEAN> #booleen
 }
 
-void empty() : {}
+private void empty() : {}
 {
     {}
+}
+
+void nbre() #nbre : {int x;} {
+	<NUMBER> {
+		try { x = Integer.parseInt(token.image);
+		} catch (NumberFormatException ee) {
+		   System.err.println("Error: " + token.image + " is not a number.");
+		   x = 0;
+		}
+		jjtThis.jjtSetValue(x);
+	}
+}
+
+void chaine() #chaine : {Token t;}
+{
+  t = <STRING> {jjtThis.value = t.image;}
 }
