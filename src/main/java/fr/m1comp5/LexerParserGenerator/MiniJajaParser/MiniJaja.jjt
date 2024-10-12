@@ -108,8 +108,7 @@ private void classe() #classe(3) : {}
     <CLASS> ident() <LCBRACKET> decls() methmain() <RCBRACKET>
 }
 
-private void ident() #ident :
-{Token t;}
+private void ident() #ident : {Token t;}
 {
     t = <IDENTIFIER> {jjtThis.value = t.image;}
 }
@@ -343,7 +342,7 @@ void nbre() #nbre : {int x;} {
 	}
 }
 
-void chaine() #chaine : {}
+void chaine() #chaine : {Token t;}
 {
-  <STRING> { jjtThis.jjtSetValue(token.image); }
+  t = <STRING> {jjtThis.value = t.image;}
 }
