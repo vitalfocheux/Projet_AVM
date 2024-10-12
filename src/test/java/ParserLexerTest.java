@@ -66,7 +66,7 @@ public class ParserLexerTest
 
     static Stream<org.junit.jupiter.params.provider.Arguments> fileProviderKO() throws IOException {
         Stream.Builder<org.junit.jupiter.params.provider.Arguments> builder = Stream.builder();
-        List<String> filepaths = getAllFilePaths("src/main/resources/data/error");
+        List<String> filepaths = getAllFilePaths("src/main/resources/data/error/parser_lexer");
         for(String filepath : filepaths){
             builder.add(Arguments.of(filepath));
         }
