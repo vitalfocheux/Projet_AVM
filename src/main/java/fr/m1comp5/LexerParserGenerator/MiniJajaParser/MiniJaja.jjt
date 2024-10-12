@@ -170,7 +170,7 @@ private void methmain() #main(2) : {}
 
 private void entetes() : {}
 {
-    entete() entetes1() #entetes(2) |
+    entete() entetes1() |
     empty() #enil
 }
 
@@ -239,7 +239,7 @@ private void listexp() : {}
 
 private void listexp1() : {}
 {
-    <COMMA> listexp() #listexp(2) |
+    <COMMA> exp() listexp1() #listexp(2) |
     empty() #exnil
 }
 
