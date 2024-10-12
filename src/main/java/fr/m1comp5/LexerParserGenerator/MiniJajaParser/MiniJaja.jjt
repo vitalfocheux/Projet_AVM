@@ -2,6 +2,7 @@ options {
     STATIC = false;
     NODE_DEFAULT_VOID = true;
     MULTI = true;
+    VISITOR = true;
 }
 
 PARSER_BEGIN(MiniJaja)
@@ -102,7 +103,7 @@ SimpleNode start() #root : {}
     classe() {return jjtThis;}
 }
 
-void classe() #classe(3) : {}
+private void classe() #classe(3) : {}
 {
     <CLASS> ident() <LCBRACKET> decls() methmain() <RCBRACKET>
 }
@@ -314,13 +315,13 @@ private void ident2() : {}
     empty()
 }
 
-private void typemeth() #rien : {}
+private void typemeth() : {}
 {
     <VOID> #rien |
     type()
 }
 
-private void type() #type: {}
+private void type() : {}
 {
     <INT> #entier     |
     <BOOLEAN> #booleen
