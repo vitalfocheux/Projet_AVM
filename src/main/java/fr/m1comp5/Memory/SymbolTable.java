@@ -28,14 +28,22 @@ public class SymbolTable
 
     /**
      * Compute location of an object in the symbol table based on his id,
-     * this function is useful when we need to rehash the table
+     * this function is useful when we need to rehash the table.
+     * This algorithm use FNV-1a hash algorithm
      * @param key The key to put in the symbol
      * @param size The size of the new buckets
      * @return Location where the object will be put
      */
     private int hashFunction(String key, int size)
     {
-        return key.hashCode() % size;
+        final int FNV_PRIME = 0x01000193;
+        int hashCode = 0x811c9dc5;
+        for (char c : key.toCharArray())
+        {
+            hashCode ^= c;
+            hashCode *= FNV_PRIME;
+        }
+        return hashCode;
     }
 
     /**
