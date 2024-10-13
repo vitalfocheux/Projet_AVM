@@ -43,7 +43,7 @@ public class SymbolTable
             hashCode ^= c;
             hashCode *= FNV_PRIME;
         }
-        return hashCode;
+        return hashCode % size;
     }
 
     /**
