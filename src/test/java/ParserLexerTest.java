@@ -1,7 +1,7 @@
-import fr.m1comp5.LexerParserGenerator.MiniJajaParser.MiniJaja;
-import fr.m1comp5.LexerParserGenerator.MiniJajaParser.ParseException;
+import fr.m1comp5.Analyzer.MiniJaja;
+import fr.m1comp5.Analyzer.ParseException;
 
-import fr.m1comp5.LexerParserGenerator.MiniJajaParser.SimpleNode;
+import fr.m1comp5.Analyzer.SimpleNode;
 import org.junit.Test;
 import java.io.FileReader;
 import java.io.BufferedReader;

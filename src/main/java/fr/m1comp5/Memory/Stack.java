@@ -47,13 +47,6 @@ public class Stack {
             base = -1;
             top = -1;
         }
-        /**
-         * Search variable from the base pointer useful in case of a function
-         * @param id The id of the variable
-         * @throws Exception
-         * @return Null if the variable is not found and the variable otherwise
-         */
-        base = baseValue;
         return obj;
     }
 
@@ -63,44 +56,34 @@ public class Stack {
      * @throws Exception
      * @return Null if the variable is not found and the variable otherwise
      */
-    public MemoryObject searchVariable(String id) throws StackException
-    {
-        if (stackList.isEmpty())
-        {
+    public MemoryObject searchVariable(String id) throws StackException {
+        if (stackList.isEmpty()) {
             throw new StackException("Can't search the object because the stack is empty");
         }
-        for (int i = base; i < top; ++i)
-        {
-            if (stackList.get(i).getId() == id)
-            {
+        for (int i = base; i < top; ++i) {
+            if (stackList.get(i).getId() == id) {
                 return stackList.get(i);
             }
         }
         return null;
     }
 
-    public void moveBaseToTop()
-    {
+    public void moveBaseToTop() {
         base = top;
     }
 
-    public MemoryObject getBaseObject() throws StackException
-    {
-        if (stackList.isEmpty())
-        {
+    public MemoryObject getBaseObject() throws StackException {
+        if (stackList.isEmpty()) {
             throw new StackException("Can't get the base element of an empty stack");
         }
         return stackList.get(base);
     }
 
-    public void setBaseFromValue(int baseValue) throws StackException
-    {
-        if (stackList.isEmpty())
-        {
+    public void setBaseFromValue(int baseValue) throws StackException {
+        if (stackList.isEmpty()) {
             throw new StackException("Can't change the base pointer of an empty stack");
         }
-        if (baseValue < 0 || baseValue > top)
-        {
+        if (baseValue < 0 || baseValue > top) {
             throw new StackException("The base of the stack must be a positive number and must be less than the top of the stack");
         }
         base = baseValue;
