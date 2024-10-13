@@ -1,6 +1,8 @@
 package fr.m1comp5.UI;
 
-import fr.m1comp5.LexersParsers.MiniJaja.*;
+import fr.m1comp5.Analyzer.MiniJaja;
+import fr.m1comp5.Analyzer.ParseException;
+import fr.m1comp5.Analyzer.SimpleNode;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -12,10 +14,6 @@ import java.io.*;
 public class MiniJajaWindow
 {
     JFrame mainFrame;
-    JMenu fileMenu;
-    JMenu editMenu;
-    JMenu viewMenu;
-    JMenu helpMenu;
 
     public MiniJajaWindow()
     {
@@ -28,10 +26,10 @@ public class MiniJajaWindow
         JMenuBar menuBar = new JMenuBar();
 
         // Créer les menus
-        fileMenu = new JMenu("File");
-        editMenu = new JMenu("Edit");
-        viewMenu = new JMenu("View");
-        helpMenu = new JMenu("Help");
+        JMenu fileMenu = new JMenu("File");
+        JMenu editMenu = new JMenu("Edit");
+        JMenu viewMenu = new JMenu("View");
+        JMenu helpMenu = new JMenu("Help");
 
         // Ajouter des éléments dans le menu "File" avec des icônes redimensionnées
         JMenuItem newFileItem = new JMenuItem("New File", resizeIcon("/icon/new-file.png", 22, 22));
@@ -230,6 +228,7 @@ public class MiniJajaWindow
 
     private ImageIcon resizeIcon(String iconPath, int width, int height)
     {
+        System.out.println(iconPath);
         ImageIcon icon = new ImageIcon(getClass().getResource(iconPath).getPath());
         Image image = icon.getImage();
         Image resizedImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);

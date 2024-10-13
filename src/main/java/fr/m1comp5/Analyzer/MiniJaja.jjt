@@ -6,7 +6,7 @@ options {
 }
 
 PARSER_BEGIN(MiniJaja)
-package fr.m1comp5.LexersParsers.MiniJaja;
+package fr.m1comp5.Analyzer;
 import java.io.FileReader;
 
 public class MiniJaja
@@ -256,7 +256,7 @@ private void exp1() : {}
 private void exp2() : {}
 {
     terme() exp5() |
-    <SUB> terme() exp5()
+    <SUB> terme() exp5() #neg(1)
 }
 
 private void exp3() : {}
