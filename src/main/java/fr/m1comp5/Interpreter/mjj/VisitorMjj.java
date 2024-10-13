@@ -26,7 +26,6 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTclasse node, Object data) {
         String ident = (String) ((ASTident) node.jjtGetChild(0)).jjtGetValue();
-        System.out.println("Class : "+ ident);
 
         node.jjtGetChild(1).jjtAccept(this, data); //Visit vars or vnil
         node.jjtGetChild(2).jjtAccept(this, data); //Visit main
@@ -139,7 +138,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTretour node, Object data) {
         Object returnValue = node.jjtGetChild(0).jjtAccept(this, data);
-        System.out.println("Return Value ! "+returnValue);
+        System.out.println("Return Value : "+returnValue);
         return returnValue;
     }
 
@@ -248,7 +247,6 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTsub node, Object data) {
         int nb1 = (int) node.jjtGetChild(0).jjtAccept(this, data);
         int nb2 = (int) node.jjtGetChild(1).jjtAccept(this, data);
-        System.out.println(nb1 + "-" + nb2);
         return nb1 - nb2;
     }
 
