@@ -46,7 +46,7 @@
                             <goal>jjtree-javacc</goal>
                         </goals>
                         <configuration>
-                            <sourceDirectory>${basedir}/src/main/java/fr/m1comp5/LexerParserGenerator/MiniJajaParser</sourceDirectory>
+                            <sourceDirectory>${basedir}/src/main/java/fr/m1comp5/Analyzer</sourceDirectory>
                         </configuration>
                     </execution>
                 </executions>
