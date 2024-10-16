@@ -1,0 +1,7 @@
+class error {
+
+    main{
+        int a;
+        boolean a;
+    }
+}
