@@ -14,6 +14,10 @@ import java.io.*;
 public class MiniJajaWindow
 {
     JFrame mainFrame;
+    JMenu fileMenu;
+    JMenu editMenu;
+    JMenu viewMenu;
+    JMenu helpMenu;
 
     public MiniJajaWindow()
     {
@@ -26,10 +30,10 @@ public class MiniJajaWindow
         JMenuBar menuBar = new JMenuBar();
 
         // Créer les menus
-        JMenu fileMenu = new JMenu("File");
-        JMenu editMenu = new JMenu("Edit");
-        JMenu viewMenu = new JMenu("View");
-        JMenu helpMenu = new JMenu("Help");
+        fileMenu = new JMenu("File");
+        editMenu = new JMenu("Edit");
+        viewMenu = new JMenu("View");
+        helpMenu = new JMenu("Help");
 
         // Ajouter des éléments dans le menu "File" avec des icônes redimensionnées
         JMenuItem newFileItem = new JMenuItem("New File", resizeIcon("/icon/new-file.png", 22, 22));

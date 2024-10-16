@@ -2,7 +2,7 @@ class unary_minus {
 
     main {
 
-        return -12; // -12
+        return - -12; // 12
 
     }
 

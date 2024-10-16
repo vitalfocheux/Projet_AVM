@@ -55,7 +55,7 @@ public class ParserLexerTest
             try (InputStream is = new FileInputStream(filepath)) {
                 Reader reader = new InputStreamReader(is);
                 MiniJaja mjjparser = new MiniJaja(reader);
-                mjjparser.classe();
+                mjjparser.start();
             } catch (FileNotFoundException e) {
                 System.out.println("File: " + filepath + " not found");
             } catch (IOException e) {
@@ -75,7 +75,7 @@ public class ParserLexerTest
 
     static Stream<org.junit.jupiter.params.provider.Arguments> fileProvider() throws IOException {
         Stream.Builder<org.junit.jupiter.params.provider.Arguments> builder = Stream.builder();
-        List<String> filepaths = getAllFilePaths("src/main/resources/data/success");
+        List<String> filepaths = getAllFilePaths("src/main/resources/data");
         for(String filepath : filepaths){
             builder.add(Arguments.of(filepath));
         }
