@@ -215,7 +215,7 @@ private void instr1() : {}
 private void instr2() : {}
 {
     <LPAR> listexp() <RPAR> #appelI(2) |
-    ident2() instr1()
+    [ident2()] instr1()
 }
 
 private void instr3() : {}
@@ -305,13 +305,12 @@ private void fact() : {}
 private void fact1() : {}
 {
     <LPAR> listexp() <RPAR> #appelE(2) |
-    ident2()
+    [ident2()]
 }
 
 private void ident2() : {}
 {
-    <LBRACKET> exp() <RBRACKET> #tab(2) |
-    empty()
+    <LBRACKET> exp() <RBRACKET> #tab(2)
 }
 
 private void typemeth() : {}
