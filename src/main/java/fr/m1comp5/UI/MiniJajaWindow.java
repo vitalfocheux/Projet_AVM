@@ -1,6 +1,5 @@
 package fr.m1comp5.UI;
 
-import fr.m1comp5.LexersParsers.MiniJaja.*;
 import fr.m1comp5.Analyzer.MiniJaja;
 import fr.m1comp5.Analyzer.ParseException;
 import fr.m1comp5.Analyzer.SimpleNode;

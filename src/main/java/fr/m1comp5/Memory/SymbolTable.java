@@ -95,6 +95,11 @@ public class SymbolTable
         return true;
     }
 
+    public boolean put(String ident, Object o)
+    {
+        return true;
+    }
+
     /**
      * Remove an element from the symbol table
      * @param mo Memory object to remove from the symbol table

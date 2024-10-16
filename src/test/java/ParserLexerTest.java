@@ -55,7 +55,7 @@ public class ParserLexerTest
             try (InputStream is = new FileInputStream(filepath)) {
                 Reader reader = new InputStreamReader(is);
                 MiniJaja mjjparser = new MiniJaja(reader);
-                mjjparser.classe();
+                mjjparser.start();
             } catch (FileNotFoundException e) {
                 System.out.println("File: " + filepath + " not found");
             } catch (IOException e) {
