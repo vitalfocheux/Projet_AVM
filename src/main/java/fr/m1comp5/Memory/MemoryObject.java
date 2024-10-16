@@ -1,8 +1,5 @@
 package fr.m1comp5.Memory;
 
-/**
- * QUAD = ID x VAL x OBJ x SORTE
- */
 public class MemoryObject
 {
     private String id;

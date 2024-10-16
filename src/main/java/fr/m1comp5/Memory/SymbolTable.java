@@ -196,5 +196,4 @@ public class SymbolTable
         }
         bucket.add(mo);
     }
-
 }
