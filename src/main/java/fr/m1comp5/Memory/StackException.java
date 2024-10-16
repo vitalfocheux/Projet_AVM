@@ -1,6 +1,5 @@
 package fr.m1comp5.Memory;
 
-
 /**
  * Exception for the stack
  */
