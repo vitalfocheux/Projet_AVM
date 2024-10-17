@@ -1,0 +1,31 @@
+image: maven:3-openjdk-17
+
+stages:
+  - build
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+cache:
+  paths:
+    # On s'assure que les dépendances Maven sont mises en cache
+    # pour éviter de les rapatrier à chaque lancement du pipeline
+    - $CI_PROJECT_DIR/.m2/repository
+  key: "$CI_BUILD_REF_NAME"
+
+build-job:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == 'test'
+  tags:
+    - avm_groupe5
+  stage: build
+  script:
+    - chmod +x ./settings.sh
+    - ./settings.sh
+    - mvn clean jacoco:prepare-agent test jacoco:report install sonar:sonar deploy
+      -Dsonar.projectKey=AVM-Groupe-5
+      -Dsonar.projectName=AVM-Groupe-5
+      -Dsonar.host.url=https://disc.univ-fcomte.fr/cr700-sonarqube
+      -Dsonar.token=$SONAR_TOKEN
