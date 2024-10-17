@@ -31,7 +31,24 @@
             <version>1.0.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>3.12.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus-deptinfo</id>
+            <url>https://disc.univ-fcomte.fr/cr700-nexus/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-deptinfo-snapshots</id>
+            <url>https://disc.univ-fcomte.fr/cr700-nexus/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <build>
         <plugins>
@@ -51,6 +68,16 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.7</version>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.9.0.2155</version>
+            </plugin>
         </plugins>
     </build>
     
@@ -58,6 +85,10 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.basedir}/target/site/jacoco/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
 </project>
