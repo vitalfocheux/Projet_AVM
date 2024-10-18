@@ -11,7 +11,7 @@ import java.io.FileReader;
 
 public class MiniJaja
 {
-    public static fr.m1comp5.Analyzer.generated.MiniJaja getInstance(String filename)
+    public static MiniJaja getInstance(String filename)
     {
         FileReader reader = null;
         try
@@ -25,7 +25,6 @@ public class MiniJaja
         }
         return new MiniJaja(reader);
     }
-}}
 }
 PARSER_END(MiniJaja)
 
