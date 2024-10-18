@@ -1,5 +1,5 @@
-import fr.m1comp5.Analyzer.Node;
-import fr.m1comp5.Analyzer.MiniJaja; // Your parser
+import fr.m1comp5.Analyzer.generated.Node;
+import fr.m1comp5.Analyzer.generated.MiniJaja; // Your parser
 import fr.m1comp5.Interpreter.mjj.InterpreterMjj;
 import org.junit.jupiter.api.Test;
 

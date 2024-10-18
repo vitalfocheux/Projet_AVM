@@ -1,8 +1,8 @@
 package fr.m1comp5.UI;
 
-import fr.m1comp5.Analyzer.MiniJaja;
-import fr.m1comp5.Analyzer.ParseException;
-import fr.m1comp5.Analyzer.SimpleNode;
+import fr.m1comp5.Analyzer.generated.MiniJaja;
+import fr.m1comp5.Analyzer.generated.ParseException;
+import fr.m1comp5.Analyzer.generated.SimpleNode;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;

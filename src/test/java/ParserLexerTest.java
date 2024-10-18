@@ -1,14 +1,11 @@
-import fr.m1comp5.Analyzer.MiniJaja;
-import fr.m1comp5.Analyzer.ParseException;
+import fr.m1comp5.Analyzer.generated.MiniJaja;
+import fr.m1comp5.Analyzer.generated.ParseException;
 
-import fr.m1comp5.Analyzer.SimpleNode;
-import org.junit.Test;
-import java.io.FileReader;
-import java.io.BufferedReader;
+import fr.m1comp5.Analyzer.generated.SimpleNode;
+
 import java.io.IOException;
 import static org.junit.Assert.*;
 
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -19,7 +16,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ParserLexerTest

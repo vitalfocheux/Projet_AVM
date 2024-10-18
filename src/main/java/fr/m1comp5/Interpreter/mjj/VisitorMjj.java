@@ -1,7 +1,7 @@
 package fr.m1comp5.Interpreter.mjj;
 
-import fr.m1comp5.Analyzer.*;
 import fr.m1comp5.Analyzer.Type;
+import fr.m1comp5.Analyzer.generated.*;
 import fr.m1comp5.Memory.SymbolTable;
 
 public class VisitorMjj implements MiniJajaVisitor {
