@@ -5,11 +5,16 @@ import fr.m1comp5.Analyzer.Type;
 import fr.m1comp5.Memory.SymbolTable;
 
 public class VisitorMjj implements MiniJajaVisitor {
-
+    private String toDisplay;
     private SymbolTable symbolTable;
 
     public VisitorMjj() {
         this.symbolTable = new SymbolTable();
+        this.toDisplay = "";
+    }
+
+    public String toString() {
+        return this.toDisplay;
     }
 
     @Override
@@ -144,21 +149,52 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTecrire node, Object data) {
+        Object value = node.jjtGetChild(0).jjtAccept(this, data);
+        try {
+            toDisplay += value;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
     @Override
     public Object visit(ASTecrireln node, Object data) {
+        Object value = node.jjtGetChild(0).jjtAccept(this, data);
+        try {
+            toDisplay += value+"\n";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
     @Override
     public Object visit(ASTsi node, Object data) {
+        Object value = node.jjtGetChild(0).jjtAccept(this, data);
+        try {
+            if ((boolean) value) {
+                node.jjtGetChild(1).jjtAccept(this, data);
+            } else {
+                node.jjtGetChild(2).jjtAccept(this, data);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
     @Override
     public Object visit(ASTtantque node, Object data) {
+        Object value = node.jjtGetChild(0).jjtAccept(this, data);
+        try {
+            if ((boolean) value) {
+                node.jjtGetChild(1).jjtAccept(this, data);
+                node.jjtAccept(this, data);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
