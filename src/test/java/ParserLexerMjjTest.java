@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class ParserLexerTest
+public class ParserLexerMjjTest
 {
     //TODO: Comparer les fichiers de sortie avec les fichiers de référence grâce à la commande diff
     private void testASTParser(String path, SimpleNode root){
