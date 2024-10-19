@@ -1,7 +1,9 @@
 package fr.m1comp5.Interpreter.mjj;
 
 import fr.m1comp5.Analyzer.mjj.*;
-import fr.m1comp5.Analyzer.Type;
+import fr.m1comp5.Memory.ObjectType;
+import fr.m1comp5.Memory.MemoryObject;
+import fr.m1comp5.Memory.ObjectNature;
 import fr.m1comp5.Memory.SymbolTable;
 
 public class VisitorMjj implements MiniJajaVisitor {
@@ -82,7 +84,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTvar node, Object data) {
-        Type varType = (Type) node.jjtGetChild(0).jjtAccept(this, data); //Var type
+        ObjectType varType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data); //Var type
         String varIdent = (String) node.jjtGetChild(1).jjtAccept(this, data); //Var name
         Object value = null;
         if (node.jjtGetNumChildren() > 2) {
@@ -92,8 +94,8 @@ public class VisitorMjj implements MiniJajaVisitor {
         if (varIdent == null) {
             throw new RuntimeException("Variable name cannot be null.");
         }
-
-        symbolTable.put(varIdent, value);
+        MemoryObject m = new MemoryObject(varIdent,value, ObjectNature.VAR, varType);
+        symbolTable.put(m);
 //        System.out.println("Declared var: "+varType+" "+varIdent+ " = "+value);
 //        symbolTable.getTable().forEach((key,val) -> System.out.println(key +": "+ val));
 
@@ -337,12 +339,12 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTentier node, Object data) {
-        return Type.INTEGER;
+        return ObjectType.INT;
     }
 
     @Override
     public Object visit(ASTbooleen node, Object data) {
-        return Type.BOOLEAN;
+        return ObjectType.BOOLEAN;
     }
 
     @Override

@@ -1,24 +1,39 @@
 import fr.m1comp5.Analyzer.mjj.MiniJaja;
 import fr.m1comp5.Analyzer.mjj.ParseException;
-import fr.m1comp5.Analyzer.mjj.SimpleNode;
 
+import fr.m1comp5.Analyzer.mjj.SimpleNode;
 import java.io.IOException;
 import static org.junit.Assert.*;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class ParserLexerTest
+public class ParserLexerMjjTest
 {
+    //TODO: Comparer les fichiers de sortie avec les fichiers de référence grâce à la commande diff
+    private void testASTParser(String path, SimpleNode root){
+        List<String> paths = Arrays.stream(path.split("\\\\")).toList();
+        boolean exceptionCaught = false;
+
+        File outputFile = new File("target/resources/ast/"+paths.get(paths.size()-1));
+        outputFile.getParentFile().mkdirs();
+        try (PrintStream out = new PrintStream(new FileOutputStream(outputFile))) {
+            System.setOut(out);
+            root.dump("");
+        } catch (FileNotFoundException e) {
+            exceptionCaught = true;
+            e.printStackTrace();
+        } finally {
+            System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
+        }
+        Assertions.assertFalse(exceptionCaught);
+    }
 
     @ParameterizedTest
     @MethodSource("fileProvider")
@@ -26,16 +41,21 @@ public class ParserLexerTest
         try(InputStream is = new FileInputStream(filepath)){
             Reader reader = new InputStreamReader(is);
             MiniJaja mjjparser = new MiniJaja(reader);
+
+            boolean exceptionCaught = false;
             try
             {
-                System.out.println(filepath);
+                //System.out.println(filepath);
                 SimpleNode n = mjjparser.start();
-                n.dump("");
+                testASTParser(filepath, n);
+                //n.dump("");
             }
             catch (ParseException e)
             {
+                exceptionCaught = true;
                 System.out.println(e.getMessage());
             }
+            Assertions.assertFalse(exceptionCaught);
         }catch (FileNotFoundException e){
             System.out.println("File: "+filepath+" not found");
         }catch (IOException e){
@@ -60,33 +80,12 @@ public class ParserLexerTest
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> fileProviderKO() throws IOException {
-        Stream.Builder<org.junit.jupiter.params.provider.Arguments> builder = Stream.builder();
-        List<String> filepaths = getAllFilePaths("src/main/resources/data/error/parser_lexer");
-        for(String filepath : filepaths){
-            builder.add(Arguments.of(filepath));
-        }
-        return builder.build();
+        return UtilsTest.fileProvider("src/main/resources/data/error/parser_lexer");
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> fileProvider() throws IOException {
-        Stream.Builder<org.junit.jupiter.params.provider.Arguments> builder = Stream.builder();
-        List<String> filepaths = getAllFilePaths("src/main/resources/data");
-        for(String filepath : filepaths){
-            builder.add(Arguments.of(filepath));
-        }
-        return builder.build();
+        return UtilsTest.fileProvider("src/main/resources/data/success");
     }
 
-    private static List<String> getAllFilePaths(String directory) throws IOException {
-        List<String> filepaths = new ArrayList<>();
-        try(Stream<Path> paths = Files.walk(Paths.get(directory))){
-            paths.forEach(path -> {
-                if(Files.isRegularFile(path)){
-                    filepaths.add(path.toString());
-                }
-            });
-        }
-        return filepaths;
-    }
 
 }
