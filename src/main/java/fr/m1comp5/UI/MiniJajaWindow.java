@@ -3,6 +3,7 @@ package fr.m1comp5.UI;
 import fr.m1comp5.Analyzer.mjj.MiniJaja;
 import fr.m1comp5.Analyzer.mjj.ParseException;
 import fr.m1comp5.Analyzer.mjj.SimpleNode;
+import fr.m1comp5.Interpreter.mjj.InterpreterMjj;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -82,7 +83,10 @@ public class MiniJajaWindow
                 try
                 {
                     SimpleNode n = mjj.start();
+                    InterpreterMjj it = new InterpreterMjj(n);
                     consoleArea.append("Compilation successfull");
+//                    System.out.println(it.interpret());
+                    consoleArea.append(it.interpret());
                     n.dump("");
                 }
                 catch (ParseException pe)
@@ -232,7 +236,6 @@ public class MiniJajaWindow
 
     private ImageIcon resizeIcon(String iconPath, int width, int height)
     {
-        System.out.println(iconPath);
         ImageIcon icon = new ImageIcon(getClass().getResource(iconPath).getPath());
         Image image = icon.getImage();
         Image resizedImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
