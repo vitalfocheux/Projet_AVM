@@ -6,12 +6,12 @@ options {
 }
 
 PARSER_BEGIN(MiniJaja)
-package fr.m1comp5.Analyzer;
+package fr.m1comp5.Analyzer.mjj;
 import java.io.FileReader;
 
 public class MiniJaja
 {
-    public static MiniJaja getInstance(String filename)
+    public static fr.m1comp5.Analyzer.mjj.generated.MiniJaja getInstance(String filename)
     {
         FileReader reader = null;
         try
