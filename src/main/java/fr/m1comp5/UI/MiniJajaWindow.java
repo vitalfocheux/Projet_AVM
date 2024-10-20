@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.HashMap;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 
 public class MiniJajaWindow
@@ -133,10 +135,12 @@ public class MiniJajaWindow
         // Ajouter le panneau principal à la fenêtre
         //mainFrame.add(mainPanel);
         tabbedPane.add(mainPanel);
+        tabbedPane.setTabComponentAt(0, new JLabel("Sans titre"));
         mainFrame.add(tabbedPane, BorderLayout.CENTER);
 
         // Ajouter la barre de menu
         mainFrame.setJMenuBar(menuBar);
+
     }
 
     public void showWindow()
@@ -159,33 +163,91 @@ public class MiniJajaWindow
     }
 
     //open file function
-    public static void openFile() {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setMultiSelectionEnabled(true);
-        fileChooser.setDialogTitle("Open File");
-        // Filtre pour les fichiers avec l'extension .mjj
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("MiniJaja Files", "mjj");
-        fileChooser.setFileFilter(filter);
+    private static void openFile() {
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setMultiSelectionEnabled(true); // Enable selecting multiple files
+    int option = fileChooser.showOpenDialog(null);
 
-        int option = fileChooser.showOpenDialog(null);
-        if (option == JFileChooser.APPROVE_OPTION) {
-            File[] files = fileChooser.getSelectedFiles();
-            for (File file : files) {
-                try (FileReader reader = new FileReader(file)) {
-                    JTextArea textArea = new JTextArea();
-                    textArea.read(reader, null);
-                    JScrollPane scrollPane = new JScrollPane(textArea);
-                    tabbedPane.addTab(file.getName(), scrollPane);
-                    tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, new JLabel(file.getName()));
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(mainFrame, "Error opening file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                }
+    if (option == JFileChooser.APPROVE_OPTION) {
+        File[] files = fileChooser.getSelectedFiles(); // Get all selected files
+        for (File file : files) {
+            try (FileReader reader = new FileReader(file)) {
+                JTextArea textArea = new JTextArea();
+                textArea.read(reader, null);
+                JScrollPane scrollPane = new JScrollPane(textArea);
+                tabbedPane.addTab(file.getName(), scrollPane);
+                int tabIndex = tabbedPane.getTabCount() - 1;
+
+                // Set custom tab with close button
+                tabbedPane.setTabComponentAt(tabIndex, createTabHeader(file.getName(), textArea));
+
+                // Track open files and changes
+                openFiles.put(textArea, file);
+                unsavedChanges.put(textArea, false);
+
+                // Add document listener to track changes in the JTextArea
+                textArea.getDocument().addDocumentListener(new DocumentListener() {
+                    @Override
+                    public void insertUpdate(DocumentEvent e) {
+                        unsavedChanges.put(textArea, true);
+                    }
+
+                    @Override
+                    public void removeUpdate(DocumentEvent e) {
+                        unsavedChanges.put(textArea, true);
+                    }
+
+                    @Override
+                    public void changedUpdate(DocumentEvent e) {
+                        unsavedChanges.put(textArea, true);
+                    }
+                });
+
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(mainFrame, "Error opening file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
+}
+
+    // Create custom tab header with close button
+    private static JPanel createTabHeader(String title, JTextArea textArea) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+
+        JLabel label = new JLabel(title);
+        panel.add(label, BorderLayout.CENTER);
+
+        JButton closeButton = new JButton("X");
+        closeButton.setMargin(new Insets(0, 0, 0, 0)); // Remove extra padding
+        closeButton.setPreferredSize(new Dimension(15,15));
+        closeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int tabIndex = tabbedPane.indexOfComponent(textArea.getParent().getParent());
+
+                if (unsavedChanges.get(textArea)) {
+                    int option = JOptionPane.showConfirmDialog(mainFrame, "Do you want to save changes?", "Unsaved Changes", JOptionPane.YES_NO_CANCEL_OPTION);
+                    if (option == JOptionPane.YES_OPTION) {
+                        saveFile();
+                    } else if (option == JOptionPane.CANCEL_OPTION) {
+                        return; // Don't close the tab
+                    }
+                }
+
+                // Remove the tab and clean up
+                tabbedPane.remove(tabIndex);
+                unsavedChanges.remove(textArea);
+                openFiles.remove(textArea);
+            }
+        });
+
+        panel.add(closeButton, BorderLayout.EAST);
+        return panel;
+    }
 
     public static void newFile() {
-        // Utiliser JFileChooser pour permettre à l'utilisateur de créer un nouveau fichier
+        // Use JFileChooser to allow the user to create a new file
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Create a New File");
         int userSelection = fileChooser.showSaveDialog(mainFrame);
@@ -196,6 +258,10 @@ public class MiniJajaWindow
             try {
                 if (newFile.createNewFile()) {
                     JOptionPane.showMessageDialog(mainFrame, "New file created: " + newFile.getName());
+
+                    // Open the new file in a new tab after it's created
+                    openFileNamed(newFile); // Call the overloaded openFile method
+
                 } else {
                     JOptionPane.showMessageDialog(mainFrame, "File already exists.");
                 }
@@ -205,37 +271,90 @@ public class MiniJajaWindow
         }
     }
 
-    public void saveFile() {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Save File");
+    // Overload the openFile() method to accept a File argument
+    public static void openFileNamed(File file) {
+        try (FileReader reader = new FileReader(file)) {
+            JTextArea textArea = new JTextArea();
+            textArea.read(reader, null);
+            JScrollPane scrollPane = new JScrollPane(textArea);
 
-        // Filtre pour enregistrer avec l'extension .mjj
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("MiniJaja Files", "mjj");
-        fileChooser.setFileFilter(filter);
+            tabbedPane.addTab(file.getName(), scrollPane);
+            int tabIndex = tabbedPane.getTabCount() - 1;
+            tabbedPane.setTabComponentAt(tabIndex, createTabHeader(file.getName(), textArea));
 
-        int userSelection = fileChooser.showSaveDialog(mainFrame);
+            // Track the file and unsaved changes
+            openFiles.put(textArea, file);
+            unsavedChanges.put(textArea, false);
 
-        if (userSelection == JFileChooser.APPROVE_OPTION) {
-            File fileToSave = fileChooser.getSelectedFile();
-            String path = fileToSave.getAbsolutePath();
+            // Track changes to detect unsaved changes
+            textArea.getDocument().addDocumentListener(new DocumentListener() {
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    unsavedChanges.put(textArea, true);
+                }
 
-            // Vérifie si le fichier a l'extension .mjj, sinon l'ajoute
-            if (!path.endsWith(".mjj")) {
-                fileToSave = new File(path + ".mjj");
-            }
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    unsavedChanges.put(textArea, true);
+                }
 
-            try (FileWriter writer = new FileWriter(fileToSave)) {
-                editorArea.write(writer);
-                /* JOptionPane.showMessageDialog(mainFrame, "File saved: " + fileToSave.getName()); */
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    unsavedChanges.put(textArea, true);
+                }
+            });
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(mainFrame, "Error opening file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // Method to save the current active tab content
+    private static void saveFile() {
+        if (tabbedPane.getTabCount() == 0) {
+            JOptionPane.showMessageDialog(mainFrame, "No open files to save!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int selectedTab = tabbedPane.getSelectedIndex(); // Get the current active tab
+        JScrollPane scrollPane = (JScrollPane) tabbedPane.getComponentAt(selectedTab);
+        JTextArea textArea = (JTextArea) scrollPane.getViewport().getView();
+
+        File file = openFiles.get(textArea);
+        if (file != null) {
+            try (FileWriter writer = new FileWriter(file)) {
+                writer.write(textArea.getText());
+                unsavedChanges.put(textArea, false); // Reset the unsaved changes flag
+                JOptionPane.showMessageDialog(mainFrame, "File saved successfully!");
             } catch (IOException ex) {
-                JOptionPane.showMessageDialog(mainFrame, "Error saving file.");
+                JOptionPane.showMessageDialog(mainFrame, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JFileChooser fileChooser = new JFileChooser();
+            int option = fileChooser.showSaveDialog(null);
+            if (option == JFileChooser.APPROVE_OPTION) {
+                file = fileChooser.getSelectedFile();
+                openFiles.put(textArea, file);
+                saveFile(); // Recursive call to save to the chosen file
             }
         }
     }
 
-
     public void runCode() {
-        String code = editorArea.getText(); // Récupérer le code de l'éditeur
+        consoleArea.setText("");
+        int selectedIndex= tabbedPane.getSelectedIndex();
+        Component tabContent =  tabbedPane.getComponentAt(selectedIndex);
+        String code;
+
+        if (tabContent instanceof JScrollPane) {
+            JScrollPane scrollPane = (JScrollPane) tabContent;
+            JTextArea textArea = (JTextArea) scrollPane.getViewport().getView();
+
+            // Return the content of the JTextArea
+            code = textArea.getText();
+        } else {
+            code = editorArea.getText();
+        }
+
         MiniJaja mjj = new MiniJaja(new ByteArrayInputStream(code.getBytes()));
         consoleArea.setText("");  // Vider la console avant d'exécuter
         try
@@ -246,7 +365,7 @@ public class MiniJajaWindow
         }
         catch (ParseException pe)
         {
-            consoleArea.append("Error syntax in the code");
+            consoleArea.append("Syntax error in code");
         }
         catch (Exception exp)
         {
