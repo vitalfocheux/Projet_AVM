@@ -10,14 +10,18 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.util.HashMap;
+
 
 public class MiniJajaWindow
 {
-    JFrame mainFrame;
-    JMenu fileMenu;
-    JMenu editMenu;
-    JMenu viewMenu;
-    JMenu helpMenu;
+    private static JFrame mainFrame;
+    static JMenu fileMenu,editMenu, viewMenu, helpMenu;
+    private static JTabbedPane tabbedPane;
+    private static JTextArea editorArea, consoleArea;
+
+    private static HashMap<JTextArea, Boolean> unsavedChanges = new HashMap<>(); // Track unsaved changes
+    private static HashMap<JTextArea, File> openFiles = new HashMap<>(); // Map each tab's JTextArea to the open file
 
     public MiniJajaWindow()
     {
@@ -58,13 +62,14 @@ public class MiniJajaWindow
         // Créer un panneau principal avec BorderLayout
         JPanel mainPanel = new JPanel(new BorderLayout());
 
+        tabbedPane = new JTabbedPane();
         // Créer une zone de texte
-        JTextArea editorArea = new JTextArea();
+        editorArea = new JTextArea();
         editorArea.setFont(new Font("Consolas", Font.PLAIN, 14));
         JScrollPane editorScrollPane = new JScrollPane(editorArea);
 
         // Créer une console en bas de la fenêtre
-        JTextArea consoleArea = new JTextArea(8, 40);  // Console avec 8 lignes visibles
+        consoleArea = new JTextArea(8, 40);  // Console avec 8 lignes visibles
         consoleArea.setEditable(false);  // La console ne doit pas être modifiable
         JScrollPane consoleScrollPane = new JScrollPane(consoleArea);
 
@@ -72,30 +77,6 @@ public class MiniJajaWindow
         ImageIcon runIcon = resizeIcon("", 32, 32);
         JButton executeButton = new JButton("Run Code", runIcon);
 
-        // Action du bouton "Run Code"
-        executeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String code = editorArea.getText(); // Récupérer le code de l'éditeur
-                MiniJaja mjj = new MiniJaja(new ByteArrayInputStream(code.getBytes()));
-                consoleArea.setText("");  // Vider la console avant d'exécuter
-                try
-                {
-                    SimpleNode n = mjj.start();
-                    consoleArea.append("Compilation successfull");
-                    n.dump("");
-                }
-                catch (ParseException pe)
-                {
-                    consoleArea.append("Error syntax in the code");
-                }
-                catch (Exception exp)
-                {
-                    consoleArea.append(exp.getMessage());
-                }
-
-            }
-        });
 
         // Créer une barre d'icônes (JToolBar)
         JToolBar toolBar = new JToolBar();
@@ -108,90 +89,26 @@ public class MiniJajaWindow
         JButton runButton = new JButton(resizeIcon("/icon/code.png", 22, 22));
         runButton.setToolTipText("Run Code");
 
-        // Ajouter des actions pour les boutons de la barre d'icônes
-        newFileButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Utiliser JFileChooser pour permettre à l'utilisateur de créer un nouveau fichier
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setDialogTitle("Create a New File");
-                int userSelection = fileChooser.showSaveDialog(mainFrame);
+        //Action Listener pour ouverture fichier
+        ActionListener openFileAction = e -> openFile();
+        openFileButton.addActionListener(openFileAction);
+        openFileItem.addActionListener(openFileAction);
 
-                if (userSelection == JFileChooser.APPROVE_OPTION) {
-                    File newFile = fileChooser.getSelectedFile();
+        //Action Listener pour nouveau fichier
+        ActionListener newFileAction = e -> newFile();
+        newFileButton.addActionListener((newFileAction));
+        newFileItem.addActionListener(newFileAction);
 
-                    try {
-                        if (newFile.createNewFile()) {
-                            JOptionPane.showMessageDialog(mainFrame, "New file created: " + newFile.getName());
-                        } else {
-                            JOptionPane.showMessageDialog(mainFrame, "File already exists.");
-                        }
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(mainFrame, "Error creating file.");
-                    }
-                }
-            }
-        });
+        //Action Listener pour sauvegarder fichier
+        ActionListener saveFileAction = e -> saveFile();
+        saveFileButton.addActionListener(saveFileAction);
+        saveFileItem.addActionListener(saveFileAction);
 
-        // Action pour ouvrir un fichier avec l'extension .mjj
-        openFileButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setDialogTitle("Open File");
-
-                // Filtre pour les fichiers avec l'extension .mjj
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("MiniJaja Files", "mjj");
-                fileChooser.setFileFilter(filter);
-
-                int userSelection = fileChooser.showOpenDialog(mainFrame);
-
-                if (userSelection == JFileChooser.APPROVE_OPTION) {
-                    File fileToOpen = fileChooser.getSelectedFile();
-
-                    try (FileReader reader = new FileReader(fileToOpen)) {
-                        editorArea.read(reader, fileToOpen);
-                        JOptionPane.showMessageDialog(mainFrame, "Opened file: " + fileToOpen.getName());
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(mainFrame, "Error opening file.");
-                    }
-                }
-            }
-        });
-
-        // Action pour enregistrer un fichier
-        saveFileButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setDialogTitle("Save File");
-
-                // Filtre pour enregistrer avec l'extension .mjj
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("MiniJaja Files", "mjj");
-                fileChooser.setFileFilter(filter);
-
-                int userSelection = fileChooser.showSaveDialog(mainFrame);
-
-                if (userSelection == JFileChooser.APPROVE_OPTION) {
-                    File fileToSave = fileChooser.getSelectedFile();
-                    String path = fileToSave.getAbsolutePath();
-
-                    // Vérifie si le fichier a l'extension .mjj, sinon l'ajoute
-                    if (!path.endsWith(".mjj")) {
-                        fileToSave = new File(path + ".mjj");
-                    }
-
-                    try (FileWriter writer = new FileWriter(fileToSave)) {
-                        editorArea.write(writer);
-                        /* JOptionPane.showMessageDialog(mainFrame, "File saved: " + fileToSave.getName()); */
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(mainFrame, "Error saving file.");
-                    }
-                }
-            }
-        });
-
-        runButton.addActionListener(e -> executeButton.doClick());  // Exécuter le code via le bouton "Run Code"
+        //Action Listener pour lancer l'execution
+        ActionListener runCodeAction = e -> runCode();
+        executeButton.addActionListener(runCodeAction);
+        runButton.addActionListener(runCodeAction);
+        //runButton.addActionListener(e -> executeButton.doClick());  // Exécuter le code via le bouton "Run Code"
 
         // Ajouter les boutons à la barre d'outils
         toolBar.add(newFileButton);
@@ -208,13 +125,15 @@ public class MiniJajaWindow
         mainPanel.add(editorScrollPane, BorderLayout.CENTER);
 
         // Ajouter le panneau de la console en bas
-        mainPanel.add(consolePanel, BorderLayout.SOUTH);
+        mainFrame.add(consolePanel, BorderLayout.SOUTH);
 
         // Ajouter la barre d'icônes en haut
         mainFrame.add(toolBar, BorderLayout.NORTH);
 
         // Ajouter le panneau principal à la fenêtre
-        mainFrame.add(mainPanel);
+        //mainFrame.add(mainPanel);
+        tabbedPane.add(mainPanel);
+        mainFrame.add(tabbedPane, BorderLayout.CENTER);
 
         // Ajouter la barre de menu
         mainFrame.setJMenuBar(menuBar);
@@ -238,4 +157,102 @@ public class MiniJajaWindow
         Image resizedImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         return new ImageIcon(resizedImage);
     }
+
+    //open file function
+    public static void openFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setMultiSelectionEnabled(true);
+        fileChooser.setDialogTitle("Open File");
+        // Filtre pour les fichiers avec l'extension .mjj
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("MiniJaja Files", "mjj");
+        fileChooser.setFileFilter(filter);
+
+        int option = fileChooser.showOpenDialog(null);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            File[] files = fileChooser.getSelectedFiles();
+            for (File file : files) {
+                try (FileReader reader = new FileReader(file)) {
+                    JTextArea textArea = new JTextArea();
+                    textArea.read(reader, null);
+                    JScrollPane scrollPane = new JScrollPane(textArea);
+                    tabbedPane.addTab(file.getName(), scrollPane);
+                    tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, new JLabel(file.getName()));
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(mainFrame, "Error opening file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+
+    public static void newFile() {
+        // Utiliser JFileChooser pour permettre à l'utilisateur de créer un nouveau fichier
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Create a New File");
+        int userSelection = fileChooser.showSaveDialog(mainFrame);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File newFile = fileChooser.getSelectedFile();
+
+            try {
+                if (newFile.createNewFile()) {
+                    JOptionPane.showMessageDialog(mainFrame, "New file created: " + newFile.getName());
+                } else {
+                    JOptionPane.showMessageDialog(mainFrame, "File already exists.");
+                }
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(mainFrame, "Error creating file.");
+            }
+        }
+    }
+
+    public void saveFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save File");
+
+        // Filtre pour enregistrer avec l'extension .mjj
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("MiniJaja Files", "mjj");
+        fileChooser.setFileFilter(filter);
+
+        int userSelection = fileChooser.showSaveDialog(mainFrame);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            String path = fileToSave.getAbsolutePath();
+
+            // Vérifie si le fichier a l'extension .mjj, sinon l'ajoute
+            if (!path.endsWith(".mjj")) {
+                fileToSave = new File(path + ".mjj");
+            }
+
+            try (FileWriter writer = new FileWriter(fileToSave)) {
+                editorArea.write(writer);
+                /* JOptionPane.showMessageDialog(mainFrame, "File saved: " + fileToSave.getName()); */
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(mainFrame, "Error saving file.");
+            }
+        }
+    }
+
+
+    public void runCode() {
+        String code = editorArea.getText(); // Récupérer le code de l'éditeur
+        MiniJaja mjj = new MiniJaja(new ByteArrayInputStream(code.getBytes()));
+        consoleArea.setText("");  // Vider la console avant d'exécuter
+        try
+        {
+            SimpleNode n = mjj.start();
+            consoleArea.append("Compilation successfull");
+            n.dump("");
+        }
+        catch (ParseException pe)
+        {
+            consoleArea.append("Error syntax in the code");
+        }
+        catch (Exception exp)
+        {
+            consoleArea.append(exp.getMessage());
+        }
+
+    }
 }
+
