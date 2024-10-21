@@ -1,6 +1,6 @@
 class error {
 
-    int main {
+    main {
 
         return 1 + -2;
     }
