@@ -34,7 +34,7 @@ public class Stack {
         if (base == -1) {
             base = 0;
         }
-        stackList.add(top++, object);
+        stackList.add(++top, object);
         return stackList.get(top);
     }
 
@@ -50,6 +50,10 @@ public class Stack {
         return obj;
     }
 
+    public boolean empty(){
+        return stackList.isEmpty();
+    }
+
     /**
      * Search variable from the base pointer useful in case of a function
      * @param id The id of the variable
@@ -60,8 +64,8 @@ public class Stack {
         if (stackList.isEmpty()) {
             throw new StackException("Can't search the object because the stack is empty");
         }
-        for (int i = base; i < top; ++i) {
-            if (stackList.get(i).getId() == id) {
+        for (int i = base; i < top+1; ++i) {
+            if (stackList.get(i).getId().equals(id)) {
                 return stackList.get(i);
             }
         }
@@ -70,13 +74,6 @@ public class Stack {
 
     public void moveBaseToTop() {
         base = top;
-    }
-
-    public MemoryObject getBaseObject() throws StackException {
-        if (stackList.isEmpty()) {
-            throw new StackException("Can't get the base element of an empty stack");
-        }
-        return stackList.get(base);
     }
 
     public void setBaseFromValue(int baseValue) throws StackException {
