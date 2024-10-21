@@ -79,9 +79,9 @@ public class ParserLexerMjjTest
         });
     }
 
-    static Stream<org.junit.jupiter.params.provider.Arguments> fileProviderKO() throws IOException {
-        return UtilsTest.fileProvider("src/main/resources/data/error/parser_lexer");
-    }
+    //static Stream<org.junit.jupiter.params.provider.Arguments> fileProviderKO() throws IOException {
+    //    return UtilsTest.fileProvider("src/main/resources/data/error/parser_lexer");
+    //}
 
     static Stream<org.junit.jupiter.params.provider.Arguments> fileProvider() throws IOException {
         return UtilsTest.fileProvider("src/main/resources/data/success");

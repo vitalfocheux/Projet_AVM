@@ -18,6 +18,7 @@ public class InterpreterMjjTest {
         boolean exceptionCaught = false;
         try {
             // Assuming you already have a parser that creates the AST
+            System.out.println(filepath);
             MiniJaja parser = new MiniJaja(new FileReader(filepath));
             Node rootNode = parser.start(); // Parse and get the AST root
 

@@ -34,4 +34,6 @@ public class MemoryObject
     {
         return type;
     }
+
+    public String toString() { return "<"+ getId() +","+ getValue() +","+getNature()+","+getType()+">"; }
 }

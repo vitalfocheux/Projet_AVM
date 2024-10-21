@@ -41,12 +41,14 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTident node, Object data) {
-        String varIdent = (String) node.jjtGetValue();
-
-        if (node.jjtGetParent() instanceof ASTvar) {
-            return varIdent;
+        try {
+            if (symbolTable.get((String) node.jjtGetValue()).getType() == ObjectType.EPSILON) {
+                throw new Exception();
+            }
+            return (String) node.jjtGetValue();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return symbolTable.get(varIdent);
     }
 
     @Override
@@ -86,16 +88,17 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTvar node, Object data) {
         ObjectType varType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data); //Var type
         String varIdent = (String) node.jjtGetChild(1).jjtAccept(this, data); //Var name
+        if (varIdent == null) {
+            throw new RuntimeException("Variable name cannot be null.");
+        }
         Object value = null;
         if (node.jjtGetNumChildren() > 2) {
             value = node.jjtGetChild(2).jjtAccept(this, data); // Retrieve the initialized value
         }
 
-        if (varIdent == null) {
-            throw new RuntimeException("Variable name cannot be null.");
-        }
-        MemoryObject m = new MemoryObject(varIdent,value, ObjectNature.VAR, varType);
-        symbolTable.put(m);
+        MemoryObject mo = new MemoryObject(varIdent,value, ObjectNature.VAR, varType);
+        System.out.println("Saving :" + mo.toString());
+        symbolTable.put(mo);
 //        System.out.println("Declared var: "+varType+" "+varIdent+ " = "+value);
 //        symbolTable.getTable().forEach((key,val) -> System.out.println(key +": "+ val));
 
@@ -202,12 +205,15 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTaffectation node, Object data) {
-        String varIdent = (String) node.jjtGetChild(0).jjtAccept(this, data);
-        Object value = node.jjtGetChild(1).jjtAccept(this, data);
-
-        symbolTable.put(varIdent, value);
-
-        System.out.println("Assigned " + value + " to var " + varIdent);
+        try {
+            Object value = node.jjtGetChild(1).jjtAccept(this, data);
+            String varIdent = (String) node.jjtGetChild(0).jjtAccept(this, data);
+            MemoryObject mo = symbolTable.get(varIdent);
+            mo = new MemoryObject(varIdent,value,mo.getNature(),mo.getType());
+            System.out.println("Assigning " + value + " to var " + varIdent);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 

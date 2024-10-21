@@ -55,13 +55,16 @@ public class SymbolTable
      */
     public MemoryObject get(String id)
     {
+        System.out.println("Trying to get "+id);
         List<MemoryObject> bucket = buckets.get(hashFunction(id));
         if (bucket == null)
         {
+            System.out.println("Symbol table is null");
             return null;
         }
         for (MemoryObject mo : bucket)
         {
+            System.out.println(mo.toString());
             if (mo.getId().equals(id))
             {
                 return mo;
@@ -79,6 +82,7 @@ public class SymbolTable
     {
         if (mo == null)
         {
+            System.out.println("Mo is null in put");
             return false;
         }
         List<MemoryObject> bucket = buckets.get(hashFunction(mo.getId()));
@@ -87,16 +91,13 @@ public class SymbolTable
             bucket = new ArrayList<>();
         }
         ++count;
+        System.out.println("Adding a var to table");
         bucket.add(mo);
+        printTable();
         if (needToRehash())
         {
             rehash();
         }
-        return true;
-    }
-
-    public boolean put(String ident, Object o)
-    {
         return true;
     }
 
@@ -195,5 +196,13 @@ public class SymbolTable
             bucket = new ArrayList<>();
         }
         bucket.add(mo);
+    }
+
+    public void printTable() {
+        for (List<MemoryObject> bucket : buckets) {
+            for (MemoryObject mo : bucket) {
+                System.out.println(mo.toString());
+            }
+        }
     }
 }
