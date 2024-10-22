@@ -28,14 +28,22 @@ public class SymbolTable
 
     /**
      * Compute location of an object in the symbol table based on his id,
-     * this function is useful when we need to rehash the table
+     * this function is useful when we need to rehash the table.
+     * This algorithm use FNV-1a hash algorithm
      * @param key The key to put in the symbol
      * @param size The size of the new buckets
      * @return Location where the object will be put
      */
     private int hashFunction(String key, int size)
     {
-        return key.hashCode() % size;
+        final int FNV_PRIME = 0x01000193;
+        int hashCode = 0x811c9dc5;
+        for (char c : key.toCharArray())
+        {
+            hashCode ^= c;
+            hashCode *= FNV_PRIME;
+        }
+        return Math.abs(hashCode % size);
     }
 
     /**
@@ -55,16 +63,13 @@ public class SymbolTable
      */
     public MemoryObject get(String id)
     {
-        System.out.println("Trying to get "+id);
         List<MemoryObject> bucket = buckets.get(hashFunction(id));
         if (bucket == null)
         {
-            System.out.println("Symbol table is null");
             return null;
         }
         for (MemoryObject mo : bucket)
         {
-            System.out.println(mo.toString());
             if (mo.getId().equals(id))
             {
                 return mo;
@@ -82,18 +87,17 @@ public class SymbolTable
     {
         if (mo == null)
         {
-            System.out.println("Mo is null in put");
             return false;
         }
-        List<MemoryObject> bucket = buckets.get(hashFunction(mo.getId()));
+        int hash = hashFunction(mo.getId());
+        List<MemoryObject> bucket = buckets.get(hash);
         if (bucket == null)
         {
             bucket = new ArrayList<>();
+            buckets.set(hash, bucket);
         }
         ++count;
-        System.out.println("Adding a var to table");
         bucket.add(mo);
-        printTable();
         if (needToRehash())
         {
             rehash();
@@ -179,30 +183,28 @@ public class SymbolTable
             for (MemoryObject mo : lmo)
             {
                 int hashCode = hashFunction(mo.getId(), size);
-                addToBucket(mo, newBuckets.get(hashCode));
+                addToBucket(mo, newBuckets, hashCode);
             }
         }
         buckets = newBuckets;
     }
 
-    private void addToBucket(MemoryObject mo, List<MemoryObject> bucket)
+    private void addToBucket(MemoryObject mo, List<List<MemoryObject>> buckets, int hashCode)
     {
         if (mo == null)
         {
             return;
         }
+        if (buckets == null)
+        {
+            return;
+        }
+        List<MemoryObject> bucket = buckets.get(hashCode);
         if (bucket == null)
         {
             bucket = new ArrayList<>();
+            buckets.set(hashCode, bucket);
         }
         bucket.add(mo);
-    }
-
-    public void printTable() {
-        for (List<MemoryObject> bucket : buckets) {
-            for (MemoryObject mo : bucket) {
-                System.out.println(mo.toString());
-            }
-        }
     }
 }

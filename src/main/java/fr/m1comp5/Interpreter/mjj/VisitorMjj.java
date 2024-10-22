@@ -33,20 +33,27 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTclasse node, Object data) {
         String ident = (String) ((ASTident) node.jjtGetChild(0)).jjtGetValue();
-
-        node.jjtGetChild(1).jjtAccept(this, data); //Visit vars or vnil
-        node.jjtGetChild(2).jjtAccept(this, data); //Visit main
+        try {
+            //symbolTable.put(new MemoryObject(ident, ObjectType.EPSILON, ObjectNature.VAR, ObjectType.EPSILON));
+            node.jjtGetChild(1).jjtAccept(this, data); //Visit vars or vnil
+            node.jjtGetChild(2).jjtAccept(this, data); //Visit main
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
     @Override
     public Object visit(ASTident node, Object data) {
+        System.out.println("Inside ASTident : "+(String) node.jjtGetValue());
         try {
             if (symbolTable.get((String) node.jjtGetValue()).getType() == ObjectType.EPSILON) {
                 throw new Exception();
             }
+            System.out.println("returning "+(String)node.jjtGetValue());
             return (String) node.jjtGetValue();
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -57,12 +64,12 @@ public class VisitorMjj implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTdecls node, Object data) {
+    public Object visit(ASTcst node, Object data) {
         return null;
     }
 
     @Override
-    public Object visit(ASTcst node, Object data) {
+    public Object visit(ASTdecls node, Object data) {
         return null;
     }
 
@@ -80,14 +87,11 @@ public class VisitorMjj implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTtableau node, Object data) {
-        return null;
-    }
-
-    @Override
     public Object visit(ASTvar node, Object data) {
         ObjectType varType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data); //Var type
-        String varIdent = (String) node.jjtGetChild(1).jjtAccept(this, data); //Var name
+        String varIdent = (String) ((ASTident) node.jjtGetChild(1)).jjtGetValue();
+        System.out.println("Inside ASTvar: "+varIdent);
+
         if (varIdent == null) {
             throw new RuntimeException("Variable name cannot be null.");
         }
@@ -99,9 +103,12 @@ public class VisitorMjj implements MiniJajaVisitor {
         MemoryObject mo = new MemoryObject(varIdent,value, ObjectNature.VAR, varType);
         System.out.println("Saving :" + mo.toString());
         symbolTable.put(mo);
-//        System.out.println("Declared var: "+varType+" "+varIdent+ " = "+value);
-//        symbolTable.getTable().forEach((key,val) -> System.out.println(key +": "+ val));
 
+        return null;
+    }
+
+    @Override
+    public Object visit(ASTtableau node, Object data) {
         return null;
     }
 
@@ -256,8 +263,10 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTet node, Object data) {
+        System.out.println("Inside ASTet");
         boolean exp1 = (boolean) node.jjtGetChild(0).jjtAccept(this, data);
         boolean exp2 = (boolean) node.jjtGetChild(1).jjtAccept(this, data);
+        System.out.println("Values for AND are : " + exp1 + " - " + exp2);
         return exp1 && exp2;
     }
 
