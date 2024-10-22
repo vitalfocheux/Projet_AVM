@@ -12,13 +12,14 @@ public class InterpreterMjj {
     }
 
     public String interpret() {
-        if (root != null) {
+        try {
             System.out.println("Starting interpretation...");
             root.jjtAccept(VisitorMjj, null);
-        } else {
-            System.err.println("Error! Root node is null, cannot interpret.");
+            return VisitorMjj.toString();
+        } catch (Exception e) {
+            System.err.println("Error in interpretation visitor: " + e.getMessage());
         }
-        return VisitorMjj.toString();
+        return null;
     }
 
     public void setRoot(Node root) {

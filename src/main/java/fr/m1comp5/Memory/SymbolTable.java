@@ -98,6 +98,7 @@ public class SymbolTable
         }
         ++count;
         bucket.add(mo);
+        System.out.println("Saving in symbol table: " + mo.toString());
         if (needToRehash())
         {
             rehash();

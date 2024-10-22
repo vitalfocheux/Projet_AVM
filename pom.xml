@@ -52,22 +52,16 @@
 
     <build>
         <plugins>
-            <!--    <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>javacc-maven-plugin</artifactId>
-                <version>3.0.1</version>
-                <executions>
-                    <execution>
-                        <id>AST</id>
-                        <goals>
-                            <goal>jjtree-javacc</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirectory>${basedir}/src/main/java/fr/m1comp5/Analyzer/mjj</sourceDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>   -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.7</version>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.9.0.2155</version>
+            </plugin>
         </plugins>
     </build>
 
