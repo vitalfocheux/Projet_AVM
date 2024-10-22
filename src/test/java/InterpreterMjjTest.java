@@ -1,5 +1,5 @@
-import fr.m1comp5.Analyzer.Node;
-import fr.m1comp5.Analyzer.MiniJaja; // Your parser
+import fr.m1comp5.Analyzer.mjj.MiniJaja;
+import fr.m1comp5.Analyzer.mjj.Node;
 import fr.m1comp5.Interpreter.mjj.InterpreterMjj;
 
 import org.junit.jupiter.api.Assertions;
@@ -18,6 +18,7 @@ public class InterpreterMjjTest {
         boolean exceptionCaught = false;
         try {
             // Assuming you already have a parser that creates the AST
+            System.out.println(filepath);
             MiniJaja parser = new MiniJaja(new FileReader(filepath));
             Node rootNode = parser.start(); // Parse and get the AST root
 

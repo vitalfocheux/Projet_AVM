@@ -1,0 +1,104 @@
+options {
+    STATIC = true;
+    NODE_DEFAULT_VOID = true;
+    MULTI = true;
+    VISITOR = true;
+}
+
+PARSER_BEGIN(JajaCode)
+package fr.m1comp5.Analyzer;
+import java.io.FileReader;
+
+public class JajaCode
+{
+    public static MiniJaja getInstance(String filename)
+    {
+        FileReader reader = null;
+        try
+        {
+            reader = new FileReader(filename);
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+        return new MiniJaja(reader);
+    }
+}
+PARSER_END(JajaCode)
+
+/* To skip */
+SKIP :
+{
+    " "                                              |
+    "\t"                                             |
+    "\r"                                             |
+    "\n"                                             |
+    <"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>        |
+    <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+
+ }
+
+/* MiniJaja reserved keywords */
+<DEFAULT> TOKEN :
+{
+    <CLASS: "class">     |
+    <MAIN: "main">       |
+    <VOID: "void">       |
+    <INT: "int">         |
+    <BOOLEAN: "boolean"> |
+    <FINAL: "final">     |
+    <TRUE: "true">       |
+    <FALSE: "false">     |
+    <LENGTH: "length">   |
+    <WHILE: "while">     |
+    <RETURN: "return">   |
+    <WRITE: "write">     |
+    <WRITELN: "writeln"> |
+    <IF : "if">          |
+    <ELSE : "else">
+}
+
+/* MiniJaja operator */
+<DEFAULT> TOKEN :
+{
+    <ADD: "+">                  |
+    <SUB: "-">                  |
+    <DIV: "/">                  |
+    <MUL: "*">                  |
+    <SUP: ">">                  |
+    <INF: "<">                  |
+    <AND: "&&">                 |
+    <OR: "||">                  |
+    <EQUAL: "==">               |
+    <NOT: "!">                  |
+    <INCREMENT : "++">          |
+    <ASSIGN_INCREMENT : "+=">   |
+    <ASSIGN: "=">
+}
+
+/* MiniJaja Separator */
+<DEFAULT> TOKEN :
+{
+    <SEMICOLON: ";">    |
+    <COMMA: "," >       |
+    <LCBRACKET: "{">    |
+    <RCBRACKET: "}">    |
+    <LPAR: "(">         |
+    <RPAR: ")">         |
+    <LBRACKET: "[">     |
+    <RBRACKET: "]">
+}
+
+<DEFAULT> TOKEN :
+{
+    <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])*> |
+    <NUMBER: (["0"-"9"])+>                                          |
+    <STRING:  "\"" (~["\""])* "\"">
+}
+
+SimpleNode start() #root : {}
+{
+    classe() {return jjtThis;}
+}
