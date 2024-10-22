@@ -12,14 +12,10 @@ public class InterpreterMjj {
     }
 
     public String interpret() {
-        try {
-            System.out.println("Starting interpretation...");
-            root.jjtAccept(VisitorMjj, null);
-            return VisitorMjj.toString();
-        } catch (Exception e) {
-            System.err.println("Error in interpretation visitor: " + e.getMessage());
-        }
-        return null;
+        System.out.println("Starting interpretation...");
+        root.jjtAccept(VisitorMjj, null);
+        System.out.println("Value of interpretation is : " + VisitorMjj.toString());
+        return VisitorMjj.toString();
     }
 
     public void setRoot(Node root) {

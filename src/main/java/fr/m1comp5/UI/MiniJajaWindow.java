@@ -84,9 +84,8 @@ public class MiniJajaWindow
                 {
                     SimpleNode n = mjj.start();
                     InterpreterMjj it = new InterpreterMjj(n);
-                    consoleArea.append("Compilation successfull");
-//                    System.out.println(it.interpret());
-                    consoleArea.append(it.interpret());
+                    consoleArea.append("Compilation successfull\n");
+                    consoleArea.append("Resul of interpretation is : " + it.interpret());
                     n.dump("");
                 }
                 catch (ParseException pe)
