@@ -25,7 +25,7 @@ public class StackTest {
 
     @Test
     public void getTop() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         assertEquals(obj, stack.getTop());
     }
@@ -38,14 +38,14 @@ public class StackTest {
 
     @Test
     public void getBase() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         assertEquals(obj, stack.getBase());
     }
 
     @Test
     public void getBaseSameGetTop() throws StackException{
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         assertEquals(stack.getBase(), stack.getTop());
         assertEquals(obj, stack.getBase());
@@ -54,8 +54,8 @@ public class StackTest {
 
     @Test
     public void getBaseDiffGetTop() throws StackException{
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
-        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
+        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.push(obj2);
         assertNotEquals(stack.getBase(), stack.getTop());
@@ -71,8 +71,8 @@ public class StackTest {
 
     @Test
     public void pushMultiple() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
-        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
+        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.push(obj2);
         assertEquals(obj2, stack.getTop());
@@ -81,7 +81,7 @@ public class StackTest {
 
     @Test
     public void pushSameObjTwice() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.push(obj);
         assertEquals(obj, stack.pop());
@@ -97,7 +97,7 @@ public class StackTest {
 
     @Test
     public void pop() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         assertEquals(obj, stack.pop());
         assertTrue(stack.empty());
@@ -111,16 +111,16 @@ public class StackTest {
 
     @Test
     public void searchVariable() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         assertEquals(obj, stack.searchVariable("id"));
     }
 
     @Test
     public void searchVariableMultiple() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
-        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.INT, ObjectType.VAR);
-        MemoryObject obj3 = new MemoryObject("id3", 3, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
+        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.VAR, ObjectType.INT);
+        MemoryObject obj3 = new MemoryObject("id3", 3, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.push(obj2);
         stack.push(obj3);
@@ -132,15 +132,15 @@ public class StackTest {
 
     @Test
     public void searchVariableNotFound() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         assertNull(stack.searchVariable("id2"));
     }
 
     @Test
     public void searchVariableAfterPop() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
-        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
+        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.push(obj2);
         assertEquals(obj2, stack.searchVariable("id2"));
@@ -152,8 +152,8 @@ public class StackTest {
 
     @Test
     public void searchVariableAfterMoveBaseToTop() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
-        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
+        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.push(obj2);
         stack.moveBaseToTop();
@@ -163,8 +163,8 @@ public class StackTest {
 
     @Test
     public void searchVariableAfterSetBaseFromValue() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
-        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
+        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.push(obj2);
         stack.setBaseFromValue(1);
@@ -174,8 +174,8 @@ public class StackTest {
 
     @Test
     public void moveBaseToTop() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
-        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
+        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.push(obj2);
         stack.moveBaseToTop();
@@ -191,7 +191,7 @@ public class StackTest {
 
     @Test(expected = StackException.class)
     public void setBaseFromValueNegatif() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.setBaseFromValue(-1);
         assertEquals(obj, stack.getBase());
@@ -199,7 +199,7 @@ public class StackTest {
 
     @Test(expected = StackException.class)
     public void setBaseFromValueTooHigh() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.setBaseFromValue(3);
         assertEquals(obj, stack.getBase());
@@ -207,8 +207,8 @@ public class StackTest {
 
     @Test
     public void setBaseFromValue() throws StackException {
-        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.INT, ObjectType.VAR);
-        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.INT, ObjectType.VAR);
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
+        MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.push(obj2);
         stack.setBaseFromValue(1);
