@@ -1,9 +1,10 @@
+package fr.m1comp5;
+
 import fr.m1comp5.Analyzer.mjj.MiniJaja;
 import fr.m1comp5.Analyzer.mjj.ParseException;
 
 import fr.m1comp5.Analyzer.mjj.SimpleNode;
 import java.io.IOException;
-import static org.junit.Assert.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -66,7 +67,7 @@ public class ParserLexerMjjTest
     @ParameterizedTest
     @MethodSource("fileProviderKO")
     void testParserKO(String filepath) {
-        assertThrows(ParseException.class, () -> {
+        Assertions.assertThrows(ParseException.class, () -> {
             try (InputStream is = new FileInputStream(filepath)) {
                 Reader reader = new InputStreamReader(is);
                 MiniJaja mjjparser = new MiniJaja(reader);

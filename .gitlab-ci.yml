@@ -56,7 +56,7 @@ test-job:
   dependencies:
     - build-job
   script:
-    - mvn test
+    - mvn jacoco:prepare-agent test -Dtest=InterpreterMjjTest jacoco:report install
 
 
 deploy-job:

@@ -1,3 +1,5 @@
+package fr.m1comp5;
+
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.io.IOException;

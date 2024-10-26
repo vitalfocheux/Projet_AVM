@@ -1,3 +1,5 @@
+package fr.m1comp5;
+
 import fr.m1comp5.Analyzer.mjj.MiniJaja;
 import fr.m1comp5.Analyzer.mjj.Node;
 import fr.m1comp5.Interpreter.mjj.InterpreterMjj;
@@ -15,11 +17,11 @@ import java.util.stream.Stream;
 public class InterpreterMjjTest {
     @ParameterizedTest
     @MethodSource("fileProvider")
-    void testInterpreterMiniJaja(String filepath) throws IOException {
+    void testInterpreterMiniJaja(String filepath) {
         boolean exceptionCaught = false;
         try {
             // Assuming you already have a parser that creates the AST
-            System.out.println(filepath);
+            //System.out.println(filepath);
             MiniJaja parser = new MiniJaja(new FileReader(filepath));
             Node rootNode = parser.start(); // Parse and get the AST root
 
