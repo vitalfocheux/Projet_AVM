@@ -6,25 +6,10 @@ options {
 }
 
 PARSER_BEGIN(MiniJaja)
-package fr.m1comp5.Analyzer.mjj;
-import java.io.FileReader;
+package fr.m1comp5.Analyzer.mjj.generated;
 
 public class MiniJaja
 {
-    public static MiniJaja getInstance(String filename)
-    {
-        FileReader reader = null;
-        try
-        {
-            reader = new FileReader(filename);
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-            return null;
-        }
-        return new MiniJaja(reader);
-    }
 }
 PARSER_END(MiniJaja)
 
@@ -98,7 +83,7 @@ SKIP :
     <STRING:  "\"" (~["\""])* "\"">
 }
 
-SimpleNode start() #root : {}
+public SimpleNode start() #root : {}
 {
     classe() {return jjtThis;}
 }
