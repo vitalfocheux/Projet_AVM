@@ -3,6 +3,7 @@ image: maven:3-openjdk-17
 stages:
   - build
   - test
+  - verify
   - deploy
   - sonarQube
 
@@ -37,6 +38,17 @@ test-job:
     - build-job
   script:
     - mvn jacoco:prepare-agent test jacoco:report
+  parallel: 2
+
+verify-job:
+  stage: verify
+  tags:
+    - avm_groupe5
+  dependencies:
+    - build-job
+  script:
+    - mvn verify
+  parallel: 2
 
 deploy-job:
   stage: deploy
@@ -60,7 +72,7 @@ Sonar-job:
     - chmod +x ./settings.sh
     - ./settings.sh
     - mvn sonar:sonar deploy
-      -Dsonar.projectKey=AVM-Groupe-5 
-      -Dsonar.projectName=AVM-Groupe-5 
-      -Dsonar.host.url=https://disc.univ-fcomte.fr/cr700-sonarqube 
+      -Dsonar.projectKey=AVM-Groupe-5
+      -Dsonar.projectName=AVM-Groupe-5
+      -Dsonar.host.url=https://disc.univ-fcomte.fr/cr700-sonarqube
       -Dsonar.token=$SONAR_TOKEN
