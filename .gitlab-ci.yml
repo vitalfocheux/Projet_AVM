@@ -49,7 +49,7 @@ verify-job:
   parallel: 2
 
 deploy-job:
-  stage: deplou
+  stage: deploy
   tags:
     - avm_groupe5
   needs: [test-job, verify-job]
