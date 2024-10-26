@@ -1,8 +1,8 @@
 package fr.m1comp5.UI;
 
-import fr.m1comp5.Analyzer.mjj.MiniJaja;
-import fr.m1comp5.Analyzer.mjj.ParseException;
-import fr.m1comp5.Analyzer.mjj.SimpleNode;
+import fr.m1comp5.Analyzer.mjj.bin.MiniJaja;
+import fr.m1comp5.Analyzer.mjj.bin.ParseException;
+import fr.m1comp5.Analyzer.mjj.bin.SimpleNode;
 import fr.m1comp5.Interpreter.mjj.InterpreterMjj;
 
 import javax.swing.*;
