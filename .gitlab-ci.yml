@@ -34,7 +34,7 @@ test-job:
   stage: test
   tags:
     - avm_groupe5
-  needs: [build-job]
+  dependencies: [build-job]
   script:
     - mvn jacoco:prepare-agent test jacoco:report
   parallel: 2
@@ -43,7 +43,7 @@ verify-job:
   stage: test
   tags:
     - avm_groupe5
-  needs: [build-job]
+  dependencies: [build-job]
   script:
     - mvn verify
   parallel: 2
@@ -52,7 +52,7 @@ deploy-job:
   stage: deploy
   tags:
     - avm_groupe5
-  needs: [test-job, verify-job]
+  dependencies: [test-job, verify-job]
   script:
     - chmod +x ./settings.sh
     - ./settings.sh
@@ -62,7 +62,7 @@ Sonar-job:
   stage: sonarQube
   tags:
     - avm_groupe5
-  needs: [deploy-job]
+  dependencies: [deploy-job]
   script:
     - chmod +x ./settings.sh
     - ./settings.sh
