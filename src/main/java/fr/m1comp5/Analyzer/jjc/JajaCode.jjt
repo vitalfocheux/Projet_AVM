@@ -6,7 +6,7 @@ options {
 }
 
 PARSER_BEGIN(JajaCode)
-package fr.m1comp5.Analyzer.jjc.bin;
+package fr.m1comp5.Analyzer.jjc.generated;
 
 public class JajaCode
 {
@@ -98,7 +98,7 @@ SKIP :
     <STRING:  "\"" (~["\""])* "\"">
 }
 
-SimpleNode start() #Root : {}
+public SimpleNode start() #Root : {}
 {
     classe() {return jjtThis;}
 }

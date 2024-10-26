@@ -1,5 +1,5 @@
-import fr.m1comp5.Analyzer.mjj.bin.MiniJaja;
-import fr.m1comp5.Analyzer.mjj.bin.Node;
+import fr.m1comp5.Analyzer.mjj.generated.MiniJaja;
+import fr.m1comp5.Analyzer.mjj.generated.Node;
 import fr.m1comp5.Interpreter.mjj.InterpreterMjj;
 
 import org.junit.jupiter.api.Assertions;

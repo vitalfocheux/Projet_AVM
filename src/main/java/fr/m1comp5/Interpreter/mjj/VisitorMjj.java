@@ -1,6 +1,6 @@
 package fr.m1comp5.Interpreter.mjj;
 
-import fr.m1comp5.Analyzer.mjj.bin.*;
+import fr.m1comp5.Analyzer.mjj.generated.*;
 import fr.m1comp5.Memory.ObjectType;
 import fr.m1comp5.Memory.MemoryObject;
 import fr.m1comp5.Memory.ObjectNature;

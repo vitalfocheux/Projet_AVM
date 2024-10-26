@@ -1,7 +1,7 @@
-import fr.m1comp5.Analyzer.mjj.bin.MiniJaja;
-import fr.m1comp5.Analyzer.mjj.bin.ParseException;
+import fr.m1comp5.Analyzer.mjj.generated.MiniJaja;
+import fr.m1comp5.Analyzer.mjj.generated.ParseException;
 
-import fr.m1comp5.Analyzer.mjj.bin.SimpleNode;
+import fr.m1comp5.Analyzer.mjj.generated.SimpleNode;
 import java.io.IOException;
 import static org.junit.Assert.*;
 
