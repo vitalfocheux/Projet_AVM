@@ -57,6 +57,9 @@ test-job:
     - build-job
   script:
     - mvn jacoco:prepare-agent test jacoco:report install
+  artifacts:
+    paths:
+      - target/site/jacoco
 
 
 deploy-job:
@@ -77,3 +80,4 @@ deploy-job:
       -Dsonar.projectName=AVM-Groupe-5
       -Dsonar.host.url=https://disc.univ-fcomte.fr/cr700-sonarqube
       -Dsonar.token=$SONAR_TOKEN
+      -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
