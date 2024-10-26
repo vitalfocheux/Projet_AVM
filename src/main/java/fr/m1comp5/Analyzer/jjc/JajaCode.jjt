@@ -203,7 +203,7 @@ private void number() #JcNbre : {int x = 0; Token t;}
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
         jjtThis.value = x;
     }

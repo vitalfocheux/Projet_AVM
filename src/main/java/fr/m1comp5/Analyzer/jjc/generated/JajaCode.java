@@ -731,7 +731,7 @@ public class JajaCode/*@bgen(jjtree)*/implements JajaCodeTreeConstants, JajaCode
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
         jjtn000.value = x;
     } finally {
