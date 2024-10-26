@@ -53,6 +53,8 @@ test-job:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_BRANCH == 'test'
+  dependencies:
+    - build-job
   script:
     - mvn test
 
@@ -64,6 +66,9 @@ deploy-job:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_BRANCH == 'test'
+  dependencies:
+    - build-job
+    - test-job
   script:
     - chmod +x ./settings.sh
     - ./settings.sh
