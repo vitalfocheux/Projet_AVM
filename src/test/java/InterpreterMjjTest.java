@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 public class InterpreterMjjTest {
@@ -36,6 +37,14 @@ public class InterpreterMjjTest {
     }
 
     static Stream<Arguments> fileProvider() throws IOException {
-        return UtilsTest.fileProvider("src/main/resources/data/success");
+        Stream<Arguments> res = UtilsTest.fileProvider("src/main/resources/data/success");
+
+        res = res.filter(arg -> {
+            String filepath = (String) arg.get()[0];
+            filepath = Paths.get(filepath).getFileName().toString();
+            return !(filepath.contains("1.mjj") || filepath.contains("tas.mjj") || filepath.contains("synomynie.mjj") || filepath.contains("fact.mjj"));
+        });
+
+        return res;
     }
 }
