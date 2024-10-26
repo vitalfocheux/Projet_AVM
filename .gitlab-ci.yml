@@ -72,8 +72,8 @@ deploy-job:
   script:
     - chmod +x ./settings.sh
     - ./settings.sh
-    - mvn install sonar:sonar \
-      -Dsonar.projectKey=AVM-Groupe-5 \
-      -Dsonar.projectName=AVM-Groupe-5 \
-      -Dsonar.host.url=https://disc.univ-fcomte.fr/cr700-sonarqube \
+    - mvn install sonar:sonar
+      -Dsonar.projectKey=AVM-Groupe-5
+      -Dsonar.projectName=AVM-Groupe-5
+      -Dsonar.host.url=https://disc.univ-fcomte.fr/cr700-sonarqube
       -Dsonar.token=$SONAR_TOKEN
