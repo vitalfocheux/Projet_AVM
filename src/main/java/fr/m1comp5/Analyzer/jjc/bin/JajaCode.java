@@ -733,7 +733,7 @@ public class JajaCode/*@bgen(jjtree)*/implements JajaCodeTreeConstants, JajaCode
         {
             System.out.println(e.getMessage());
         }
-        jjThis.value = x;
+        jjtn000.value = x;
     } finally {
       if (jjtc000) {
         jjtree.closeNodeScope(jjtn000, true);

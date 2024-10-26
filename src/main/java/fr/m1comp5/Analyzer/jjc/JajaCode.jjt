@@ -205,7 +205,7 @@ private void number() #JcNbre : {int x = 0; Token t;}
         {
             System.out.println(e.getMessage());
         }
-        jjThis.value = x;
+        jjtThis.value = x;
     }
 }
 

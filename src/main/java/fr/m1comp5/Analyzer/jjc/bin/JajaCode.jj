@@ -806,7 +806,7 @@ private void number()         : {/*@bgen(jjtree) JcNbre */
         {
             System.out.println(e.getMessage());
         }
-        jjThis.value = x;
+        jjtn000.value = x;
     }/*@bgen(jjtree)*/
     } finally {
       if (jjtc000) {
