@@ -1,9 +1,9 @@
 package fr.m1comp5;
 
-import fr.m1comp5.Analyzer.mjj.MiniJaja;
-import fr.m1comp5.Analyzer.mjj.ParseException;
+import fr.m1comp5.Analyzer.mjj.generated.MiniJaja;
+import fr.m1comp5.Analyzer.mjj.generated.ParseException;
 
-import fr.m1comp5.Analyzer.mjj.SimpleNode;
+import fr.m1comp5.Analyzer.mjj.generated.SimpleNode;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Assertions;
