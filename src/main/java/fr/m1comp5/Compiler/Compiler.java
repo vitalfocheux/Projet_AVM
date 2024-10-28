@@ -37,7 +37,7 @@ public class Compiler {
             filecount = dir.listFiles().length;
         }
         filecount++;
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("./temp"+filecount+".jjc"))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("./CompiledCode/temp"+filecount+".jjc"))) {
             bw.write(jjcToString());
         } catch (Exception e) {
             System.err.println(e.getMessage());
