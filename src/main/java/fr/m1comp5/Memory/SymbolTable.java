@@ -3,6 +3,7 @@ package fr.m1comp5.Memory;
 import java.util.ArrayList;
 import java.util.List;
 import java.math.BigInteger;
+import java.util.Objects;
 
 public class SymbolTable
 {
@@ -125,7 +126,7 @@ public class SymbolTable
         int idx = -1;
         for (int i = 0; i < lmo.size(); ++i)
         {
-            if (lmo.get(i).getId() == mo.getId())
+            if (Objects.equals(lmo.get(i).getId(), mo.getId()))
             {
                 idx = i;
                 break;
