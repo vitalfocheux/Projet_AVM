@@ -7,9 +7,12 @@ import fr.m1comp5.Interpreter.mjj.InterpreterMjj;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.TabSet;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.*;
 
 public class MiniJajaWindow
@@ -62,6 +65,7 @@ public class MiniJajaWindow
         // Créer une zone de texte
         JTextArea editorArea = new JTextArea();
         editorArea.setFont(new Font("Consolas", Font.PLAIN, 14));
+        editorArea.setTabSize(4);
         JScrollPane editorScrollPane = new JScrollPane(editorArea);
 
         // Créer une console en bas de la fenêtre
