@@ -22,7 +22,7 @@ public class ParserLexerMjjTest
         List<String> paths = Arrays.stream(path.split("\\\\")).toList();
         boolean exceptionCaught = false;
 
-        File outputFile = new File("target/resources/ast/"+paths.get(paths.size()-1));
+        File outputFile = new File("target/resources/mjj/ast/"+paths.get(paths.size()-1));
         outputFile.getParentFile().mkdirs();
         try (PrintStream out = new PrintStream(new FileOutputStream(outputFile))) {
             System.setOut(out);
@@ -81,11 +81,11 @@ public class ParserLexerMjjTest
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> fileProviderKO() throws IOException {
-        return UtilsTest.fileProvider("src/main/resources/data/error/parser_lexer");
+        return UtilsTest.fileProvider("src/main/resources/data/mjj/error/parser_lexer");
     }
 
     static Stream<org.junit.jupiter.params.provider.Arguments> fileProvider() throws IOException {
-        return UtilsTest.fileProvider("src/main/resources/data/success");
+        return UtilsTest.fileProvider("src/main/resources/data/mjj/success");
     }
 
 
