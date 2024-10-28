@@ -38,6 +38,7 @@ public class VisitorMjj implements MiniJajaVisitor {
             node.jjtGetChild(1).jjtAccept(this, data); //Visit vars or vnil
             node.jjtGetChild(2).jjtAccept(this, data); //Visit main
         } catch (Exception e) {
+            System.out.println("Exception is : "+ e.getMessage());
             throw new RuntimeException(e);
         }
         return null;
@@ -52,7 +53,7 @@ public class VisitorMjj implements MiniJajaVisitor {
             System.out.println("ASTident -> "+(String)node.jjtGetValue() + " = " + symbolTable.get((String) node.jjtGetValue()).getValue());
             return symbolTable.get((String) node.jjtGetValue()).getValue();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Exception is : "+ e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -163,6 +164,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         try {
             toDisplay += value;
         } catch (Exception e) {
+            System.out.println("Exception is : "+ e.getMessage());
             throw new RuntimeException(e);
         }
         return null;
@@ -174,6 +176,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         try {
             toDisplay += value+"\n";
         } catch (Exception e) {
+            System.out.println("Exception is : "+ e.getMessage());
             throw new RuntimeException(e);
         }
         return null;
@@ -189,6 +192,7 @@ public class VisitorMjj implements MiniJajaVisitor {
                 node.jjtGetChild(2).jjtAccept(this, data);
             }
         } catch (Exception e) {
+            System.out.println("Exception is : "+ e.getMessage());
             throw new RuntimeException(e);
         }
         return null;
@@ -203,6 +207,7 @@ public class VisitorMjj implements MiniJajaVisitor {
                 node.jjtAccept(this, data);
             }
         } catch (Exception e) {
+            System.out.println("Exception is : "+ e.getMessage());
             throw new RuntimeException(e);
         }
         return null;
@@ -217,6 +222,7 @@ public class VisitorMjj implements MiniJajaVisitor {
             mo = new MemoryObject(varIdent,value,mo.getNature(),mo.getType());
             System.out.println("ASTaffectation -> " + value + " = " + varIdent);
         } catch (Exception e) {
+            System.out.println("Exception is : "+ e.getMessage());
             throw new RuntimeException(e);
         }
         return null;

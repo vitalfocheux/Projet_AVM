@@ -1,55 +1,55 @@
-import org.junit.Before;
-import org.junit.Test;
+package fr.m1comp5;
 
 import fr.m1comp5.Memory.*;
-
-import javax.sound.midi.MetaMessage;
-
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class StackTest {
 
     Stack stack;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         stack = new Stack();
     }
 
-    @Test(expected = StackException.class)
+    @Test
     public void getTopEmptyStack() throws StackException {
-        MemoryObject obj = stack.getTop();
-        assertNull(obj);
+        Assertions.assertThrows(StackException.class, () -> {
+            stack.getTop();
+        });
     }
 
     @Test
     public void getTop() throws StackException {
         MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
-        assertEquals(obj, stack.getTop());
+        Assertions.assertEquals(obj, stack.getTop());
     }
 
-    @Test(expected = StackException.class)
+    @Test
     public void getBaseEmptyStack() throws StackException {
-        MemoryObject obj = stack.getBase();
-        assertNull(obj);
+        Assertions.assertThrows(StackException.class, () -> {
+            stack.getBase();
+        });
     }
 
     @Test
     public void getBase() throws StackException {
         MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
-        assertEquals(obj, stack.getBase());
+        Assertions.assertEquals(obj, stack.getBase());
     }
 
     @Test
     public void getBaseSameGetTop() throws StackException{
         MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
-        assertEquals(stack.getBase(), stack.getTop());
-        assertEquals(obj, stack.getBase());
-        assertEquals(obj, stack.getTop());
+        Assertions.assertEquals(stack.getBase(), stack.getTop());
+        Assertions.assertEquals(obj, stack.getBase());
+        Assertions.assertEquals(obj, stack.getTop());
     }
 
     @Test
@@ -58,15 +58,19 @@ public class StackTest {
         MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.push(obj2);
-        assertNotEquals(stack.getBase(), stack.getTop());
-        assertEquals(obj, stack.getBase());
-        assertEquals(obj2, stack.getTop());
+        Assertions.assertNotEquals(stack.getBase(), stack.getTop());
+        Assertions.assertEquals(obj, stack.getBase());
+        Assertions.assertEquals(obj2, stack.getTop());
     }
 
-    @Test(expected = StackException.class)
+    @Test
     public void pushNull() throws StackException{
-        stack.push(null);
-        assertNull(stack.getTop());
+        Assertions.assertThrows(StackException.class, () -> {
+            stack.push(null);
+        });
+        Assertions.assertThrows(StackException.class, () -> {
+            stack.getTop();
+        });
     }
 
     @Test
@@ -75,8 +79,8 @@ public class StackTest {
         MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.push(obj2);
-        assertEquals(obj2, stack.getTop());
-        assertEquals(obj, stack.getBase());
+        Assertions.assertEquals(obj2, stack.getTop());
+        Assertions.assertEquals(obj, stack.getBase());
     }
 
     @Test
@@ -84,36 +88,38 @@ public class StackTest {
         MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.push(obj);
-        assertEquals(obj, stack.pop());
-        assertEquals(obj, stack.pop());
-        assertTrue(stack.empty());
+        Assertions.assertEquals(obj, stack.pop());
+        Assertions.assertEquals(obj, stack.pop());
+        Assertions.assertTrue(stack.empty());
     }
 
-    @Test(expected = StackException.class)
+    @Test
     public void popEmptyStack() throws StackException {
-        MemoryObject obj = stack.pop();
-        assertNull(obj);
+        Assertions.assertThrows(StackException.class, () -> {
+            stack.pop();
+        });
     }
 
     @Test
     public void pop() throws StackException {
         MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
-        assertEquals(obj, stack.pop());
-        assertTrue(stack.empty());
+        Assertions.assertEquals(obj, stack.pop());
+        Assertions.assertTrue(stack.empty());
     }
 
-    @Test(expected = StackException.class)
+    @Test
     public void searchVariableEmptyStack() throws StackException {
-        MemoryObject obj = stack.searchVariable("id");
-        assertNull(obj);
+        Assertions.assertThrows(StackException.class, () -> {
+            stack.searchVariable("id");
+        });
     }
 
     @Test
     public void searchVariable() throws StackException {
         MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
-        assertEquals(obj, stack.searchVariable("id"));
+        Assertions.assertEquals(obj, stack.searchVariable("id"));
     }
 
     @Test
@@ -124,17 +130,17 @@ public class StackTest {
         stack.push(obj);
         stack.push(obj2);
         stack.push(obj3);
-        assertEquals(obj3, stack.searchVariable("id3"));
-        assertEquals(obj2, stack.searchVariable("id2"));
-        assertEquals(obj, stack.searchVariable("id"));
-        assertNull(stack.searchVariable("id4"));
+        Assertions.assertEquals(obj3, stack.searchVariable("id3"));
+        Assertions.assertEquals(obj2, stack.searchVariable("id2"));
+        Assertions.assertEquals(obj, stack.searchVariable("id"));
+        Assertions.assertNull(stack.searchVariable("id4"));
     }
 
     @Test
     public void searchVariableNotFound() throws StackException {
         MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
-        assertNull(stack.searchVariable("id2"));
+        Assertions.assertNull(stack.searchVariable("id2"));
     }
 
     @Test
@@ -143,11 +149,11 @@ public class StackTest {
         MemoryObject obj2 = new MemoryObject("id2", 2, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
         stack.push(obj2);
-        assertEquals(obj2, stack.searchVariable("id2"));
-        assertEquals(obj, stack.searchVariable("id"));
-        assertEquals(obj2, stack.pop());
-        assertEquals(obj, stack.searchVariable("id"));
-        assertNull(stack.searchVariable("id2"));
+        Assertions.assertEquals(obj2, stack.searchVariable("id2"));
+        Assertions.assertEquals(obj, stack.searchVariable("id"));
+        Assertions.assertEquals(obj2, stack.pop());
+        Assertions.assertEquals(obj, stack.searchVariable("id"));
+        Assertions.assertNull(stack.searchVariable("id2"));
     }
 
     @Test
@@ -157,8 +163,8 @@ public class StackTest {
         stack.push(obj);
         stack.push(obj2);
         stack.moveBaseToTop();
-        assertEquals(obj2, stack.searchVariable("id2"));
-        assertNull(stack.searchVariable("id"));
+        Assertions.assertEquals(obj2, stack.searchVariable("id2"));
+        Assertions.assertNull(stack.searchVariable("id"));
     }
 
     @Test
@@ -168,8 +174,8 @@ public class StackTest {
         stack.push(obj);
         stack.push(obj2);
         stack.setBaseFromValue(1);
-        assertEquals(obj2, stack.searchVariable("id2"));
-        assertNull(stack.searchVariable("id"));
+        Assertions.assertEquals(obj2, stack.searchVariable("id2"));
+        Assertions.assertNull(stack.searchVariable("id"));
     }
 
     @Test
@@ -179,30 +185,36 @@ public class StackTest {
         stack.push(obj);
         stack.push(obj2);
         stack.moveBaseToTop();
-        assertEquals(obj2, stack.getBase());
-        assertNotEquals(obj, stack.getTop());
-        assertEquals(obj2, stack.getTop());
+        Assertions.assertEquals(obj2, stack.getBase());
+        Assertions.assertNotEquals(obj, stack.getTop());
+        Assertions.assertEquals(obj2, stack.getTop());
     }
 
-    @Test(expected = StackException.class)
+    @Test
     public void setBaseFromValueEmptyStack() throws StackException {
-        stack.setBaseFromValue(0);
+        Assertions.assertThrows(StackException.class, () -> {
+            stack.setBaseFromValue(0);
+        });
     }
 
-    @Test(expected = StackException.class)
+    @Test
     public void setBaseFromValueNegatif() throws StackException {
         MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
-        stack.setBaseFromValue(-1);
-        assertEquals(obj, stack.getBase());
+        Assertions.assertThrows(StackException.class, () -> {
+            stack.setBaseFromValue(-1);
+        });
+        Assertions.assertEquals(obj, stack.getBase());
     }
 
-    @Test(expected = StackException.class)
+    @Test
     public void setBaseFromValueTooHigh() throws StackException {
         MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         stack.push(obj);
-        stack.setBaseFromValue(3);
-        assertEquals(obj, stack.getBase());
+        Assertions.assertThrows(StackException.class, () -> {
+            stack.setBaseFromValue(3);
+        });
+        Assertions.assertEquals(obj, stack.getBase());
     }
 
     @Test
@@ -212,7 +224,7 @@ public class StackTest {
         stack.push(obj);
         stack.push(obj2);
         stack.setBaseFromValue(1);
-        assertEquals(obj2, stack.getBase());
+        Assertions.assertEquals(obj2, stack.getBase());
     }
 
 }
