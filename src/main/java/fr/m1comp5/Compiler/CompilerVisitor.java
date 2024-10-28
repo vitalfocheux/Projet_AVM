@@ -48,9 +48,9 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
             instrs.add(nodePop);
             instrs.add(nodeJcStop);
-        } else {
-            return 0;
+            return ndss+nmma+nrdss+3;
         }
+        return 0;
     }
 
     @Override
