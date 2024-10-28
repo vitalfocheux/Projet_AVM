@@ -1,7 +1,6 @@
 package fr.m1comp5.Compiler;
 
 import fr.m1comp5.Analyzer.mjj.generated.Node;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -19,14 +18,21 @@ public class Compiler {
 
     public void compile() {
         try {
-            root.jjtAccept(visitor, null);
+            root.jjtAccept(visitor, new DataModel(1,Mode.DEFAULT));
             instrs = visitor.getInstrs();
+            System.out.println("Compiling to jajacode...");
+            writeJjcFile();
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
     }
 
     public String jjcToString() {
+        StringBuilder sb = new StringBuilder();
+        for(fr.m1comp5.Analyzer.jjc.generated.Node instr : instrs) {
+            sb.append(instr.toString());
+            sb.append("\n");
+        }
         return null;
     }
 

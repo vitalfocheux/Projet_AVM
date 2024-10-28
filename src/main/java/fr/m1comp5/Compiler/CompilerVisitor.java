@@ -1,12 +1,12 @@
 package fr.m1comp5.Compiler;
 
-import fr.m1comp5.Analyzer.jjc.generated.Node;
-import fr.m1comp5.Analyzer.mjj.generated.*;
 import fr.m1comp5.Analyzer.jjc.generated.*;
+import fr.m1comp5.Analyzer.mjj.generated.*;
 import fr.m1comp5.Analyzer.mjj.generated.SimpleNode;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static fr.m1comp5.Analyzer.jjc.generated.JajaCodeTreeConstants.*;
 
 public class CompilerVisitor implements MiniJajaVisitor {
     List<fr.m1comp5.Analyzer.jjc.generated.Node> instrs;
@@ -32,12 +32,35 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTclasse node, Object data) {
-        return null;
+        DataModel dm = (DataModel) data;
+        int n = (Integer) dm.data[0];
+        Mode m = (Mode) dm.data[1];
+        if (m == Mode.DEFAULT) {
+            ASTInit nodeInit = new ASTInit(JJTINIT);
+            ASTPop nodePop = new ASTPop(JJTPOP);
+            ASTJcStop nodeJcStop = new ASTJcStop(JJTJCSTOP);
+
+            instrs.add(nodeInit);
+
+            int ndss = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+1, Mode.DEFAULT));
+            int nmma = (int) node.jjtGetChild(2).jjtAccept(this, new DataModel(n+ndss+1, Mode.DEFAULT));
+            int nrdss = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+ndss+nmma+1, Mode.REMOVE));
+
+            instrs.add(nodePop);
+            instrs.add(nodeJcStop);
+        } else {
+            return 0;
+        }
     }
 
     @Override
     public Object visit(ASTident node, Object data) {
-        return null;
+        ASTLoad loadNode = new ASTLoad(JJTLOAD);
+        ASTJcIdent varIdent = new ASTJcIdent(JJTJCIDENT);
+        varIdent.jjtSetValue(node.jjtGetValue());
+        loadNode.jjtAddChild(varIdent,0);
+        instrs.add(loadNode);
+        return 1;
     }
 
     @Override
