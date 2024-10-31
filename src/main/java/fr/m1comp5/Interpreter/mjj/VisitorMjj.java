@@ -59,17 +59,10 @@ public class VisitorMjj implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTvnil node, Object data) {
-        return null;
-    }
-
-    @Override
-    public Object visit(ASTcst node, Object data) {
-        return null;
-    }
-
-    @Override
     public Object visit(ASTdecls node, Object data) {
+        for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+            node.jjtGetChild(i).jjtAccept(this, data);
+        }
         return null;
     }
 
@@ -87,10 +80,33 @@ public class VisitorMjj implements MiniJajaVisitor {
     }
 
     @Override
+    public Object visit(ASTvnil node, Object data) {
+        return null;
+    }
+
+    @Override
+    public Object visit(ASTcst node, Object data) {
+        ObjectType varType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data); //Var type
+        String varIdent = (String) ((ASTident) node.jjtGetChild(1)).jjtGetValue();
+
+        if (varIdent == null) {
+            throw new RuntimeException("Variable name cannot be null.");
+        }
+        Object value = null;
+        if (node.jjtGetNumChildren() > 2) {
+            value = node.jjtGetChild(2).jjtAccept(this, data); // Retrieve the initialized value
+        }
+
+        MemoryObject mo = new MemoryObject(varIdent,value, ObjectNature.CST, varType);
+        symbolTable.put(mo);
+
+        return null;
+    }
+
+    @Override
     public Object visit(ASTvar node, Object data) {
         ObjectType varType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data); //Var type
         String varIdent = (String) ((ASTident) node.jjtGetChild(1)).jjtGetValue();
-        System.out.println("ASTvar -> "+varIdent);
 
         if (varIdent == null) {
             throw new RuntimeException("Variable name cannot be null.");
@@ -249,6 +265,9 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTlistexp node, Object data) {
+        for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+            node.jjtGetChild(i).jjtAccept(this, data);
+        }
         return null;
     }
 
