@@ -5,5 +5,5 @@ public enum ObjectType
     INT,
     BOOLEAN,
     VOID,
-    EPSILON,
+    OMEGA,
 }

@@ -47,7 +47,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTident node, Object data) {
         try {
-            if (symbolTable.get((String) node.jjtGetValue()).getType() == ObjectType.EPSILON) {
+            if (symbolTable.get((String) node.jjtGetValue()).getType() == ObjectType.OMEGA) {
                 throw new Exception();
             }
             System.out.println("ASTident -> "+(String)node.jjtGetValue() + " = " + symbolTable.get((String) node.jjtGetValue()).getValue());
@@ -129,7 +129,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTomega node, Object data) {
-        return "EMPTY";
+        return "OMEGA";
     }
 
     @Override

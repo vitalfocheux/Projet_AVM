@@ -25,6 +25,10 @@ public class MemoryObject
         return value;
     }
 
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
     public ObjectNature getNature()
     {
         return nature;
@@ -36,4 +40,10 @@ public class MemoryObject
     }
 
     public String toString() { return "<"+ getId() +","+ getValue() +","+getNature()+","+getType()+">"; }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MemoryObject) return ((MemoryObject)obj).id.equals(this.id);
+        return false;
+    }
 }
