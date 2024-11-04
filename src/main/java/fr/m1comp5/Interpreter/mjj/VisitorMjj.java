@@ -1,5 +1,7 @@
 package fr.m1comp5.Interpreter.mjj;
 
+import fr.m1comp5.Analyzer.jjc.generated.ASTAnd;
+import fr.m1comp5.Analyzer.jjc.generated.ASTOr;
 import fr.m1comp5.Analyzer.mjj.generated.*;
 import fr.m1comp5.Memory.ObjectType;
 import fr.m1comp5.Memory.MemoryObject;
@@ -293,7 +295,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTneg node, Object data) {
-        int nb = (Integer) node.jjtGetChild(0).jjtAccept(this, data);
+        int nb = (int) node.jjtGetChild(0).jjtAccept(this, data);
         return -nb;
     }
 

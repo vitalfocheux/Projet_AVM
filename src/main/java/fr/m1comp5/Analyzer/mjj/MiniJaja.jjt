@@ -229,7 +229,7 @@ private void listexp1() : {}
 
 private void exp() : {}
 {
-    <NOT> exp1() exp3() #not(1) |
+    <NOT> exp1() #not |
     exp1() exp3()
 }
 
@@ -241,7 +241,7 @@ private void exp1() : {}
 private void exp2() : {}
 {
     terme() exp5() |
-    <SUB> terme() exp5() #neg(1)
+    <SUB> terme() #neg
 }
 
 private void exp3() : {}

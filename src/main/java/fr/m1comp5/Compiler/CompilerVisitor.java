@@ -4,6 +4,7 @@ import fr.m1comp5.Analyzer.jjc.generated.*;
 import fr.m1comp5.Analyzer.mjj.generated.*;
 import fr.m1comp5.Analyzer.mjj.generated.Node;
 import fr.m1comp5.Analyzer.mjj.generated.SimpleNode;
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,6 +1,7 @@
 package fr.m1comp5.Compiler;
 
 import fr.m1comp5.Analyzer.mjj.generated.Node;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
