@@ -178,7 +178,11 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTecrire node, Object data) {
         Object value = node.jjtGetChild(0).jjtAccept(this, data);
         try {
-            toDisplay += value;
+            if (value instanceof String) {
+                toDisplay += (String) ((String) value).replace("\"","");
+            } else {
+                toDisplay += value;
+            }
         } catch (Exception e) {
             System.out.println("Exception is : "+ e.getMessage());
             throw new RuntimeException(e);
@@ -190,7 +194,12 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTecrireln node, Object data) {
         Object value = node.jjtGetChild(0).jjtAccept(this, data);
         try {
-            toDisplay += value+"\n";
+            if (value instanceof String) {
+                toDisplay += (String) ((String) value).replace("\"","");
+                toDisplay += "\n";
+            } else {
+                toDisplay += value+"\n";
+            }
         } catch (Exception e) {
             System.out.println("Exception is : "+ e.getMessage());
             throw new RuntimeException(e);
