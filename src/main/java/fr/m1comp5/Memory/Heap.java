@@ -1,9 +1,6 @@
 package fr.m1comp5.Memory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Heap
 {
@@ -141,9 +138,10 @@ public class Heap
         throw new HeapException("There is no free block of this size");
     }
 
+    /* TODO : Overload with allocateInHeap(int size, ObjectType type, Object value) */
     public int allocateInHeap(int size, ObjectType type) throws HeapException
     {
-        int elementSize = 0;
+        int elementSize = size;
         if (!isPowerOfTwo(size))
         {
             elementSize = minimumBlockSizeForElement(size);
@@ -153,17 +151,16 @@ public class Heap
         {
             hb = getNextUpperFreeBlock(elementSize);
         }
-        // Can never be null will throw an exception before
+        else
+        {
+            hb = getFreeBlock(elementSize);
+        }
         if (hb.getSize() != elementSize)
         {
             divideBlockToGetBestFit(hb, elementSize);
             hb = getFreeBlock(elementSize);
-            hb.setBlockUsed();
         }
-        else
-        {
-            hb.setBlockUsed();
-        }
+        hb.setBlockUsed();
         elements.add(new HeapElement(hb.getAddress(), size, type));
         System.out.println(blocks);
         return hb.getAddress();
@@ -206,9 +203,99 @@ public class Heap
         return getHeapElement(address).getType();
     }
 
-
     private boolean accessedIndexOk(HeapElement he, int index)
     {
         return index >= 0 && index < he.getSize();
+    }
+
+    private void refragmentHeap()
+    {
+    }
+
+    private void refragmentBlocks()
+    {
+        List<HeapBlock> freeBlocks = new ArrayList<>();
+        for (Map.Entry<Integer, List<HeapBlock>> i : blocks.entrySet())
+        {
+            List<HeapBlock> lhb = i.getValue();
+            for (HeapBlock hb : lhb)
+            {
+                if (hb.isFree())
+                {
+                    freeBlocks.add(hb);
+                }
+            }
+        }
+        if (freeBlocks.isEmpty())
+        {
+            return;
+        }
+        int i = 0;
+        List<HeapBlock> add = new ArrayList<>();
+        Set<HeapBlock> supress = new TreeSet<>();
+        while (i < freeBlocks.size())
+        {
+            if (supress.contains(freeBlocks.get(i)))
+            {
+                ++i;
+                continue;
+            }
+            int j = 0;
+            while (j < freeBlocks.size())
+            {
+                if (supress.contains(freeBlocks.get(j)))
+                {
+                    ++j;
+                    continue;
+                }
+                HeapBlock firstBlock = freeBlocks.get(i);
+                HeapBlock secondBlock = freeBlocks.get(j);
+                if (canAssembleBlocks(firstBlock, secondBlock))
+                {
+                    addNewBlock(add, firstBlock, secondBlock);
+                    supress.add(firstBlock);
+                    supress.add(secondBlock);
+                }
+                ++j;
+            }
+            ++i;
+        }
+        for (HeapBlock hb : supress)
+        {
+            if (blocks.containsKey(hb.getSize()))
+            {
+                blocks.get(hb.getSize()).remove(hb);
+            }
+        }
+        for (HeapBlock hb : add)
+        {
+            if (!blocks.containsKey(hb.getSize()))
+            {
+                blocks.put(hb.getSize(), new ArrayList<>());
+                blocks.get(hb.getSize()).add(hb);
+            }
+            else
+            {
+                blocks.get(hb.getSize()).remove(hb);
+            }
+        }
+    }
+
+    private boolean canAssembleBlocks(HeapBlock hb1, HeapBlock hb2)
+    {
+        return hb1 != hb2 && hb1.getAddress() == hb2.getEndAddress() || hb1.getEndAddress() == hb2.getAddress() && hb1.getSize() == hb2.getSize();
+    }
+
+    private void addNewBlock(List<HeapBlock> toAdd, HeapBlock hb1, HeapBlock hb2)
+    {
+        int newBlockSize = hb1.getSize() * 2;
+        if (hb1.getAddress() > hb2.getEndAddress())
+        {
+            toAdd.add(new HeapBlock(hb2.getAddress(), newBlockSize));
+        }
+        else
+        {
+            toAdd.add(new HeapBlock(hb1.getAddress(), newBlockSize));
+        }
     }
 }

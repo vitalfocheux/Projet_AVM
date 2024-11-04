@@ -1,6 +1,6 @@
 package fr.m1comp5.Memory;
 
-public class HeapBlock
+public class HeapBlock implements Comparable<HeapBlock>
 {
     private boolean free;
     final private int size;
@@ -20,7 +20,12 @@ public class HeapBlock
 
     public void setBlockUsed()
     {
-        this.free = true;
+        free = false;
+    }
+
+    public void setBlockFree()
+    {
+        free = true;
     }
 
     public int getAddress()
@@ -28,7 +33,7 @@ public class HeapBlock
         return address;
     }
 
-    private int getEndAddress()
+    public int getEndAddress()
     {
         return address + size;
     }
@@ -36,5 +41,10 @@ public class HeapBlock
     public int getSize()
     {
         return size;
+    }
+
+    @Override
+    public int compareTo(HeapBlock o) {
+        return address - o.address;
     }
 }
