@@ -138,9 +138,34 @@ public class Heap
         throw new HeapException("There is no free block of this size");
     }
 
+    private int getMaximumBlockSize()
+    {
+        int max = 0;
+        for (Map.Entry<Integer, List<HeapBlock>> i : blocks.entrySet())
+        {
+            List<HeapBlock> lhb = i.getValue();
+            if (i.getKey() > max && !lhb.isEmpty())
+            {
+                for (HeapBlock hb : lhb)
+                {
+                    if (hb.isFree()) {
+                        max = i.getKey();
+                        break;
+                    }
+                }
+            }
+        }
+        return max;
+    }
+
     /* TODO : Overload with allocateInHeap(int size, ObjectType type, Object value) */
     public int allocateInHeap(int size, ObjectType type) throws HeapException
     {
+        while (size > getMaximumBlockSize())
+        {
+            growHeap();
+            mergeMemory();
+        }
         int elementSize = size;
         if (!isPowerOfTwo(size))
         {
@@ -164,6 +189,30 @@ public class Heap
         elements.add(new HeapElement(hb.getAddress(), size, type));
         System.out.println(blocks);
         return hb.getAddress();
+    }
+
+    private void growHeap()
+    {
+        int prevSize = size;
+        size *= 2;
+        if (!blocks.containsKey(prevSize))
+        {
+            blocks.put(prevSize, new ArrayList<>());
+        }
+        blocks.get(prevSize).add(new HeapBlock(prevSize, prevSize));
+        Object[] newHeapValues = new Object[size];
+        for (int i = 0; i < size; ++i)
+        {
+            if (i < prevSize)
+            {
+                newHeapValues[i] = heap[i];
+            }
+            else
+            {
+                newHeapValues[i] = null;
+            }
+        }
+        heap = newHeapValues;
     }
 
     private HeapElement getHeapElement(int address) throws HeapException
@@ -208,13 +257,65 @@ public class Heap
         return index >= 0 && index < he.getSize();
     }
 
-    private void refragmentHeap()
-    {
-    }
-
-    private void refragmentBlocks()
+    private void mergeMemory()
     {
         List<HeapBlock> freeBlocks = new ArrayList<>();
+        List<HeapBlock> add = new ArrayList<>();
+        Set<HeapBlock> sup = new TreeSet<>();
+        fillListOfFreeBlocks(freeBlocks);
+        while(canMergeBlocks(freeBlocks, null, null))
+        {
+            canMergeBlocks(freeBlocks, add, sup);
+            suppressBlocksFromSet(sup);
+            addBlocksFromList(add);
+            fillListOfFreeBlocks(freeBlocks);
+        }
+    }
+
+    private boolean canMergeBlocks(List<HeapBlock> freeBlocks, List<HeapBlock> add, Set<HeapBlock> sup)
+    {
+        boolean res = false;
+        for (HeapBlock hb : freeBlocks)
+        {
+            if (supSetContainHeapBlock(sup, hb))
+            {
+                continue;
+            }
+            for (HeapBlock hhb : freeBlocks)
+            {
+                if (supSetContainHeapBlock(sup, hhb))
+                {
+                    continue;
+                }
+                if (canAssembleBlocks(hb, hhb))
+                {
+                    if (add != null)
+                    {
+                        addNewBlock(add, hb, hhb);
+                    }
+                    if (sup != null)
+                    {
+                        sup.add(hb);
+                        sup.add(hhb);
+                    }
+                    res = true;
+                }
+            }
+        }
+        return res;
+    }
+
+    private boolean supSetContainHeapBlock(Set<HeapBlock> sup, HeapBlock hb)
+    {
+        return sup != null && hb != null && sup.contains(hb);
+    }
+
+    private void fillListOfFreeBlocks(List<HeapBlock> freeBlocks)
+    {
+        if (!freeBlocks.isEmpty())
+        {
+            freeBlocks.clear();
+        }
         for (Map.Entry<Integer, List<HeapBlock>> i : blocks.entrySet())
         {
             List<HeapBlock> lhb = i.getValue();
@@ -226,48 +327,23 @@ public class Heap
                 }
             }
         }
-        if (freeBlocks.isEmpty())
-        {
-            return;
-        }
-        int i = 0;
-        List<HeapBlock> add = new ArrayList<>();
-        Set<HeapBlock> supress = new TreeSet<>();
-        while (i < freeBlocks.size())
-        {
-            if (supress.contains(freeBlocks.get(i)))
-            {
-                ++i;
-                continue;
-            }
-            int j = 0;
-            while (j < freeBlocks.size())
-            {
-                if (supress.contains(freeBlocks.get(j)))
-                {
-                    ++j;
-                    continue;
-                }
-                HeapBlock firstBlock = freeBlocks.get(i);
-                HeapBlock secondBlock = freeBlocks.get(j);
-                if (canAssembleBlocks(firstBlock, secondBlock))
-                {
-                    addNewBlock(add, firstBlock, secondBlock);
-                    supress.add(firstBlock);
-                    supress.add(secondBlock);
-                }
-                ++j;
-            }
-            ++i;
-        }
-        for (HeapBlock hb : supress)
+    }
+
+    private void suppressBlocksFromSet(Set<HeapBlock> blocksToSup)
+    {
+        for (HeapBlock hb : blocksToSup)
         {
             if (blocks.containsKey(hb.getSize()))
             {
                 blocks.get(hb.getSize()).remove(hb);
             }
         }
-        for (HeapBlock hb : add)
+        blocksToSup.clear();
+    }
+
+    private void addBlocksFromList(List<HeapBlock> blocksToAdd)
+    {
+        for (HeapBlock hb : blocksToAdd)
         {
             if (!blocks.containsKey(hb.getSize()))
             {
@@ -276,9 +352,10 @@ public class Heap
             }
             else
             {
-                blocks.get(hb.getSize()).remove(hb);
+                blocks.get(hb.getSize()).add(hb);
             }
         }
+        blocksToAdd.clear();
     }
 
     private boolean canAssembleBlocks(HeapBlock hb1, HeapBlock hb2)
@@ -298,4 +375,44 @@ public class Heap
             toAdd.add(new HeapBlock(hb1.getAddress(), newBlockSize));
         }
     }
+
+    private void freeBlock(int address, int blockSize)
+    {
+        List<HeapBlock> lhb = blocks.get(blockSize);
+        for (HeapBlock hb : lhb)
+        {
+            if (hb.getAddress() == address)
+            {
+                cleanBlockMemory(hb);
+                hb.setBlockFree();
+            }
+        }
+    }
+
+    private void cleanBlockMemory(HeapBlock hb)
+    {
+        for (int i = hb.getAddress(); i < hb.getEndAddress(); ++i)
+        {
+            heap[i] = null;
+        }
+    }
+
+    public void decrementReference(int address) throws HeapException
+    {
+        HeapElement he = getHeapElement(address);
+        he.decrementReferenceNumber();
+        if (he.getNbReference() == 0)
+        {
+            elements.remove(he);
+            freeBlock(he.getAddress(), minimumBlockSizeForElement(he.getSize()));
+            mergeMemory();
+        }
+    }
+
+    public void incrementReference(int address) throws HeapException
+    {
+        HeapElement he = getHeapElement(address);
+        he.incrementReferenceNumber();
+    }
+
 }
