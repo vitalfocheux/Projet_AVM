@@ -47,4 +47,21 @@ public class HeapBlock implements Comparable<HeapBlock>
     public int compareTo(HeapBlock o) {
         return address - o.address;
     }
+
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Adress : ").append(address).append('\n');
+        sb.append("Size : ").append(size).append('\n');
+        sb.append("IsFree : ");
+        if (free)
+        {
+            sb.append("true");
+        }
+        else
+        {
+            sb.append("false");
+        }
+        return sb.toString();
+    }
 }

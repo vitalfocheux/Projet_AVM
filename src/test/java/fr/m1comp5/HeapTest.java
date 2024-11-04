@@ -35,7 +35,23 @@ public class HeapTest {
             Assertions.assertEquals(heap.accessValue(address, i), i);
             System.out.println(heap.accessValue(address, i));
         }
+    }
 
+    @Test
+    public void allocateSingleVariable() throws HeapException
+    {
+        int address = heap.allocateInHeap(1, ObjectType.INT);
+        heap.setValue(address, 0, 1);
+        Assertions.assertEquals(heap.accessValue(address, 0), 1);
+        System.out.println(heap.accessValue(address, 0));
+        int address2 = heap.allocateInHeap(1, ObjectType.INT);
+        heap.setValue(address2, 0, 1);
+        Assertions.assertEquals(heap.accessValue(address2, 0), 1);
+        System.out.println(heap.accessValue(address2, 0));
+        int address3 = heap.allocateInHeap(500, ObjectType.INT);
+        heap.setValue(address3, 400, 400);
+        Assertions.assertEquals(heap.accessValue(address3, 400), 400);
+        System.out.println(heap.accessValue(address3, 400));
     }
 
     @Test
@@ -46,5 +62,11 @@ public class HeapTest {
         Assertions.assertEquals(heap.accessValue(address, 0), 78);
     }
 
+    @Test
+    public void growHeap() throws HeapException
+    {
+        int address = heap.allocateInHeap(2048, ObjectType.INT);
+
+    }
 
 }
