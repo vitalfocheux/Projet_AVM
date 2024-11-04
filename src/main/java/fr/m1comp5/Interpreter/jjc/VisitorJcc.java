@@ -37,7 +37,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTRoot node, Object data) {
-        return null
+        return null;
     }
 
     @Override
@@ -86,8 +86,8 @@ public class VisitorJcc implements JajaCodeVisitor {
         switch (nature) {
             case VAR : mem.identVal(varIdent, type, pos); break;
             case CST :
-                MemoryObject mo = mem.getStack().pop();
-                mem.declCst(varIdent, mo.getValue(), type);
+//                MemoryObject mo = mem.getStack().pop();
+//                mem.declCst(varIdent, mo.getValue(), type);
                 break;
             case TAB: break;
             case METH: break;

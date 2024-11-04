@@ -14,7 +14,6 @@ public class InterpreterMjj {
     public String interpret() {
         System.out.println("Starting interpretation...");
         root.jjtAccept(VisitorMjj, null);
-        System.out.println("Value of interpretation is : " + VisitorMjj.toString());
         return VisitorMjj.toString();
     }
 

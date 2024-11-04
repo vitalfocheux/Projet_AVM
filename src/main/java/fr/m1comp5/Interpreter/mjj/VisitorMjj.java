@@ -170,7 +170,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTretour node, Object data) {
         Object returnValue = node.jjtGetChild(0).jjtAccept(this, data);
-        toDisplay += returnValue;
+        toDisplay +=  "Return value is : "+returnValue+"\n";
         return returnValue;
     }
 
@@ -233,9 +233,9 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTaffectation node, Object data) {
         try {
             Object value = node.jjtGetChild(1).jjtAccept(this, data);
-            String varIdent = (String) node.jjtGetChild(0).jjtAccept(this, data);
+            String varIdent = (String) ((ASTident) node.jjtGetChild(0)).jjtGetValue();;
             MemoryObject mo = symbolTable.get(varIdent);
-            mo = new MemoryObject(varIdent,value,mo.getNature(),mo.getType());
+            symbolTable.update(varIdent,value);
             System.out.println("ASTaffectation -> " + value + " = " + varIdent);
         } catch (Exception e) {
             System.out.println("Exception is : "+ e.getMessage());
