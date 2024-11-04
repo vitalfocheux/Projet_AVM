@@ -3,7 +3,6 @@ package fr.m1comp5.Typechecker;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
-import fr.m1comp5.Analyzer.*;
 import fr.m1comp5.Analyzer.mjj.generated.*;
 
 public class TypeChecker implements MiniJajaVisitor {
@@ -355,5 +354,11 @@ public class TypeChecker implements MiniJajaVisitor {
             }
         }
         return null;
+    }
+
+    @Override
+    public Object visit(SimpleNode node, Object data) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'visit'");
     }
 }
