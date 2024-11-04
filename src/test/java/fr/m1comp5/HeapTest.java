@@ -38,5 +38,13 @@ public class HeapTest {
 
     }
 
+    @Test
+    public void addHeap() throws HeapException
+    {
+        int address = heap.allocateInHeap(2, ObjectType.INT);
+        heap.setValue(address, 0, 78);
+        Assertions.assertEquals(heap.accessValue(address, 0), 78);
+    }
+
 
 }
