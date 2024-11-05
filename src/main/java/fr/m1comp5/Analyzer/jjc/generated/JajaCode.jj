@@ -804,7 +804,7 @@ private void number()         : {/*@bgen(jjtree) JcNbre */
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
         jjtn000.value = x;
     }/*@bgen(jjtree)*/

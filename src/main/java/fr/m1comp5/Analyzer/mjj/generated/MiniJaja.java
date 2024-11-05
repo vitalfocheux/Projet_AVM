@@ -5,8 +5,8 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
   protected JJTMiniJajaState jjtree = new JJTMiniJajaState();
 
   final public SimpleNode start() throws ParseException {
-                                   /*@bgen(jjtree) root */
-  ASTroot jjtn000 = new ASTroot(JJTROOT);
+                                   /*@bgen(jjtree) Root */
+  ASTRoot jjtn000 = new ASTRoot(JJTROOT);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -37,8 +37,8 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
   }
 
   final private void classe() throws ParseException {
-                                    /*@bgen(jjtree) #classe( 3) */
-  ASTclasse jjtn000 = new ASTclasse(JJTCLASSE);
+                                    /*@bgen(jjtree) #Classe( 3) */
+  ASTClasse jjtn000 = new ASTClasse(JJTCLASSE);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -70,8 +70,8 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
   }
 
   final private void ident() throws ParseException {
-                               /*@bgen(jjtree) ident */
-                               ASTident jjtn000 = new ASTident(JJTIDENT);
+                               /*@bgen(jjtree) Ident */
+                               ASTIdent jjtn000 = new ASTIdent(JJTIDENT);
                                boolean jjtc000 = true;
                                jjtree.openNodeScope(jjtn000);Token t;
     try {
@@ -97,7 +97,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       break;
     default:
       jj_la1[0] = jj_gen;
-      ASTvnil jjtn001 = new ASTvnil(JJTVNIL);
+      ASTVnil jjtn001 = new ASTVnil(JJTVNIL);
       boolean jjtc001 = true;
       jjtree.openNodeScope(jjtn001);
       try {
@@ -126,7 +126,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
 
   final private void decls1() throws ParseException {
     jj_consume_token(SEMICOLON);
-                  ASTdecls jjtn001 = new ASTdecls(JJTDECLS);
+                  ASTDecls jjtn001 = new ASTDecls(JJTDECLS);
                   boolean jjtc001 = true;
                   jjtree.openNodeScope(jjtn001);
     try {
@@ -165,7 +165,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       jj_consume_token(FINAL);
       type();
       ident();
-                             ASTcst jjtn001 = new ASTcst(JJTCST);
+                             ASTCst jjtn001 = new ASTCst(JJTCST);
                              boolean jjtc001 = true;
                              jjtree.openNodeScope(jjtn001);
       try {
@@ -206,7 +206,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       jj_consume_token(LCBRACKET);
       vars();
       instrs();
-                                                          ASTmethode jjtn001 = new ASTmethode(JJTMETHODE);
+                                                          ASTMethode jjtn001 = new ASTMethode(JJTMETHODE);
                                                           boolean jjtc001 = true;
                                                           jjtree.openNodeScope(jjtn001);
       try {
@@ -231,7 +231,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case FINAL:
       var();
       jj_consume_token(SEMICOLON);
-                        ASTvars jjtn001 = new ASTvars(JJTVARS);
+                        ASTVars jjtn001 = new ASTVars(JJTVARS);
                         boolean jjtc001 = true;
                         jjtree.openNodeScope(jjtn001);
       try {
@@ -258,7 +258,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       break;
     default:
       jj_la1[3] = jj_gen;
-      ASTvnil jjtn002 = new ASTvnil(JJTVNIL);
+      ASTVnil jjtn002 = new ASTVnil(JJTVNIL);
       boolean jjtc002 = true;
       jjtree.openNodeScope(jjtn002);
       try {
@@ -298,7 +298,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       jj_consume_token(FINAL);
       type();
       ident();
-                             ASTcst jjtn001 = new ASTcst(JJTCST);
+                             ASTCst jjtn001 = new ASTCst(JJTCST);
                              boolean jjtc001 = true;
                              jjtree.openNodeScope(jjtn001);
       try {
@@ -335,7 +335,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case LBRACKET:
       jj_consume_token(LBRACKET);
       exp();
-                        ASTtableau jjtn001 = new ASTtableau(JJTTABLEAU);
+                        ASTTableau jjtn001 = new ASTTableau(JJTTABLEAU);
                         boolean jjtc001 = true;
                         jjtree.openNodeScope(jjtn001);
       try {
@@ -348,7 +348,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       break;
     default:
       jj_la1[5] = jj_gen;
-       ASTvar jjtn002 = new ASTvar(JJTVAR);
+       ASTVar jjtn002 = new ASTVar(JJTVAR);
        boolean jjtc002 = true;
        jjtree.openNodeScope(jjtn002);
       try {
@@ -383,7 +383,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       break;
     default:
       jj_la1[6] = jj_gen;
-      ASTomega jjtn001 = new ASTomega(JJTOMEGA);
+      ASTOmega jjtn001 = new ASTOmega(JJTOMEGA);
       boolean jjtc001 = true;
       jjtree.openNodeScope(jjtn001);
       try {
@@ -411,8 +411,8 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
   }
 
   final private void methmain() throws ParseException {
-                                    /*@bgen(jjtree) #main( 2) */
-  ASTmain jjtn000 = new ASTmain(JJTMAIN);
+                                    /*@bgen(jjtree) #Main( 2) */
+  ASTMain jjtn000 = new ASTMain(JJTMAIN);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -451,7 +451,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       break;
     default:
       jj_la1[7] = jj_gen;
-      ASTenil jjtn001 = new ASTenil(JJTENIL);
+      ASTEnil jjtn001 = new ASTEnil(JJTENIL);
       boolean jjtc001 = true;
       jjtree.openNodeScope(jjtn001);
       try {
@@ -482,7 +482,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case COMMA:
       jj_consume_token(COMMA);
-              ASTentetes jjtn001 = new ASTentetes(JJTENTETES);
+              ASTEntetes jjtn001 = new ASTEntetes(JJTENTETES);
               boolean jjtc001 = true;
               jjtree.openNodeScope(jjtn001);
       try {
@@ -509,7 +509,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       break;
     default:
       jj_la1[8] = jj_gen;
-      ASTenil jjtn002 = new ASTenil(JJTENIL);
+      ASTEnil jjtn002 = new ASTEnil(JJTENIL);
       boolean jjtc002 = true;
       jjtree.openNodeScope(jjtn002);
       try {
@@ -538,7 +538,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
 
   final private void entete() throws ParseException {
     type();
-             ASTentete jjtn001 = new ASTentete(JJTENTETE);
+             ASTEntete jjtn001 = new ASTEntete(JJTENTETE);
              boolean jjtc001 = true;
              jjtree.openNodeScope(jjtn001);
     try {
@@ -577,7 +577,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       break;
     default:
       jj_la1[9] = jj_gen;
-      ASTinil jjtn001 = new ASTinil(JJTINIL);
+      ASTInil jjtn001 = new ASTInil(JJTINIL);
       boolean jjtc001 = true;
       jjtree.openNodeScope(jjtn001);
       try {
@@ -606,7 +606,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
 
   final private void instrs1() throws ParseException {
     jj_consume_token(SEMICOLON);
-                  ASTinstrs jjtn001 = new ASTinstrs(JJTINSTRS);
+                  ASTInstrs jjtn001 = new ASTInstrs(JJTINSTRS);
                   boolean jjtc001 = true;
                   jjtree.openNodeScope(jjtn001);
     try {
@@ -640,7 +640,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       break;
     case RETURN:
       jj_consume_token(RETURN);
-               ASTretour jjtn001 = new ASTretour(JJTRETOUR);
+               ASTRetour jjtn001 = new ASTRetour(JJTRETOUR);
                boolean jjtc001 = true;
                jjtree.openNodeScope(jjtn001);
       try {
@@ -669,7 +669,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       jj_consume_token(WRITE);
       jj_consume_token(LPAR);
       instr3();
-                              ASTecrire jjtn002 = new ASTecrire(JJTECRIRE);
+                              ASTEcrire jjtn002 = new ASTEcrire(JJTECRIRE);
                               boolean jjtc002 = true;
                               jjtree.openNodeScope(jjtn002);
       try {
@@ -684,7 +684,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       jj_consume_token(WRITELN);
       jj_consume_token(LPAR);
       instr3();
-                                ASTecrireln jjtn003 = new ASTecrireln(JJTECRIRELN);
+                                ASTEcrireLn jjtn003 = new ASTEcrireLn(JJTECRIRELN);
                                 boolean jjtc003 = true;
                                 jjtree.openNodeScope(jjtn003);
       try {
@@ -703,7 +703,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       jj_consume_token(LCBRACKET);
       instrs();
       jj_consume_token(RCBRACKET);
-                                                                ASTsi jjtn004 = new ASTsi(JJTSI);
+                                                                ASTSi jjtn004 = new ASTSi(JJTSI);
                                                                 boolean jjtc004 = true;
                                                                 jjtree.openNodeScope(jjtn004);
       try {
@@ -735,7 +735,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       jj_consume_token(RPAR);
       jj_consume_token(LCBRACKET);
       instrs();
-                                                       ASTtantque jjtn005 = new ASTtantque(JJTTANTQUE);
+                                                       ASTTantQue jjtn005 = new ASTTantQue(JJTTANTQUE);
                                                        boolean jjtc005 = true;
                                                        jjtree.openNodeScope(jjtn005);
       try {
@@ -757,7 +757,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ASSIGN:
       jj_consume_token(ASSIGN);
-               ASTaffectation jjtn001 = new ASTaffectation(JJTAFFECTATION);
+               ASTAffectation jjtn001 = new ASTAffectation(JJTAFFECTATION);
                boolean jjtc001 = true;
                jjtree.openNodeScope(jjtn001);
       try {
@@ -784,7 +784,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       break;
     case ASSIGN_INCREMENT:
       jj_consume_token(ASSIGN_INCREMENT);
-                         ASTsomme jjtn002 = new ASTsomme(JJTSOMME);
+                         ASTSomme jjtn002 = new ASTSomme(JJTSOMME);
                          boolean jjtc002 = true;
                          jjtree.openNodeScope(jjtn002);
       try {
@@ -810,7 +810,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       }
       break;
     case INCREMENT:
-      ASTincrement jjtn003 = new ASTincrement(JJTINCREMENT);
+      ASTIncrement jjtn003 = new ASTIncrement(JJTINCREMENT);
       boolean jjtc003 = true;
       jjtree.openNodeScope(jjtn003);
       try {
@@ -833,7 +833,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case LPAR:
       jj_consume_token(LPAR);
       listexp();
-                       ASTappelI jjtn001 = new ASTappelI(JJTAPPELI);
+                       ASTAppelI jjtn001 = new ASTAppelI(JJTAPPELI);
                        boolean jjtc001 = true;
                        jjtree.openNodeScope(jjtn001);
       try {
@@ -890,7 +890,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       break;
     default:
       jj_la1[15] = jj_gen;
-      ASTinil jjtn001 = new ASTinil(JJTINIL);
+      ASTInil jjtn001 = new ASTInil(JJTINIL);
       boolean jjtc001 = true;
       jjtree.openNodeScope(jjtn001);
       try {
@@ -928,7 +928,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case IDENTIFIER:
     case NUMBER:
       exp();
-            ASTlistexp jjtn001 = new ASTlistexp(JJTLISTEXP);
+            ASTListExp jjtn001 = new ASTListExp(JJTLISTEXP);
             boolean jjtc001 = true;
             jjtree.openNodeScope(jjtn001);
       try {
@@ -955,7 +955,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       break;
     default:
       jj_la1[16] = jj_gen;
-      ASTexnil jjtn002 = new ASTexnil(JJTEXNIL);
+      ASTExnil jjtn002 = new ASTExnil(JJTEXNIL);
       boolean jjtc002 = true;
       jjtree.openNodeScope(jjtn002);
       try {
@@ -987,7 +987,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case COMMA:
       jj_consume_token(COMMA);
       exp();
-                    ASTlistexp jjtn001 = new ASTlistexp(JJTLISTEXP);
+                    ASTListExp jjtn001 = new ASTListExp(JJTLISTEXP);
                     boolean jjtc001 = true;
                     jjtree.openNodeScope(jjtn001);
       try {
@@ -1014,7 +1014,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       break;
     default:
       jj_la1[17] = jj_gen;
-      ASTexnil jjtn002 = new ASTexnil(JJTEXNIL);
+      ASTExnil jjtn002 = new ASTExnil(JJTEXNIL);
       boolean jjtc002 = true;
       jjtree.openNodeScope(jjtn002);
       try {
@@ -1046,7 +1046,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case NOT:
       jj_consume_token(NOT);
       exp1();
-                   ASTnot jjtn001 = new ASTnot(JJTNOT);
+                   ASTNot jjtn001 = new ASTNot(JJTNOT);
                    boolean jjtc001 = true;
                    jjtree.openNodeScope(jjtn001);
       try {
@@ -1107,7 +1107,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case SUB:
       jj_consume_token(SUB);
       terme();
-                    ASTneg jjtn001 = new ASTneg(JJTNEG);
+                    ASTNeg jjtn001 = new ASTNeg(JJTNEG);
                     boolean jjtc001 = true;
                     jjtree.openNodeScope(jjtn001);
       try {
@@ -1144,7 +1144,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case AND:
       jj_consume_token(AND);
       exp1();
-                   ASTet jjtn001 = new ASTet(JJTET);
+                   ASTEt jjtn001 = new ASTEt(JJTET);
                    boolean jjtc001 = true;
                    jjtree.openNodeScope(jjtn001);
       try {
@@ -1172,7 +1172,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case OR:
       jj_consume_token(OR);
       exp1();
-                  ASTou jjtn002 = new ASTou(JJTOU);
+                  ASTOu jjtn002 = new ASTOu(JJTOU);
                   boolean jjtc002 = true;
                   jjtree.openNodeScope(jjtn002);
       try {
@@ -1208,7 +1208,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case EQUAL:
       jj_consume_token(EQUAL);
       exp2();
-                     ASTeq jjtn001 = new ASTeq(JJTEQ);
+                     ASTEq jjtn001 = new ASTEq(JJTEQ);
                      boolean jjtc001 = true;
                      jjtree.openNodeScope(jjtn001);
       try {
@@ -1236,7 +1236,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case SUP:
       jj_consume_token(SUP);
       exp2();
-                   ASTsup jjtn002 = new ASTsup(JJTSUP);
+                   ASTSup jjtn002 = new ASTSup(JJTSUP);
                    boolean jjtc002 = true;
                    jjtree.openNodeScope(jjtn002);
       try {
@@ -1272,7 +1272,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case ADD:
       jj_consume_token(ADD);
       terme();
-                    ASTadd jjtn001 = new ASTadd(JJTADD);
+                    ASTAdd jjtn001 = new ASTAdd(JJTADD);
                     boolean jjtc001 = true;
                     jjtree.openNodeScope(jjtn001);
       try {
@@ -1300,7 +1300,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case SUB:
       jj_consume_token(SUB);
       terme();
-                    ASTsub jjtn002 = new ASTsub(JJTSUB);
+                    ASTSub jjtn002 = new ASTSub(JJTSUB);
                     boolean jjtc002 = true;
                     jjtree.openNodeScope(jjtn002);
       try {
@@ -1341,7 +1341,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case MUL:
       jj_consume_token(MUL);
       fact();
-                   ASTmul jjtn001 = new ASTmul(JJTMUL);
+                   ASTMul jjtn001 = new ASTMul(JJTMUL);
                    boolean jjtc001 = true;
                    jjtree.openNodeScope(jjtn001);
       try {
@@ -1369,7 +1369,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case DIV:
       jj_consume_token(DIV);
       fact();
-                   ASTdiv jjtn002 = new ASTdiv(JJTDIV);
+                   ASTDiv jjtn002 = new ASTDiv(JJTDIV);
                    boolean jjtc002 = true;
                    jjtree.openNodeScope(jjtn002);
       try {
@@ -1410,7 +1410,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       jj_consume_token(LENGTH);
       jj_consume_token(LPAR);
       ident();
-                              ASTlongeur jjtn001 = new ASTlongeur(JJTLONGEUR);
+                              ASTLongeur jjtn001 = new ASTLongeur(JJTLONGEUR);
                               boolean jjtc001 = true;
                               jjtree.openNodeScope(jjtn001);
       try {
@@ -1422,7 +1422,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       }
       break;
     case TRUE:
-      ASTvrai jjtn002 = new ASTvrai(JJTVRAI);
+      ASTVrai jjtn002 = new ASTVrai(JJTVRAI);
       boolean jjtc002 = true;
       jjtree.openNodeScope(jjtn002);
       try {
@@ -1434,7 +1434,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       }
       break;
     case FALSE:
-      ASTfaux jjtn003 = new ASTfaux(JJTFAUX);
+      ASTFaux jjtn003 = new ASTFaux(JJTFAUX);
       boolean jjtc003 = true;
       jjtree.openNodeScope(jjtn003);
       try {
@@ -1451,7 +1451,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case LPAR:
       jj_consume_token(LPAR);
       exp();
-                   ASTexp jjtn004 = new ASTexp(JJTEXP);
+                   ASTExp jjtn004 = new ASTExp(JJTEXP);
                    boolean jjtc004 = true;
                    jjtree.openNodeScope(jjtn004);
       try {
@@ -1474,7 +1474,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
     case LPAR:
       jj_consume_token(LPAR);
       listexp();
-                       ASTappelE jjtn001 = new ASTappelE(JJTAPPELE);
+                       ASTAppelE jjtn001 = new ASTAppelE(JJTAPPELE);
                        boolean jjtc001 = true;
                        jjtree.openNodeScope(jjtn001);
       try {
@@ -1501,7 +1501,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
   final private void ident2() throws ParseException {
     jj_consume_token(LBRACKET);
     exp();
-                       ASTtab jjtn001 = new ASTtab(JJTTAB);
+                       ASTTab jjtn001 = new ASTTab(JJTTAB);
                        boolean jjtc001 = true;
                        jjtree.openNodeScope(jjtn001);
     try {
@@ -1516,7 +1516,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
   final private void typemeth() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case VOID:
-      ASTrien jjtn001 = new ASTrien(JJTRIEN);
+      ASTRien jjtn001 = new ASTRien(JJTRIEN);
       boolean jjtc001 = true;
       jjtree.openNodeScope(jjtn001);
       try {
@@ -1541,7 +1541,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
   final private void type() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case INT:
-      ASTentier jjtn001 = new ASTentier(JJTENTIER);
+      ASTEntier jjtn001 = new ASTEntier(JJTENTIER);
       boolean jjtc001 = true;
       jjtree.openNodeScope(jjtn001);
       try {
@@ -1553,7 +1553,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
       }
       break;
     case BOOLEAN:
-      ASTbooleen jjtn002 = new ASTbooleen(JJTBOOLEEN);
+      ASTBooleen jjtn002 = new ASTBooleen(JJTBOOLEEN);
       boolean jjtc002 = true;
       jjtree.openNodeScope(jjtn002);
       try {
@@ -1576,17 +1576,17 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
   }
 
   final public void nbre() throws ParseException {
-                     /*@bgen(jjtree) nbre */
-                     ASTnbre jjtn000 = new ASTnbre(JJTNBRE);
+                     /*@bgen(jjtree) Nbre */
+                     ASTNbre jjtn000 = new ASTNbre(JJTNBRE);
                      boolean jjtc000 = true;
-                     jjtree.openNodeScope(jjtn000);int x;
+                     jjtree.openNodeScope(jjtn000);int x; Token t;
     try {
-      jj_consume_token(NUMBER);
-                   jjtree.closeNodeScope(jjtn000, true);
-                   jjtc000 = false;
-                try { x = Integer.parseInt(token.image);
+      t = jj_consume_token(NUMBER);
+                       jjtree.closeNodeScope(jjtn000, true);
+                       jjtc000 = false;
+                try { x = Integer.parseInt(t.image);
                 } catch (NumberFormatException ee) {
-                   System.err.println("Error: " + token.image + " is not a number.");
+                   System.err.println(ee.getMessage());
                    x = 0;
                 }
                 jjtn000.jjtSetValue(x);
@@ -1598,8 +1598,8 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants, MiniJaja
   }
 
   final public void chaine() throws ParseException {
-                         /*@bgen(jjtree) chaine */
-                         ASTchaine jjtn000 = new ASTchaine(JJTCHAINE);
+                         /*@bgen(jjtree) Chaine */
+                         ASTChaine jjtn000 = new ASTChaine(JJTCHAINE);
                          boolean jjtc000 = true;
                          jjtree.openNodeScope(jjtn000);Token t;
     try {
