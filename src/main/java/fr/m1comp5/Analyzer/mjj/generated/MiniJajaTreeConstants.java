@@ -33,11 +33,11 @@ public interface MiniJajaTreeConstants
   public int JJTLISTEXP = 27;
   public int JJTEXNIL = 28;
   public int JJTNOT = 29;
-  public int JJTNEG = 30;
-  public int JJTET = 31;
-  public int JJTOU = 32;
-  public int JJTEQ = 33;
-  public int JJTSUP = 34;
+  public int JJTET = 30;
+  public int JJTOU = 31;
+  public int JJTEQ = 32;
+  public int JJTSUP = 33;
+  public int JJTNEG = 34;
   public int JJTADD = 35;
   public int JJTSUB = 36;
   public int JJTMUL = 37;
@@ -86,11 +86,11 @@ public interface MiniJajaTreeConstants
     "ListExp",
     "Exnil",
     "Not",
-    "Neg",
     "Et",
     "Ou",
     "Eq",
     "Sup",
+    "Neg",
     "Add",
     "Sub",
     "Mul",
@@ -108,4 +108,4 @@ public interface MiniJajaTreeConstants
     "Chaine",
   };
 }
-/* JavaCC - OriginalChecksum=46b77f55756ba6a1a54c0493ee991a85 (do not edit this line) */
+/* JavaCC - OriginalChecksum=19c2c0c77a6a77311d1aeb2a5c875fe6 (do not edit this line) */

@@ -33,11 +33,11 @@ public interface MiniJajaVisitor
   public Object visit(ASTListExp node, Object data);
   public Object visit(ASTExnil node, Object data);
   public Object visit(ASTNot node, Object data);
-  public Object visit(ASTNeg node, Object data);
   public Object visit(ASTEt node, Object data);
   public Object visit(ASTOu node, Object data);
   public Object visit(ASTEq node, Object data);
   public Object visit(ASTSup node, Object data);
+  public Object visit(ASTNeg node, Object data);
   public Object visit(ASTAdd node, Object data);
   public Object visit(ASTSub node, Object data);
   public Object visit(ASTMul node, Object data);
@@ -54,4 +54,4 @@ public interface MiniJajaVisitor
   public Object visit(ASTNbre node, Object data);
   public Object visit(ASTChaine node, Object data);
 }
-/* JavaCC - OriginalChecksum=3d4556dc4b1ed85a98c593cace1d3989 (do not edit this line) */
+/* JavaCC - OriginalChecksum=df96cf42b36dd9a309d503c7cdfa0878 (do not edit this line) */

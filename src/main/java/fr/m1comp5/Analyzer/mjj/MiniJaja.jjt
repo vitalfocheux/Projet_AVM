@@ -83,17 +83,17 @@ SKIP :
     <STRING:  "\"" (~["\""])* "\"">
 }
 
-public SimpleNode start() #root : {}
+public SimpleNode start() #Root : {}
 {
     classe() {return jjtThis;}
 }
 
-private void classe() #classe(3) : {}
+private void classe() #Classe(3) : {}
 {
     <CLASS> ident() <LCBRACKET> decls() methmain() <RCBRACKET>
 }
 
-private void ident() #ident : {Token t;}
+private void ident() #Ident : {Token t;}
 {
     t = <IDENTIFIER> {jjtThis.value = t.image;}
 }
@@ -101,53 +101,53 @@ private void ident() #ident : {Token t;}
 private void decls() : {}
 {
     decl() decls1() |
-    empty() #vnil
+    empty() #Vnil
 }
 
 private void decls1() : {}
 {
-    <SEMICOLON> decls() #decls(2)
+    <SEMICOLON> decls() #Decls(2)
 }
 
 private void decl() : {}
 {
     typemeth() ident() decl1()           |
-    <FINAL> type() ident() vexp() #cst(3)
+    <FINAL> type() ident() vexp() #Cst(3)
 }
 
 private void decl1() : {}
 {
-    <LPAR> entetes() <RPAR> <LCBRACKET> vars() instrs() <RCBRACKET> #methode(5) |
+    <LPAR> entetes() <RPAR> <LCBRACKET> vars() instrs() <RCBRACKET> #Methode(5) |
     var1()
 }
 
 private void vars() : {}
 {
-    var() <SEMICOLON> vars() #vars(2) |
-    empty() #vnil
+    var() <SEMICOLON> vars() #Vars(2) |
+    empty() #Vnil
 
 }
 
 private void var() : {}
 {
     typemeth() ident() var1()            |
-    <FINAL> type() ident() vexp() #cst(3)
+    <FINAL> type() ident() vexp() #Cst(3)
 }
 
 private void var1() : {}
 {
-     <LBRACKET> exp() <RBRACKET> #tableau(3) |
-     vexp() #var(3)
+     <LBRACKET> exp() <RBRACKET> #Tableau(3) |
+     vexp() #Var(3)
 }
 
 private void vexp() : {}
 {
     <ASSIGN> exp() |
-    empty() #omega
+    empty() #Omega
 }
 
 
-private void methmain() #main(2) : {}
+private void methmain() #Main(2) : {}
 {
     <MAIN> <LCBRACKET> vars() instrs() <RCBRACKET>
 }
@@ -155,51 +155,51 @@ private void methmain() #main(2) : {}
 private void entetes() : {}
 {
     entete() entetes1() |
-    empty() #enil
+    empty() #Enil
 }
 
 private void entetes1() : {}
 {
-    <COMMA> entetes() #entetes(2) |
-    empty() #enil
+    <COMMA> entetes() #Entetes(2) |
+    empty() #Enil
 }
 
 private void entete() : {}
 {
-    type() ident() #entete(2)
+    type() ident() #Entete(2)
 }
 
 private void instrs() : {}
 {
     instr() instrs1() |
-    empty() #inil
+    empty() #Inil
 }
 
 private void instrs1() : {}
 {
-    <SEMICOLON> instrs() #instrs(2)
+    <SEMICOLON> instrs() #Instrs(2)
 }
 
 private void instr() : {}
 {
     ident() instr2()                                           |
-    <RETURN> exp() #retour                                     |
-    <WRITE> <LPAR> instr3() <RPAR> #ecrire(1)                  |
-    <WRITELN> <LPAR> instr3() <RPAR> #ecrireln(1)              |
-    <IF> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> ELSE() #si(3) |
-    <WHILE> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> #tantque(2)
+    <RETURN> exp() #Retour                                     |
+    <WRITE> <LPAR> instr3() <RPAR> #Ecrire(1)                  |
+    <WRITELN> <LPAR> instr3() <RPAR> #EcrireLn(1)              |
+    <IF> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> ELSE() #Si(3) |
+    <WHILE> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> #TantQue(2)
 }
 
 private void instr1() : {}
 {
-    <ASSIGN> exp() #affectation(2)     |
-    <ASSIGN_INCREMENT> exp() #somme(2) |
-    <INCREMENT> #increment(1)
+    <ASSIGN> exp() #Affectation(2)     |
+    <ASSIGN_INCREMENT> exp() #Somme(2) |
+    <INCREMENT> #Increment(1)
 }
 
 private void instr2() : {}
 {
-    <LPAR> listexp() <RPAR> #appelI(2) |
+    <LPAR> listexp() <RPAR> #AppelI(2) |
     [ident2()] instr1()
 }
 
@@ -212,32 +212,32 @@ private void instr3() : {}
 private void ELSE() : {}
 {
     <ELSE> <LCBRACKET> instrs() <RCBRACKET> |
-    empty() #inil
+    empty() #Inil
 }
 
 private void listexp() : {}
 {
-    exp() listexp1() #listexp(2) |
-    empty() #exnil
+    exp() listexp1() #ListExp(2) |
+    empty() #Exnil
 }
 
 private void listexp1() : {}
 {
-    <COMMA> exp() listexp1() #listexp(2) |
-    empty() #exnil
+    <COMMA> exp() listexp1() #ListExp(2) |
+    empty() #Exnil
 }
 
 private void exp() : {}
 {
-    <NOT> exp1() #not |
+    <NOT> exp1() #Not |
     exp1() exp3()
 }
 
 private void exp3() : {}
 {
     [
-        <AND> exp1() exp3() #et(2) |
-        <OR> exp1() exp3() #ou(2)
+        <AND> exp1() exp3() #Et(2) |
+        <OR> exp1() exp3() #Ou(2)
     ]
 }
 
@@ -249,22 +249,22 @@ private void exp1() : {}
 private void exp4() : {}
 {
     [
-        <EQUAL> exp2() #eq(2) |
-        <SUP> exp2() #sup(2)
+        <EQUAL> exp2() #Eq(2) |
+        <SUP> exp2() #Sup(2)
     ]
 }
 
 private void exp2() : {}
 {
     terme() exp5() |
-    <SUB> terme() #neg
+    <SUB> terme() #Neg
 }
 
 private void exp5() : {}
 {
     [
-        <ADD> exp2() #add(2) |
-        <SUB> exp2() #sub(2)
+        <ADD> exp2() #Add(2) |
+        <SUB> exp2() #Sub(2)
     ]
 }
 
@@ -276,42 +276,42 @@ private void terme() : {}
 private void terme1() : {}
 {
     [
-        <MUL> terme() #mul(2) |
-        <DIV> terme() #div(2)
+        <MUL> terme() #Mul(2) |
+        <DIV> terme() #Div(2)
     ]
 }
 
 private void fact() : {}
 {
     ident() fact1()                 |
-    <LENGTH> <LPAR> ident() <RPAR>  #longeur(1) |
-    <TRUE> #vrai                      |
-    <FALSE> #faux                     |
+    <LENGTH> <LPAR> ident() <RPAR>  #Longeur(1) |
+    <TRUE> #Vrai                      |
+    <FALSE> #Faux                     |
     nbre()                            |
-    <LPAR> exp() <RPAR> #exp(1)
+    <LPAR> exp() <RPAR> #Exp(1)
 }
 
 private void fact1() : {}
 {
-    <LPAR> listexp() <RPAR> #appelE(2) |
+    <LPAR> listexp() <RPAR> #AppelE(2) |
     [ident2()]
 }
 
 private void ident2() : {}
 {
-    <LBRACKET> exp() <RBRACKET> #tab(2)
+    <LBRACKET> exp() <RBRACKET> #Tab(2)
 }
 
 private void typemeth() : {}
 {
-    <VOID> #rien |
+    <VOID> #Rien |
     type()
 }
 
 private void type() : {}
 {
-    <INT> #entier     |
-    <BOOLEAN> #booleen
+    <INT> #Entier     |
+    <BOOLEAN> #Booleen
 }
 
 private void empty() : {}
@@ -319,7 +319,7 @@ private void empty() : {}
     {}
 }
 
-void nbre() #nbre : {int x;} {
+void nbre() #Nbre : {int x;} {
 	<NUMBER> {
 		try { x = Integer.parseInt(token.image);
 		} catch (NumberFormatException ee) {
@@ -330,7 +330,7 @@ void nbre() #nbre : {int x;} {
 	}
 }
 
-void chaine() #chaine : {Token t;}
+void chaine() #Chaine : {Token t;}
 {
   t = <STRING> {jjtThis.value = t.image;}
 }
