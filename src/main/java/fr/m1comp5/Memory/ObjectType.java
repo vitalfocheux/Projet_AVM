@@ -6,4 +6,5 @@ public enum ObjectType
     BOOLEAN,
     VOID,
     EPSILON,
+    STRING,
 }
