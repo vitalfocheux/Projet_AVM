@@ -3,10 +3,7 @@ package fr.m1comp5.Interpreter.mjj;
 import fr.m1comp5.Analyzer.jjc.generated.ASTAnd;
 import fr.m1comp5.Analyzer.jjc.generated.ASTOr;
 import fr.m1comp5.Analyzer.mjj.generated.*;
-import fr.m1comp5.Memory.ObjectType;
-import fr.m1comp5.Memory.MemoryObject;
-import fr.m1comp5.Memory.ObjectNature;
-import fr.m1comp5.Memory.SymbolTable;
+import fr.m1comp5.Memory.*;
 
 public class VisitorMjj implements MiniJajaVisitor {
     private String toDisplay;
@@ -100,8 +97,13 @@ public class VisitorMjj implements MiniJajaVisitor {
         }
 
         MemoryObject mo = new MemoryObject(varIdent,value, ObjectNature.CST, varType);
-        symbolTable.put(mo);
-
+        try
+        {
+            symbolTable.put(mo);
+        }
+        catch (SymbolTableException ignored)
+        {
+        }
         return null;
     }
 
@@ -119,8 +121,13 @@ public class VisitorMjj implements MiniJajaVisitor {
         }
 
         MemoryObject mo = new MemoryObject(varIdent,value, ObjectNature.VAR, varType);
-        symbolTable.put(mo);
-
+        try
+        {
+            symbolTable.put(mo);
+        }
+        catch (SymbolTableException ignored)
+        {
+        }
         return null;
     }
 
@@ -265,7 +272,13 @@ public class VisitorMjj implements MiniJajaVisitor {
         String varIdent = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
         MemoryObject mo = symbolTable.get(varIdent);
         int val = (int) mo.getValue() + 1;
-        symbolTable.put(new MemoryObject(varIdent,val,mo.getNature(),mo.getType()));
+        try
+        {
+            symbolTable.put(new MemoryObject(varIdent,val,mo.getNature(),mo.getType()));
+        }
+        catch (SymbolTableException ignored)
+        {
+        }
         return val;
     }
 

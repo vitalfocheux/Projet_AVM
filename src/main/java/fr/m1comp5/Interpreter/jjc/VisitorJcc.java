@@ -84,7 +84,14 @@ public class VisitorJcc implements JajaCodeVisitor {
         int pos = (int) node.jjtGetChild(3).jjtAccept(this, data);
 
         switch (nature) {
-            case VAR : mem.identVal(varIdent, type, pos); break;
+            case VAR :
+                try
+                {
+                    mem.identVal(varIdent, type, pos);
+                } catch (Exception ignored)
+                {
+                }
+                 break;
             case CST :
 //                MemoryObject mo = mem.getStack().pop();
 //                mem.declCst(varIdent, mo.getValue(), type);

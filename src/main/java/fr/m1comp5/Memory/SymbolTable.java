@@ -83,7 +83,7 @@ public class SymbolTable
      * @param mo The memory object to put in the symbol table
      * @return True if the object was put in the table and false otherwise
      */
-    public boolean put(MemoryObject mo)
+    public boolean put(MemoryObject mo) throws SymbolTableException
     {
         if (mo == null)
         {
@@ -96,9 +96,15 @@ public class SymbolTable
             bucket = new ArrayList<>();
             buckets.set(hash, bucket);
         }
+        for (MemoryObject moo : bucket)
+        {
+            if (moo.equals(mo) || moo.getId().equals(mo.getId()))
+            {
+                throw new SymbolTableException("This object already exist in the symbol table");
+            }
+        }
         ++count;
         bucket.add(mo);
-        System.out.println("Saving in symbol table: " + mo.toString());
         if (needToRehash())
         {
             rehash();
@@ -106,11 +112,16 @@ public class SymbolTable
         return true;
     }
 
-    public boolean update (String ident, Object value) {
-        if (ident == null || value == null) return false;
+    public void update(String ident, Object value) throws SymbolTableException {
+        if (ident == null || value == null)
+        {
+            throw new SymbolTableException("The value and the identifier must not be null");
+        }
         MemoryObject mo = get(ident);
-        mo.setValue(value);
-        return true;
+        if (mo != null)
+        {
+            mo.setValue(value);
+        }
     }
 
     /**
@@ -118,21 +129,21 @@ public class SymbolTable
      * @param mo Memory object to remove from the symbol table
      * @return True if the object was removed and false otherwise
      */
-    public boolean remove(MemoryObject mo)
+    public void remove(MemoryObject mo)
     {
         if (mo == null)
         {
-            return false;
+            return;
         }
         List<MemoryObject> lmo = buckets.get(hashFunction(mo.getId()));
         if (lmo == null)
         {
-            return false;
+            return;
         }
         int idx = -1;
         for (int i = 0; i < lmo.size(); ++i)
         {
-            if (lmo.get(i).getId() == mo.getId())
+            if (lmo.get(i).getId().equals(mo.getId()))
             {
                 idx = i;
                 break;
@@ -143,7 +154,6 @@ public class SymbolTable
             lmo.remove(idx);
             --count;
         }
-        return idx != -1;
     }
 
     /**

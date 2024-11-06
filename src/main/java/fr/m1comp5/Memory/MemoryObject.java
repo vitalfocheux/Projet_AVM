@@ -20,6 +20,11 @@ public class MemoryObject
         return id;
     }
 
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
     public Object getValue()
     {
         return value;
@@ -34,9 +39,19 @@ public class MemoryObject
         return nature;
     }
 
+    public void setNature(ObjectNature nature)
+    {
+        this.nature = nature;
+    }
+
     public ObjectType getType()
     {
         return type;
+    }
+
+    public void setType(ObjectType type)
+    {
+        this.type = type;
     }
 
     public String toString() { return "<"+ getId() +","+ getValue() +","+getNature()+","+getType()+">"; }

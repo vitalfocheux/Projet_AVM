@@ -4,6 +4,7 @@ public enum ObjectNature
 {
     VAR,
     METH,
+    VCST,
     CST,
     TAB,
 }
