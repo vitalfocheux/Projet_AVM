@@ -56,7 +56,7 @@ public class Stack {
 
     public int size() {
         return stackList.size();
-    }
+    } 
     public MemoryObject get(int index) throws StackException {
         if (index < 0 || index >= stackList.size()) {
             throw new StackException("Index out of bounds");
