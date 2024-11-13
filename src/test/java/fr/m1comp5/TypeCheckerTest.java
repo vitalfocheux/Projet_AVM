@@ -57,6 +57,19 @@ public class TypeCheckerTest {
         }
 
     }
+    @Test 
+    public void testLong(){
+        ASTident longueur = new ASTident(0);
+        longueur.jjtSetValue("exemple");
+        ASTlongeur longueurNode = new ASTlongeur(0);
+        longueurNode.jjtAddChild(longueur, 0);
+        try {
+            typeChecker.visit(longueurNode,null ); 
+        } catch (TypeCheckException e) {
+            fail("Exception thrown during Longueur declaration: " + e.getMessage());
+        }
+
+    }
 
     @Test
     public void testVariableDeclaration() {
@@ -249,6 +262,7 @@ public class TypeCheckerTest {
     @Test
     public void testTantqueNoBoolean() {
         ASTnbre nbre = new ASTnbre(0);
+        nbre.jjtSetValue(4);
         ASTinil inil = new ASTinil(1);
         ASTtantque tantque = new ASTtantque(0);
         tantque.jjtAddChild(nbre, 0);  // pas booléen 
@@ -278,6 +292,7 @@ public class TypeCheckerTest {
     @Test
     public void testIfConditionTypeCheck2() {
         ASTnbre nbre = new ASTnbre(0);
+        nbre.jjtSetValue(1);
         ASTinil inil = new ASTinil(1);
         ASTsi ifNode = new ASTsi(0);
         ifNode.jjtAddChild(nbre, 0);  // Ajouter un nœud non-booléen comme condition
@@ -306,6 +321,7 @@ public class TypeCheckerTest {
     @Test
     public void testNegationNoBoolean() {
         ASTnbre nbre = new ASTnbre(0);
+        nbre.jjtSetValue(2);
         ASTnot not = new ASTnot(0);
         not.jjtAddChild(nbre, 0); 
 
@@ -332,6 +348,7 @@ public class TypeCheckerTest {
     @Test
     public void TestANDoperationNoBoolean() {
         ASTnbre nbre = new ASTnbre(0);
+        nbre.jjtSetValue(2);
         ASTfaux faux = new ASTfaux(1);
         ASTet et = new ASTet(0);
         et.jjtAddChild(nbre, 0);
@@ -360,6 +377,7 @@ public class TypeCheckerTest {
     @Test
     public void TestORoperationNoBoolean() {
         ASTnbre nbre = new ASTnbre(0);
+        nbre.jjtSetValue(2);
         ASTfaux faux = new ASTfaux(1);
         ASTou ou = new ASTou(0);
         ou.jjtAddChild(nbre, 0);
@@ -459,72 +477,30 @@ public class TypeCheckerTest {
         TypeCheckException exception = assertThrows(TypeCheckException.class, () -> {
             typeChecker.visit(mul, null);
         });
-
         assertTrue(exception.getMessage().contains("Type mismatch"));
     }
+
+    @Test
+    public void testListexpvide(){
+        ASTexnil exnil = new ASTexnil(0);
+        ASTlistexp listexp = new ASTlistexp(0);
+        listexp.jjtAddChild(exnil, 0);
+        try {
+            typeChecker.visit(listexp, null);
+        } catch (TypeCheckException e) {
+            fail("Exception thrown during listexp check: " + e.getMessage());
+        }
+    }
+ 
     @Test 
-    public void testAppelI(){
-        // Methode 
-        ASTcst cst = new ASTcst(0);
-        ASTentier entier = new ASTentier(0);
-        ASTident cstIdent = new ASTident(1);
-        ASTnbre nbre = new ASTnbre(2);
-        nbre.jjtSetValue(0);    
-        cstIdent.jjtSetValue("zero");
-        cst.jjtAddChild(entier, 0);
-        cst.jjtAddChild(cstIdent, 1);
-        cst.jjtAddChild(nbre, 2);
-        try {
-            typeChecker.visit(cst, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during constant declaration: " + e.getMessage());
-        }
-        ASTentier enti = new ASTentier(0);
-        ASTident varIdent = new ASTident(1);
-        varIdent.jjtSetValue("zero");
-        // ENTETES
-        ASTentetes entetes = new ASTentetes(3);
-        ASTentete entete = new ASTentete(0);
-        ASTenil enil = new ASTenil(1);
-
-        ASTentier entettype = new ASTentier(0);
-        ASTident IdentEntete = new ASTident(1);
-        IdentEntete.jjtSetValue("x");
-        entete.jjtAddChild(entettype, 0);
-        entete.jjtAddChild(IdentEntete, 1);
-
-        entetes.jjtAddChild(entete, 0);
-        entetes.jjtAddChild(enil, 1);
-        
-        ASTvnil var = new ASTvnil(4);
-        ASTretour retour = new ASTretour(5);
-        ASTnbre retourNbre = new ASTnbre(0);
-
-        retourNbre.jjtSetValue(0);
-        retour.jjtAddChild(retourNbre, 0);
-        ASTmethode methode = new ASTmethode(0);
-        methode.jjtAddChild(enti, 0);
-        methode.jjtAddChild(varIdent, 1);
-        methode.jjtAddChild(entetes, 2);
-        methode.jjtAddChild(var, 3);
-        methode.jjtAddChild(retour, 4);
-
-        try {
-            typeChecker.visit(methode, null);
-            // La méthode devrait être correctement ajoutée sans erreur
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during method declaration: " + e.getMessage());
-        }
-
-        // AppelI
-        ASTappelI appelI = new ASTappelI(0);
-        ASTident ident = new ASTident(0);
-        ident.jjtSetValue("zero");
-        ASTlistexp listexp = new ASTlistexp(1);
+    public void testListexp1(){
         ASTnbre nbre1 = new ASTnbre(0);
+        nbre1.jjtSetValue(2);
+        ASTnbre nbre2 = new ASTnbre(1);
+        nbre2.jjtSetValue(3);
+        ASTlistexp listexp = new ASTlistexp(0);
         ASTexnil exnil = new ASTexnil(0);
         ASTexp exp = new ASTexp(0);
-        nbre1.jjtSetValue(5);
         exp.jjtAddChild(nbre1, 0);
         listexp.jjtAddChild(exp, 0);
         listexp.jjtAddChild(exnil, 1);
@@ -533,8 +509,80 @@ public class TypeCheckerTest {
         } catch (TypeCheckException e) {
             fail("Exception thrown during listexp check: " + e.getMessage());
         }
+    }
+    @Test
+    public void testListexp2() {
+        ASTincrement incrementNode = increment("z",4);
+        ASTlistexp listexp = new ASTlistexp(0);
+        ASTexnil exnil = new ASTexnil(0);
+        ASTexp exp = new ASTexp(0);
+        exp.jjtAddChild(incrementNode, 0);
+        listexp.jjtAddChild(exp, 0);
+        listexp.jjtAddChild(exnil, 1);
+        try {
+            typeChecker.visit(listexp, null);
+        } catch (TypeCheckException e) {
+            fail("Exception thrown during listexp check: " + e.getMessage());
+        }
+        
+    }
+     
+    @Test 
+    public void testAppelI(){
+        // declarer methode int zero(x:entier){return 0;}
+        ASTentier enti = new ASTentier(0);
+        ASTident nomMeth = new ASTident(0);
+        nomMeth.jjtSetValue("zero");
+        // ENTETES pour methode : (x:entier)
+        ASTentetes entetes = new ASTentetes(0);
+        ASTentete entete = new ASTentete(0);
+        ASTenil enil = new ASTenil(0);
 
+        ASTentier entettype = new ASTentier(0);
+        ASTident IdentEntete = new ASTident(0);
+        IdentEntete.jjtSetValue("x");
+        entete.jjtAddChild(entettype, 0);
+        entete.jjtAddChild(IdentEntete, 1);
 
+        entetes.jjtAddChild(entete, 0);
+        entetes.jjtAddChild(enil, 1);
+        
+        ASTvnil var = new ASTvnil(0);
+        ASTretour retour = new ASTretour(0);
+        ASTnbre retourNbre = new ASTnbre(0);
+
+        retourNbre.jjtSetValue(0);
+        retour.jjtAddChild(retourNbre, 0);
+        ASTmethode methode = new ASTmethode(0);
+        methode.jjtAddChild(enti, 0);
+        methode.jjtAddChild(nomMeth, 1);
+        methode.jjtAddChild(entetes, 2);
+        methode.jjtAddChild(var, 3);
+        methode.jjtAddChild(retour, 4);
+
+        try {
+            typeChecker.visit(methode, null);
+        } catch (TypeCheckException e) {
+            fail("Exception thrown during method declaration: " + e.getMessage());
+        }
+
+        // AppelI: zero(5)
+        ASTappelI appelI = new ASTappelI(0);
+        ASTident ident = new ASTident(0);
+        ident.jjtSetValue("zero");
+        //  listexp 
+        ASTnbre nbre1 = new ASTnbre(0);
+        nbre1.jjtSetValue(2);
+        ASTnbre nbre2 = new ASTnbre(1);
+        nbre2.jjtSetValue(3);
+        ASTlistexp listexp = new ASTlistexp(0);
+        ASTexnil exnil = new ASTexnil(0);
+        ASTexp exp = new ASTexp(0);
+        exp.jjtAddChild(nbre1, 0);
+        listexp.jjtAddChild(exp, 0);
+        listexp.jjtAddChild(exnil, 1);
+       
+       
         appelI.jjtAddChild(ident, 0);
         appelI.jjtAddChild(listexp , 1);
         try {
@@ -543,7 +591,7 @@ public class TypeCheckerTest {
             fail("Exception thrown during appelI  check: " + e.getMessage());
         }
     }
-    
+
     @Test
     public void testIncrementOnInteger() {
         // Déclarer une variable y de type entier
@@ -603,5 +651,33 @@ public class TypeCheckerTest {
             assertTrue(e.getMessage().contains("Type mismatch"));
         }
     }
+
+    // Créer une constante entière
+    public void creerCstInt(String nom, int valeur){
+        ASTcst cst = new ASTcst(0);
+        ASTentier entier = new ASTentier(0);
+        ASTident cstIdent = new ASTident(1);
+        ASTnbre nbre = new ASTnbre(2);
+        nbre.jjtSetValue(valeur);    
+        cstIdent.jjtSetValue(nom);
+        cst.jjtAddChild(entier, 0);
+        cst.jjtAddChild(cstIdent, 1);
+        cst.jjtAddChild(nbre, 2); 
+        try {
+            typeChecker.visit(cst, null);
+        } catch (TypeCheckException e) {
+            fail("Exception thrown during constant declaration: " + e.getMessage());
+        }
+    }
+    // Créer un nœud d'incrémentation
+    public ASTincrement  increment(String nom, int valeur){
+        ASTincrement incrementNode = new ASTincrement(0);
+        creerCstInt(nom, valeur);
+        ASTident varIdent1 = new ASTident(0);
+        varIdent1.jjtSetValue(nom);
+         incrementNode.jjtAddChild(varIdent1, 0);
+         return incrementNode;
+    }
     
 }
+
