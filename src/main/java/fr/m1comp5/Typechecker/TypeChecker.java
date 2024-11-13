@@ -157,7 +157,6 @@ public class TypeChecker implements MiniJajaVisitor {
             throw new TypeCheckException("Expected ObjectType but found " + returnTypeObject.getClass().getSimpleName());
         }
         ObjectType returnType = (ObjectType) returnTypeObject;
-        System.out.println("Return type: " + returnType);
 
         String methodName = (String) node.jjtGetChild(1).jjtAccept(this, data);
         List<ObjectType> paramTypes = new ArrayList<>();
@@ -165,7 +164,6 @@ public class TypeChecker implements MiniJajaVisitor {
         // Récupérer les types des paramètres 
         ASTentetes entetesNode = (ASTentetes) node.jjtGetChild(2);
         collectParamTypes(entetesNode, paramTypes, data);
-        System.out.println("Param types: " + paramTypes);
 
         // Construire la signature de la méthode
         StringBuilder signatureBuilder = new StringBuilder(methodName);
@@ -338,9 +336,7 @@ public class TypeChecker implements MiniJajaVisitor {
     @Override
     public Object visit(ASTincrement node, Object data) {
         String varName = (String) node.jjtGetChild(0).jjtAccept(this, data); //  nom de la variable
-        System.out.println("Incrementing variable " + varName);
         MemoryObject mo = lookupSymbol(varName); 
-        System.out.println("MemoryObject: " + mo);
         
         if (mo == null) {
             throw new TypeCheckException("Variable " + varName + " is not defined.");
@@ -353,7 +349,6 @@ public class TypeChecker implements MiniJajaVisitor {
     @Override
     public Object visit(ASTappelI node, Object data) {
         String methodName = (String) node.jjtGetChild(0).jjtAccept(this, data);
-        System.out.println("Method name: " + node.jjtGetChild(0));
     
         // Construire la signature de la méthode à partir des paramètres
         Object paramsData = node.jjtGetChild(1);
@@ -361,7 +356,6 @@ public class TypeChecker implements MiniJajaVisitor {
             throw new TypeCheckException("Expected ASTlistexp for method parameters.");
         }
         ASTlistexp paramsNode = (ASTlistexp) paramsData;
-        System.out.println("listexp exp : " + paramsNode);
         List<ObjectType> actualParamTypes = new ArrayList<>();
         collectParamTypesFromListexp(paramsNode, actualParamTypes, data);
     
@@ -378,7 +372,6 @@ public class TypeChecker implements MiniJajaVisitor {
         String methodSignature = signatureBuilder.toString();
     
         // Rechercher la méthode avec la signature complète
-        System.out.println("Looking up method: " + methodSignature);
         MemoryObject mo = lookupSymbol(methodSignature);
         if (mo == null) {
             throw new TypeCheckException("Method " + methodSignature + " is not defined.");
@@ -405,12 +398,8 @@ public class TypeChecker implements MiniJajaVisitor {
         if (node.jjtGetNumChildren() == 2) {
             SimpleNode firstChild = (SimpleNode) node.jjtGetChild(0);
             SimpleNode secondChild = (SimpleNode) node.jjtGetChild(1);
-            System.out.println("First child: " + firstChild);
-            System.out.println("Second child: " + secondChild);
-    
             if (firstChild instanceof ASTexp) {
                 ObjectType paramType = (ObjectType) firstChild.jjtAccept(this, data);
-                System.out.println("Param type: " + paramType);
                 if (paramType == null) {
                     throw new TypeCheckException("Parameter type cannot be null.");
                 }
@@ -441,7 +430,6 @@ public class TypeChecker implements MiniJajaVisitor {
     
             if (firstChild instanceof ASTexp) {
                 ObjectType paramType = (ObjectType) firstChild.jjtAccept(this, data);
-                System.out.println("Param type: " + paramType);
                 if (paramType == null) {
                     throw new TypeCheckException("Parameter type cannot be null.");
                 }
@@ -464,7 +452,6 @@ public class TypeChecker implements MiniJajaVisitor {
     @Override
     public Object visit(ASTappelE node, Object data) {
         String methodName = (String) node.jjtGetChild(0).jjtAccept(this, data);
-        System.out.println("Method name: " + node.jjtGetChild(0));
     
         // Construire la signature de la méthode à partir des paramètres
         Object paramsData = node.jjtGetChild(1);
@@ -472,7 +459,6 @@ public class TypeChecker implements MiniJajaVisitor {
             throw new TypeCheckException("Expected ASTlistexp for method parameters.");
         }
         ASTlistexp paramsNode = (ASTlistexp) paramsData;
-        System.out.println("listexp exp : " + paramsNode);
         List<ObjectType> actualParamTypes = new ArrayList<>();
         collectParamTypesFromListexp(paramsNode, actualParamTypes, data);
     
@@ -489,7 +475,6 @@ public class TypeChecker implements MiniJajaVisitor {
         String methodSignature = signatureBuilder.toString();
     
         // Rechercher la méthode avec la signature complète
-        System.out.println("Looking up method: " + methodSignature);
         MemoryObject mo = lookupSymbol(methodSignature);
         if (mo == null) {
             throw new TypeCheckException("Method " + methodSignature + " is not defined.");
