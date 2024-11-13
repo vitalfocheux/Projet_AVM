@@ -104,7 +104,18 @@ public class VisitorJcc implements JajaCodeVisitor {
     }
 
     @Override
-    public Object visit(ASTNewArray node, Object data) {
+    public Object visit(ASTNewArray node, Object data)
+    {
+        String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        ObjectType arrayType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
+        try
+        {
+            mem.declTab(id, (Integer) mem.getStack().getTop().getValue(), arrayType);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e.getMessage());
+        }
         return null;
     }
 
@@ -195,8 +206,9 @@ public class VisitorJcc implements JajaCodeVisitor {
     }
 
     @Override
-    public Object visit(ASTJcIdent node, Object data) {
-        return null;
+    public Object visit(ASTJcIdent node, Object data)
+    {
+        return node.jjtGetValue();
     }
 
     @Override
@@ -250,8 +262,23 @@ public class VisitorJcc implements JajaCodeVisitor {
     }
 
     @Override
-    public Object visit(ASTType node, Object data) {
-        return null;
+    public Object visit(ASTType node, Object data)
+    {
+        ObjectType ftype = null;
+        String type = (String) node.jjtGetValue();
+        if (type.equals("booleen"))
+        {
+            ftype = ObjectType.BOOLEAN;
+        }
+        else if (type.equals("entier"))
+        {
+            ftype = ObjectType.INT;
+        }
+        else if (type.equals("void"))
+        {
+            ftype = ObjectType.VOID;
+        }
+        return ftype;
     }
 
     @Override
@@ -277,5 +304,24 @@ public class VisitorJcc implements JajaCodeVisitor {
     @Override
     public Object visit(ASTJcChaine node, Object data) {
         return null;
+    }
+
+
+    ObjectType getTypeFromString(String type)
+    {
+        ObjectType ftype = null;
+        if (type.equals("booleen"))
+        {
+            ftype = ObjectType.BOOLEAN;
+        }
+        else if (type.equals("entier"))
+        {
+            ftype = ObjectType.INT;
+        }
+        else if (type.equals("void"))
+        {
+            ftype = ObjectType.VOID;
+        }
+        return ftype;
     }
 }
