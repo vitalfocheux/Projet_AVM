@@ -526,6 +526,39 @@ public class TypeCheckerTest {
         }
         
     }
+
+    @Test
+    public void  testEntetes(){
+        ASTentetes entetes = new ASTentetes(0);
+       
+        ASTentetes entests1 = new ASTentetes(0);
+        // entete1 : (x:entier)
+        ASTentete entete1 = new ASTentete(0);
+        ASTentier entettype1 = new ASTentier(0);
+        ASTident IdentEntete1 = new ASTident(0);
+        entete1.jjtAddChild(entettype1, 0);
+        IdentEntete1.jjtSetValue("x");
+        entete1.jjtAddChild(IdentEntete1, 1);
+        entests1.jjtAddChild(entete1, 0);
+
+
+
+        ASTentete entete = new ASTentete(0);
+        ASTbooleen type = new ASTbooleen(0);
+        ASTident ident = new ASTident(0);
+        ident.jjtSetValue("y");
+        entete.jjtAddChild(type, 0);
+        entete.jjtAddChild(ident, 1);
+        entetes.jjtAddChild(entete, 0);
+        entetes.jjtAddChild(entests1, 1);
+        
+        try {
+            typeChecker.visit(entetes, null);
+        } catch (TypeCheckException e) {
+            fail("Exception thrown during entetes check: " + e.getMessage());
+        }
+
+    }
      
     @Test 
     public void testAppelI(){
@@ -678,6 +711,65 @@ public class TypeCheckerTest {
          incrementNode.jjtAddChild(varIdent1, 0);
          return incrementNode;
     }
-    
+    @Test 
+    public void testInstrs(){
+        ASTincrement inc = increment("x", 0); 
+        ASTinstrs instrs = new ASTinstrs(0);
+        ASTinil inil = new ASTinil(0);
+        instrs.jjtAddChild(inc, 0);
+        instrs.jjtAddChild(inil, 1);
+        try {
+            typeChecker.visit(instrs, null);
+        } catch (TypeCheckException e) {
+            fail("Exception thrown during instrs check: " + e.getMessage());
+        }
+
+    }
+    @Test
+    public void testInstrs2(){
+        ASTincrement inc = increment("x", 0); 
+        ASTincrement inc2 = increment("y", 0); 
+        ASTinstrs instrs1 = new ASTinstrs(0);
+
+        ASTinstrs instrs2 = new ASTinstrs(0);
+        ASTinil inil2 = new ASTinil(1);
+        
+        instrs2.jjtAddChild(inc2, 0);
+        instrs2.jjtAddChild(inil2, 1);
+        
+        instrs1.jjtAddChild(inc, 0);
+        instrs1.jjtAddChild(instrs2, 1);
+        try {
+            typeChecker.visit(instrs1, null);
+        } catch (TypeCheckException e) {
+            fail("Exception thrown during instrs check: " + e.getMessage());
+        }    
+    }
+
+    @Test 
+    public void testecrire(){
+        ASTident ident = new ASTident(0);
+        ident.jjtSetValue("x");
+        ASTecrire ecrire = new ASTecrire(0);
+        ecrire.jjtAddChild(ident, 0);
+        try {
+            typeChecker.visit(ecrire, null);
+        } catch (TypeCheckException e) {
+            fail("Exception thrown during ecrire check: " + e.getMessage());
+        }
+    }
+    @Test
+    public void testecrire2(){
+        ASTchaine chaine = new ASTchaine(0);
+        chaine.jjtSetValue("Hello World");
+        ASTecrire ecrire = new ASTecrire(0);
+        ecrire.jjtAddChild(chaine, 0);
+        try {
+            typeChecker.visit(ecrire, null);
+        } catch (TypeCheckException e) {
+            fail("Exception thrown during ecrire check: " + e.getMessage());
+        }
+    }
+
 }
 
