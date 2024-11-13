@@ -55,7 +55,6 @@ public class TypeChecker implements MiniJajaVisitor {
         return ObjectType.VOID;
     }
     
-
     @Override
     public Object visit(ASTident node, Object data) {
         Object value = node.jjtGetValue();
@@ -418,6 +417,7 @@ public class TypeChecker implements MiniJajaVisitor {
         }
         return null;
     }
+
     @Override
     public Object visit(ASTexp node, Object data) {
         return node.jjtGetChild(0).jjtAccept(this, data);
@@ -523,12 +523,24 @@ public class TypeChecker implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTeq node, Object data) {
-        return visitBinaryOperation(node, data, ObjectType.BOOLEAN);
+        ObjectType leftType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
+        ObjectType rightType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
+        
+        if (leftType != rightType) {
+            throw new TypeCheckException("Type mismatch: Expected same type for both operands.");
+        }
+        return ObjectType.BOOLEAN;
     }
 
     @Override
     public Object visit(ASTsup node, Object data) {
-        return visitBinaryOperation(node, data, ObjectType.BOOLEAN);
+        ObjectType leftType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
+        ObjectType rightType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
+        
+        if (leftType != rightType && leftType != ObjectType.INT && rightType != ObjectType.INT) {
+            throw new TypeCheckException("Type mismatch: Expected  type INT for both operands.");
+        }
+        return ObjectType.BOOLEAN;
     }
 
     @Override
@@ -553,6 +565,15 @@ public class TypeChecker implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTdiv node, Object data) {
+        Object value = node.jjtGetChild(1).jjtAccept(this, data);
+        if (value instanceof Integer) {
+            int rightValue = (Integer) value;
+            if (rightValue == 0) {
+                throw new TypeCheckException("Error : not allowed to divide by zero !");
+            }
+        } else {
+            throw new TypeCheckException("Expected an integer value, but got: " + value);
+        }
         return visitBinaryOperation(node, data, ObjectType.INT);
     }
 
