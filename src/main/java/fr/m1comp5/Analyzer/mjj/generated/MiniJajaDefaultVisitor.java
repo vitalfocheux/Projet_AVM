@@ -96,9 +96,6 @@ public class MiniJajaDefaultVisitor implements MiniJajaVisitor{
   public Object visit(ASTnot node, Object data){
     return defaultVisit(node, data);
   }
-  public Object visit(ASTneg node, Object data){
-    return defaultVisit(node, data);
-  }
   public Object visit(ASTet node, Object data){
     return defaultVisit(node, data);
   }
@@ -109,6 +106,9 @@ public class MiniJajaDefaultVisitor implements MiniJajaVisitor{
     return defaultVisit(node, data);
   }
   public Object visit(ASTsup node, Object data){
+    return defaultVisit(node, data);
+  }
+  public Object visit(ASTneg node, Object data){
     return defaultVisit(node, data);
   }
   public Object visit(ASTadd node, Object data){
@@ -157,4 +157,4 @@ public class MiniJajaDefaultVisitor implements MiniJajaVisitor{
     return defaultVisit(node, data);
   }
 }
-/* JavaCC - OriginalChecksum=33ba27fd96406cb26a4af3a99875cee4 (do not edit this line) */
+/* JavaCC - OriginalChecksum=a6f741f8e2adf24eb07e34236963926f (do not edit this line) */

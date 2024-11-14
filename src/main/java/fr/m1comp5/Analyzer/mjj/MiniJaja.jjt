@@ -263,8 +263,8 @@ private void exp2() : {}
 private void exp5() : {}
 {
     [
-        <ADD> exp2() #add(2) |
-        <SUB> exp2() #sub(2)
+        <ADD> terme() exp5() #add(2) |
+        <SUB> terme() exp5() #sub(2)
     ]
 }
 

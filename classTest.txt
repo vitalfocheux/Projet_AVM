@@ -1,0 +1,7 @@
+class c {
+	main {
+		int a = 10;
+		int b = a + 5 - 3 + 8 + 7;
+		writeln(b);
+	}
+}
