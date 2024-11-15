@@ -262,10 +262,14 @@ private void exp2() : {}
 
 private void exp5() : {}
 {
-    [
-        <ADD> terme() exp5() #add(2) |
-        <SUB> terme() exp5() #sub(2)
-    ]
+    exp2() exp5tail()
+}
+
+private void exp5tail() : {}
+{
+    <ADD> exp5() #add(2) |
+    <SUB> exp5() #sub(2) |
+    {}
 }
 
 private void terme() : {}
@@ -275,10 +279,9 @@ private void terme() : {}
 
 private void terme1() : {}
 {
-    [
-        <MUL> terme() #mul(2) |
-        <DIV> terme() #div(2)
-    ]
+    <MUL> terme() #mul(2) |
+    <DIV> terme() #div(2) |
+    {}
 }
 
 private void fact() : {}
