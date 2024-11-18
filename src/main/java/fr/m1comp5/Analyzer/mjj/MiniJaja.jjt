@@ -262,13 +262,15 @@ private void exp2() : {}
 
 private void exp5() : {}
 {
-    exp2() exp5tail()
+    exp5tail() exp2()
 }
 
 private void exp5tail() : {}
 {
-    <ADD> exp5() #add(2) |
-    <SUB> exp5() #sub(2) |
+    [
+        <ADD> exp5() #add(2) |
+        <SUB> exp5() #sub(2)
+    ] |
     {}
 }
 
