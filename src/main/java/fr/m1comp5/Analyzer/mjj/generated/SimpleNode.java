@@ -5,7 +5,7 @@ package fr.m1comp5.Analyzer.mjj.generated;
 public class SimpleNode implements Node {
   protected Node parent;
   protected Node[] children;
-  public int id;
+  protected int id;
   protected Object value;
   protected MiniJaja parser;
 
