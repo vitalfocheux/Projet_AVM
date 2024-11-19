@@ -292,12 +292,10 @@ public class MiniJajaWindow
                 public void insertUpdate(DocumentEvent e) {
                     unsavedChanges.put(textArea, true);
                 }
-
                 @Override
                 public void removeUpdate(DocumentEvent e) {
                     unsavedChanges.put(textArea, true);
                 }
-
                 @Override
                 public void changedUpdate(DocumentEvent e) {
                     unsavedChanges.put(textArea, true);
@@ -344,12 +342,10 @@ public class MiniJajaWindow
         int selectedIndex= tabbedPane.getSelectedIndex();
         Component tabContent =  tabbedPane.getComponentAt(selectedIndex);
         String code;
-
         if (tabContent instanceof JScrollPane) {
             JScrollPane scrollPane = (JScrollPane) tabContent;
             JTextArea textArea = (JTextArea) scrollPane.getViewport().getView();
 
-            // Return the content of the JTextArea
             code = textArea.getText();
         } else {
             code = editorArea.getText();
