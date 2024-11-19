@@ -1,5 +1,6 @@
 package fr.m1comp5.Interpreter.mjj;
-import fr.m1comp5.Analyzer.Node;
+
+import fr.m1comp5.Analyzer.mjj.generated.Node;
 
 public class InterpreterMjj {
     private Node root;
@@ -10,13 +11,11 @@ public class InterpreterMjj {
         VisitorMjj = new VisitorMjj();
     }
 
-    public void interpret() {
-        if (root != null) {
-            System.out.println("Starting interpretation...");
-            root.jjtAccept(VisitorMjj, null);
-        } else {
-            System.err.println("Error! Root node is null, cannot interpret.");
-        }
+    public String interpret() {
+        System.out.println("Starting interpretation...");
+        root.jjtAccept(VisitorMjj, null);
+        System.out.println("Value of interpretation is : " + VisitorMjj.toString());
+        return VisitorMjj.toString();
     }
 
     public void setRoot(Node root) {

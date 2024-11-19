@@ -3,6 +3,7 @@ package fr.m1comp5.Memory;
 import java.util.ArrayList;
 import java.util.List;
 import java.math.BigInteger;
+import java.util.Objects;
 
 public class SymbolTable
 {
@@ -28,14 +29,22 @@ public class SymbolTable
 
     /**
      * Compute location of an object in the symbol table based on his id,
-     * this function is useful when we need to rehash the table
+     * this function is useful when we need to rehash the table.
+     * This algorithm use FNV-1a hash algorithm
      * @param key The key to put in the symbol
      * @param size The size of the new buckets
      * @return Location where the object will be put
      */
     private int hashFunction(String key, int size)
     {
-        return key.hashCode() % size;
+        final int FNV_PRIME = 0x01000193;
+        int hashCode = 0x811c9dc5;
+        for (char c : key.toCharArray())
+        {
+            hashCode ^= c;
+            hashCode *= FNV_PRIME;
+        }
+        return Math.abs(hashCode % size);
     }
 
     /**
@@ -81,22 +90,20 @@ public class SymbolTable
         {
             return false;
         }
-        List<MemoryObject> bucket = buckets.get(hashFunction(mo.getId()));
+        int hash = hashFunction(mo.getId());
+        List<MemoryObject> bucket = buckets.get(hash);
         if (bucket == null)
         {
             bucket = new ArrayList<>();
+            buckets.set(hash, bucket);
         }
         ++count;
         bucket.add(mo);
+        System.out.println("Saving in symbol table: " + mo.toString());
         if (needToRehash())
         {
             rehash();
         }
-        return true;
-    }
-
-    public boolean put(String ident, Object o)
-    {
         return true;
     }
 
@@ -119,7 +126,7 @@ public class SymbolTable
         int idx = -1;
         for (int i = 0; i < lmo.size(); ++i)
         {
-            if (lmo.get(i).getId() == mo.getId())
+            if (Objects.equals(lmo.get(i).getId(), mo.getId()))
             {
                 idx = i;
                 break;
@@ -178,21 +185,27 @@ public class SymbolTable
             for (MemoryObject mo : lmo)
             {
                 int hashCode = hashFunction(mo.getId(), size);
-                addToBucket(mo, newBuckets.get(hashCode));
+                addToBucket(mo, newBuckets, hashCode);
             }
         }
         buckets = newBuckets;
     }
 
-    private void addToBucket(MemoryObject mo, List<MemoryObject> bucket)
+    private void addToBucket(MemoryObject mo, List<List<MemoryObject>> buckets, int hashCode)
     {
         if (mo == null)
         {
             return;
         }
+        if (buckets == null)
+        {
+            return;
+        }
+        List<MemoryObject> bucket = buckets.get(hashCode);
         if (bucket == null)
         {
             bucket = new ArrayList<>();
+            buckets.set(hashCode, bucket);
         }
         bucket.add(mo);
     }

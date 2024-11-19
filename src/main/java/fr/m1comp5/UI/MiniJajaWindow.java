@@ -1,8 +1,9 @@
 package fr.m1comp5.UI;
 
-import fr.m1comp5.Analyzer.MiniJaja;
-import fr.m1comp5.Analyzer.ParseException;
-import fr.m1comp5.Analyzer.SimpleNode;
+import fr.m1comp5.Analyzer.mjj.generated.MiniJaja;
+import fr.m1comp5.Analyzer.mjj.generated.ParseException;
+import fr.m1comp5.Analyzer.mjj.generated.SimpleNode;
+import fr.m1comp5.Interpreter.mjj.InterpreterMjj;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -155,7 +156,6 @@ public class MiniJajaWindow
 
     private ImageIcon resizeIcon(String iconPath, int width, int height)
     {
-        System.out.println(iconPath);
         ImageIcon icon = new ImageIcon(getClass().getResource(iconPath).getPath());
         Image image = icon.getImage();
         Image resizedImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);

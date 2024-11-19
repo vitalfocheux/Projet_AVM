@@ -7,7 +7,7 @@ public class MemoryObject
     private ObjectNature nature;
     private ObjectType type;
 
-    MemoryObject(String id, Object value, ObjectNature nature, ObjectType type)
+    public MemoryObject(String id, Object value, ObjectNature nature, ObjectType type)
     {
         this.id = id;
         this.value = value;
@@ -34,4 +34,6 @@ public class MemoryObject
     {
         return type;
     }
+
+    public String toString() { return "<"+ getId() +","+ getValue() +","+getNature()+","+getType()+">"; }
 }
