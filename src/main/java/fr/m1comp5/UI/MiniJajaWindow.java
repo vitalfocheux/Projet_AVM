@@ -20,8 +20,7 @@ public class MiniJajaWindow
     JMenu viewMenu;
     JMenu helpMenu;
 
-    public MiniJajaWindow()
-    {
+    public MiniJajaWindow() {
         // Créer la fenêtre principale
         mainFrame = new JFrame("Minijaja Compiler");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -61,7 +60,7 @@ public class MiniJajaWindow
 
         // Créer une zone de texte
         JTextArea editorArea = new JTextArea();
-        editorArea.setFont(new Font("Consolas", Font.PLAIN, 14));
+        editorArea.setFont(new Font("Consoles", Font.PLAIN, 14));
         editorArea.setTabSize(4);
         JScrollPane editorScrollPane = new JScrollPane(editorArea);
 
@@ -234,11 +233,11 @@ public class MiniJajaWindow
         mainFrame.setVisible(false);
     }
 
-    private ImageIcon resizeIcon(String iconPath, int width, int height)
-    {
+    private ImageIcon resizeIcon(String iconPath, int width, int height) {
         ImageIcon icon = new ImageIcon(getClass().getResource(iconPath).getPath());
         Image image = icon.getImage();
         Image resizedImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         return new ImageIcon(resizedImage);
     }
 }
+

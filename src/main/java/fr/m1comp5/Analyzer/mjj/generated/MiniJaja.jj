@@ -1238,14 +1238,9 @@ private void exp2() : {}
 /*@egen*/     
 }
 
-private void exp5() : {}
+private void exp5() : {System.out.println("oui");}
 {
-    exp2() exp5tail()
-}
-
-private void exp5tail() : {}
-{
-    [
+    (
         <ADD>/*@bgen(jjtree) #add( 2) */
               {
                 ASTadd jjtn001 = new ASTadd(JJTADD);
@@ -1253,7 +1248,7 @@ private void exp5tail() : {}
                 jjtree.openNodeScope(jjtn001);
               }
               try {
-/*@egen*/ exp5()/*@bgen(jjtree)*/
+/*@egen*/ terme()/*@bgen(jjtree)*/
               } catch (Throwable jjte001) {
                 if (jjtc001) {
                   jjtree.clearNodeScope(jjtn001);
@@ -1281,7 +1276,7 @@ private void exp5tail() : {}
                 jjtree.openNodeScope(jjtn002);
               }
               try {
-/*@egen*/ exp5()/*@bgen(jjtree)*/
+/*@egen*/ terme()/*@bgen(jjtree)*/
               } catch (Throwable jjte002) {
                 if (jjtc002) {
                   jjtree.clearNodeScope(jjtn002);
@@ -1302,9 +1297,10 @@ private void exp5tail() : {}
                 }
               }
 /*@egen*/        
-    ] |
+    ) exp5() |
     {}
 }
+
 
 private void terme() : {}
 {
@@ -1313,62 +1309,64 @@ private void terme() : {}
 
 private void terme1() : {}
 {
-    <MUL>/*@bgen(jjtree) #mul( 2) */
-          {
-            ASTmul jjtn001 = new ASTmul(JJTMUL);
-            boolean jjtc001 = true;
-            jjtree.openNodeScope(jjtn001);
-          }
-          try {
-/*@egen*/ terme()/*@bgen(jjtree)*/
-          } catch (Throwable jjte001) {
-            if (jjtc001) {
-              jjtree.clearNodeScope(jjtn001);
-              jjtc001 = false;
-            } else {
-              jjtree.popNode();
-            }
-            if (jjte001 instanceof RuntimeException) {
-              throw (RuntimeException)jjte001;
-            }
-            if (jjte001 instanceof ParseException) {
-              throw (ParseException)jjte001;
-            }
-            throw (Error)jjte001;
-          } finally {
-            if (jjtc001) {
-              jjtree.closeNodeScope(jjtn001,  2);
-            }
-          }
+    (
+        <MUL>/*@bgen(jjtree) #mul( 2) */
+              {
+                ASTmul jjtn001 = new ASTmul(JJTMUL);
+                boolean jjtc001 = true;
+                jjtree.openNodeScope(jjtn001);
+              }
+              try {
+/*@egen*/ fact()/*@bgen(jjtree)*/
+              } catch (Throwable jjte001) {
+                if (jjtc001) {
+                  jjtree.clearNodeScope(jjtn001);
+                  jjtc001 = false;
+                } else {
+                  jjtree.popNode();
+                }
+                if (jjte001 instanceof RuntimeException) {
+                  throw (RuntimeException)jjte001;
+                }
+                if (jjte001 instanceof ParseException) {
+                  throw (ParseException)jjte001;
+                }
+                throw (Error)jjte001;
+              } finally {
+                if (jjtc001) {
+                  jjtree.closeNodeScope(jjtn001,  2);
+                }
+              }
 /*@egen*/         |
-    <DIV>/*@bgen(jjtree) #div( 2) */
-          {
-            ASTdiv jjtn002 = new ASTdiv(JJTDIV);
-            boolean jjtc002 = true;
-            jjtree.openNodeScope(jjtn002);
-          }
-          try {
-/*@egen*/ terme()/*@bgen(jjtree)*/
-          } catch (Throwable jjte002) {
-            if (jjtc002) {
-              jjtree.clearNodeScope(jjtn002);
-              jjtc002 = false;
-            } else {
-              jjtree.popNode();
-            }
-            if (jjte002 instanceof RuntimeException) {
-              throw (RuntimeException)jjte002;
-            }
-            if (jjte002 instanceof ParseException) {
-              throw (ParseException)jjte002;
-            }
-            throw (Error)jjte002;
-          } finally {
-            if (jjtc002) {
-              jjtree.closeNodeScope(jjtn002,  2);
-            }
-          }
-/*@egen*/         |
+        <DIV>/*@bgen(jjtree) #div( 2) */
+              {
+                ASTdiv jjtn002 = new ASTdiv(JJTDIV);
+                boolean jjtc002 = true;
+                jjtree.openNodeScope(jjtn002);
+              }
+              try {
+/*@egen*/ fact()/*@bgen(jjtree)*/
+              } catch (Throwable jjte002) {
+                if (jjtc002) {
+                  jjtree.clearNodeScope(jjtn002);
+                  jjtc002 = false;
+                } else {
+                  jjtree.popNode();
+                }
+                if (jjte002 instanceof RuntimeException) {
+                  throw (RuntimeException)jjte002;
+                }
+                if (jjte002 instanceof ParseException) {
+                  throw (ParseException)jjte002;
+                }
+                throw (Error)jjte002;
+              } finally {
+                if (jjtc002) {
+                  jjtree.closeNodeScope(jjtn002,  2);
+                }
+              }
+/*@egen*/        
+    ) terme1() |
     {}
 }
 
