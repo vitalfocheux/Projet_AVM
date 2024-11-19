@@ -54,6 +54,16 @@ public class Stack {
         return stackList.isEmpty();
     }
 
+    public int size() {
+        return stackList.size();
+    } 
+    public MemoryObject get(int index) throws StackException {
+        if (index < 0 || index >= stackList.size()) {
+            throw new StackException("Index out of bounds");
+        }
+        return stackList.get(index);
+    }
+
     /**
      * Search variable from the base pointer useful in case of a function
      * @param id The id of the variable

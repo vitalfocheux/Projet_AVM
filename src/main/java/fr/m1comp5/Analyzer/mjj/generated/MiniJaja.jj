@@ -13,7 +13,7 @@ public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants/*@egen*/
 {/*@bgen(jjtree)*/
   protected JJTMiniJajaState jjtree = new JJTMiniJajaState();
 
-/*@egen*/
+/*@egen*/n
 }
 PARSER_END(MiniJaja)
 
