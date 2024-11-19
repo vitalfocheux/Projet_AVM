@@ -625,6 +625,71 @@ public class TypeCheckerTest {
         }
     }
 
+    @Test 
+    public void testAppelE(){
+        // declarer methode int zero(x:entier){return 0;}
+        ASTentier enti = new ASTentier(0);
+        ASTident nomMeth = new ASTident(0);
+        nomMeth.jjtSetValue("zero");
+        // ENTETES pour methode : (x:entier)
+        ASTentetes entetes = new ASTentetes(0);
+        ASTentete entete = new ASTentete(0);
+        ASTenil enil = new ASTenil(0);
+
+        ASTentier entettype = new ASTentier(0);
+        ASTident IdentEntete = new ASTident(0);
+        IdentEntete.jjtSetValue("x");
+        entete.jjtAddChild(entettype, 0);
+        entete.jjtAddChild(IdentEntete, 1);
+
+        entetes.jjtAddChild(entete, 0);
+        entetes.jjtAddChild(enil, 1);
+        
+        ASTvnil var = new ASTvnil(0);
+        ASTretour retour = new ASTretour(0);
+        ASTnbre retourNbre = new ASTnbre(0);
+
+        retourNbre.jjtSetValue(0);
+        retour.jjtAddChild(retourNbre, 0);
+        ASTmethode methode = new ASTmethode(0);
+        methode.jjtAddChild(enti, 0);
+        methode.jjtAddChild(nomMeth, 1);
+        methode.jjtAddChild(entetes, 2);
+        methode.jjtAddChild(var, 3);
+        methode.jjtAddChild(retour, 4);
+
+        try {
+            typeChecker.visit(methode, null);
+        } catch (TypeCheckException e) {
+            fail("Exception thrown during method declaration: " + e.getMessage());
+        }
+
+        // AppelI: zero(5)
+        ASTappelI appelE = new ASTappelI(0);
+        ASTident ident = new ASTident(0);
+        ident.jjtSetValue("zero");
+        //  listexp 
+        ASTnbre nbre1 = new ASTnbre(0);
+        nbre1.jjtSetValue(2);
+        ASTnbre nbre2 = new ASTnbre(1);
+        nbre2.jjtSetValue(3);
+        ASTlistexp listexp = new ASTlistexp(0);
+        ASTexnil exnil = new ASTexnil(0);
+        ASTexp exp = new ASTexp(0);
+        exp.jjtAddChild(nbre1, 0);
+        listexp.jjtAddChild(exp, 0);
+        listexp.jjtAddChild(exnil, 1);
+       
+       
+        appelE.jjtAddChild(ident, 0);
+        appelE.jjtAddChild(listexp , 1);
+        try {
+            typeChecker.visit(appelE, null);
+        } catch (TypeCheckException e) {
+            fail("Exception thrown during appelI  check: " + e.getMessage());
+        }
+    }
+
     @Test
     public void testIncrementOnInteger() {
         // Déclarer une variable y de type entier
