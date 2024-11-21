@@ -90,7 +90,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTCst node, Object data) {
         ObjectType varType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data); //Var type
-        String varIdent = (String) ((ASTident) node.jjtGetChild(1)).jjtGetValue();
+        String varIdent = (String) ((ASTIdent) node.jjtGetChild(1)).jjtGetValue();
 
         if (varIdent == null) {
             throw new RuntimeException("Variable name cannot be null.");
@@ -245,7 +245,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTAffectation node, Object data) {
         try {
             Object value = node.jjtGetChild(1).jjtAccept(this, data);
-            String varIdent = (String) ((ASTident) node.jjtGetChild(0)).jjtGetValue();;
+            String varIdent = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();;
             MemoryObject mo = symbolTable.get(varIdent);
             symbolTable.update(varIdent,value);
             System.out.println("ASTaffectation -> " + value + " = " + varIdent);
