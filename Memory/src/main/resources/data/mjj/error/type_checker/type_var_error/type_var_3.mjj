@@ -1,0 +1,7 @@
+class error {
+
+    main {
+
+        void a = 0;
+    }
+}

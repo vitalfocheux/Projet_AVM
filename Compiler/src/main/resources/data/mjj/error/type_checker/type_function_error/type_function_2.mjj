@@ -1,0 +1,15 @@
+class error {
+
+    int even(){
+
+        return 0;
+
+    };
+
+    main {
+
+        return sum();
+
+    }
+
+}

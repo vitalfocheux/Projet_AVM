@@ -1,6 +1,6 @@
 package fr.m1comp5.mjj;
 
-import fr.m1comp5.Analyzer.mjj.generated.Node;
+import fr.m1comp5.mjj.generated.Node;
 
 public class InterpreterMjj {
     private Node root;

@@ -1,10 +1,10 @@
 package fr.m1comp5.jjc;
 
-import fr.m1comp5.Analyzer.jjc.generated.*;
-import fr.m1comp5.Memory.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import fr.m1comp5.jjc.generated.*;
+import fr.m1comp5.Memory;
+import fr.m1comp5.MemoryObject;
+import fr.m1comp5.ObjectNature;
+import fr.m1comp5.ObjectType;
 
 
 public class VisitorJcc implements JajaCodeVisitor {

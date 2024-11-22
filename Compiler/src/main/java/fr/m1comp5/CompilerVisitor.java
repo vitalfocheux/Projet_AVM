@@ -2,30 +2,30 @@ package fr.m1comp5;
 
 import fr.m1comp5.jjc.generated.*;
 import fr.m1comp5.mjj.generated.*;
-import fr.m1comp5.Analyzer.mjj.generated.ASTAdd;
-import fr.m1comp5.Analyzer.mjj.generated.ASTDiv;
-import fr.m1comp5.Analyzer.mjj.generated.ASTMul;
-import fr.m1comp5.Analyzer.mjj.generated.ASTNeg;
-import fr.m1comp5.Analyzer.mjj.generated.ASTRoot;
-import fr.m1comp5.Analyzer.mjj.generated.ASTSub;
-import fr.m1comp5.Analyzer.mjj.generated.ASTSup;
-import fr.m1comp5.Analyzer.mjj.generated.Node;
-import fr.m1comp5.Analyzer.mjj.generated.SimpleNode;
-import fr.m1comp5.Analyzer.mjj.generated.MiniJajaVisitor;
+import fr.m1comp5.mjj.generated.ASTAdd;
+import fr.m1comp5.mjj.generated.ASTDiv;
+import fr.m1comp5.mjj.generated.ASTMul;
+import fr.m1comp5.mjj.generated.ASTNeg;
+import fr.m1comp5.mjj.generated.ASTNot;
+import fr.m1comp5.mjj.generated.ASTRoot;
+import fr.m1comp5.mjj.generated.ASTSub;
+import fr.m1comp5.mjj.generated.ASTSup;
+import fr.m1comp5.mjj.generated.Node;
+import fr.m1comp5.mjj.generated.SimpleNode;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static fr.m1comp5.Analyzer.jjc.generated.JajaCodeTreeConstants.*;
+import static fr.m1comp5.jjc.generated.JajaCodeTreeConstants.*;
 
 public class CompilerVisitor implements MiniJajaVisitor {
-    List<fr.m1comp5.Analyzer.jjc.generated.Node> instrs;
+    List<fr.m1comp5.jjc.generated.Node> instrs;
 
     public CompilerVisitor() {
         instrs = new ArrayList<>();
     }
 
-    public List<fr.m1comp5.Analyzer.jjc.generated.Node> getInstrs() {
+    public List<fr.m1comp5.jjc.generated.Node> getInstrs() {
         return instrs;
     }
 
@@ -353,7 +353,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(fr.m1comp5.Analyzer.mjj.generated.ASTNot node, Object data) {
+    public Object visit(ASTNot node, Object data) {
         return compileOp1(node, data);
     }
 
@@ -498,14 +498,14 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
 
-    private fr.m1comp5.Analyzer.jjc.generated.Node getNodeOp(Node node) {
-        fr.m1comp5.Analyzer.jjc.generated.Node opNode = null;
+    private fr.m1comp5.jjc.generated.Node getNodeOp(Node node) {
+        fr.m1comp5.jjc.generated.Node opNode = null;
 
-        if (node instanceof ASTAdd) opNode = (fr.m1comp5.Analyzer.jjc.generated.Node) new ASTAdd(JJTADD);
-        else if (node instanceof ASTSub) opNode = (fr.m1comp5.Analyzer.jjc.generated.Node) new ASTSub(JJTSUB);
-        else if (node instanceof ASTMul) opNode = (fr.m1comp5.Analyzer.jjc.generated.Node) new ASTMul(JJTMUL);
-        else if (node instanceof ASTDiv) opNode = (fr.m1comp5.Analyzer.jjc.generated.Node) new ASTDiv(JJTDIV);
-        else if (node instanceof ASTSup) opNode = (fr.m1comp5.Analyzer.jjc.generated.Node) new ASTSup(JJTSUP);
+        if (node instanceof ASTAdd) opNode = (fr.m1comp5.jjc.generated.Node) new ASTAdd(JJTADD);
+        else if (node instanceof ASTSub) opNode = (fr.m1comp5.jjc.generated.Node) new ASTSub(JJTSUB);
+        else if (node instanceof ASTMul) opNode = (fr.m1comp5.jjc.generated.Node) new ASTMul(JJTMUL);
+        else if (node instanceof ASTDiv) opNode = (fr.m1comp5.jjc.generated.Node) new ASTDiv(JJTDIV);
+        else if (node instanceof ASTSup) opNode = (fr.m1comp5.jjc.generated.Node) new ASTSup(JJTSUP);
         else if (node instanceof ASTEq) opNode = new ASTCmp(JJTCMP);
         else if (node instanceof ASTOu) opNode = new ASTOr(JJTOR);
         else if (node instanceof ASTEt) opNode = new ASTAnd(JJTAND);

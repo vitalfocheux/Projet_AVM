@@ -1,6 +1,6 @@
 package fr.m1comp5;
 
-import fr.m1comp5.Analyzer.mjj.generated.Node;
+import fr.m1comp5.mjj.generated.Node;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,7 +10,7 @@ import java.util.List;
 public class Compiler {
     private Node root;
     private CompilerVisitor visitor;
-    private List<fr.m1comp5.Analyzer.jjc.generated.Node> instrs;
+    private List<fr.m1comp5.jjc.generated.Node> instrs;
 
     public Compiler(Node root) {
         this.root = root;
@@ -30,7 +30,7 @@ public class Compiler {
 
     public String jjcToString() {
         StringBuilder sb = new StringBuilder();
-        for(fr.m1comp5.Analyzer.jjc.generated.Node instr : instrs) {
+        for(fr.m1comp5.jjc.generated.Node instr : instrs) {
             sb.append(instr.toString());
             sb.append("\n");
         }

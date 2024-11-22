@@ -56,7 +56,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.3</version>
                 <configuration>
-                    <mainClass>fr.m1comp5.UIMain</mainClass>
+                    <mainClass>fr.m1comp5.ui.UIMain</mainClass>
                 </configuration>
             </plugin>
         </plugins>

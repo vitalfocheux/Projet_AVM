@@ -16,34 +16,6 @@
   <url>https://maven.apache.org</url>
 
   <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.java.dev.javacc</groupId>
-      <artifactId>javacc</artifactId>
-      <version>7.0.13</version>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.11.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.mikemybytes</groupId>
-      <artifactId>junit5-formatted-source</artifactId>
-      <version>1.0.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>3.12.1</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 </project>
+

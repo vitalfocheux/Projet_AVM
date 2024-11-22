@@ -6,7 +6,7 @@ options {
 }
 
 PARSER_BEGIN(JajaCode)
-package fr.m1comp5.Analyzer.jjc.generated;
+package fr.m1comp5.jjc.generated;
 
 public class JajaCode
 {

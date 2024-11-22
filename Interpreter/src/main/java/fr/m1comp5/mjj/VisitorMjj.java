@@ -1,12 +1,10 @@
 package fr.m1comp5.mjj;
 
-import fr.m1comp5.Analyzer.jjc.generated.ASTAnd;
-import fr.m1comp5.Analyzer.jjc.generated.ASTOr;
-import fr.m1comp5.Analyzer.mjj.generated.*;
-import fr.m1comp5.Memory.ObjectType;
-import fr.m1comp5.Memory.MemoryObject;
-import fr.m1comp5.Memory.ObjectNature;
-import fr.m1comp5.Memory.SymbolTable;
+import fr.m1comp5.ObjectType;
+import fr.m1comp5.MemoryObject;
+import fr.m1comp5.ObjectNature;
+import fr.m1comp5.SymbolTable;
+import fr.m1comp5.mjj.generated.*;
 
 public class VisitorMjj implements MiniJajaVisitor {
     private String toDisplay;

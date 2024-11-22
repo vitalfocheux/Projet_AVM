@@ -1,8 +1,7 @@
 package fr.m1comp5.jjc;
 
-import fr.m1comp5.Analyzer.jjc.generated.Node;
-import fr.m1comp5.Interpreter.mjj.VisitorMjj;
-import fr.m1comp5.Memory.Memory;
+import fr.m1comp5.jjc.generated.Node;
+import fr.m1comp5.Memory;
 
 import java.util.List;
 

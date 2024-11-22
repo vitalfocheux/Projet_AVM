@@ -1,0 +1,9 @@
+class error {
+
+    boolean main {
+
+        return true;
+
+    }
+
+}

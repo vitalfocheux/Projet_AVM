@@ -7,7 +7,7 @@
 }
 
 PARSER_BEGIN(JajaCode)
-package fr.m1comp5.Analyzer.jjc.generated;
+package fr.m1comp5.jjc.generated;
 
 public class JajaCode/*@bgen(jjtree)*/implements JajaCodeTreeConstants/*@egen*/
 {/*@bgen(jjtree)*/
@@ -142,10 +142,10 @@ private void classe() : {}
 {
     adresse() instr() <SEMICOLON>/*@bgen(jjtree) #JajaCode( 3) */
                                   {
-                                    ASTJajaCode jjtn001 = new ASTJajaCode(JJTJAJACODE);
-                                    boolean jjtc001 = true;
-                                    jjtree.openNodeScope(jjtn001);
-                                  }
+            ASTJajaCode jjtn001 = new fr.m1comp5.jjc.generated.ASTJajaCode(JJTJAJACODE);
+            boolean jjtc001 = true;
+            jjtree.openNodeScope(jjtn001);
+          }
                                   try {
 /*@egen*/ classe()/*@bgen(jjtree)*/
                                   } catch (Throwable jjte001) {

@@ -6,7 +6,7 @@ options {
 }
 
 PARSER_BEGIN(MiniJaja)
-package fr.m1comp5.Analyzer.mjj.generated;
+package fr.m1comp5.mjj.generated;
 
 public class MiniJaja
 {

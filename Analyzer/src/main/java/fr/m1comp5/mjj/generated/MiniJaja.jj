@@ -7,7 +7,7 @@
 }
 
 PARSER_BEGIN(MiniJaja)
-package fr.m1comp5.Analyzer.mjj.generated;
+package fr.m1comp5.mjj.generated;
 
 public class MiniJaja/*@bgen(jjtree)*/implements MiniJajaTreeConstants/*@egen*/
 {/*@bgen(jjtree)*/
@@ -180,10 +180,10 @@ private void decls() : {}
 {
     decl() decls1() |/*@bgen(jjtree) Vnil */
     {
-      ASTVnil jjtn001 = new ASTVnil(JJTVNIL);
-      boolean jjtc001 = true;
-      jjtree.openNodeScope(jjtn001);
-    }
+  ASTVnil jjtn001 = new ASTVnil(JJTVNIL);
+  boolean jjtc001 = true;
+  jjtree.openNodeScope(jjtn001);
+}
     try {
 /*@egen*/
     empty()/*@bgen(jjtree)*/
@@ -246,10 +246,10 @@ private void decl() : {}
     typemeth() ident() decl1()           |
     <FINAL> type() ident()/*@bgen(jjtree) #Cst( 3) */
                            {
-                             ASTCst jjtn001 = new ASTCst(JJTCST);
-                             boolean jjtc001 = true;
-                             jjtree.openNodeScope(jjtn001);
-                           }
+                 ASTCst jjtn001 = new ASTCst(JJTCST);
+                 boolean jjtc001 = true;
+                 jjtree.openNodeScope(jjtn001);
+               }
                            try {
 /*@egen*/ vexp()/*@bgen(jjtree)*/
                            } catch (Throwable jjte001) {
@@ -502,10 +502,10 @@ private void entetes() : {}
 {
     entete() entetes1() |/*@bgen(jjtree) Enil */
     {
-      ASTEnil jjtn001 = new ASTEnil(JJTENIL);
-      boolean jjtc001 = true;
-      jjtree.openNodeScope(jjtn001);
-    }
+  ASTEnil jjtn001 = new ASTEnil(JJTENIL);
+  boolean jjtc001 = true;
+  jjtree.openNodeScope(jjtn001);
+}
     try {
 /*@egen*/
     empty()/*@bgen(jjtree)*/
@@ -1472,10 +1472,10 @@ private void ident2() : {}
 private void typemeth() : {}
 {/*@bgen(jjtree) Rien */
     {
-      ASTRien jjtn001 = new ASTRien(JJTRIEN);
-      boolean jjtc001 = true;
-      jjtree.openNodeScope(jjtn001);
-    }
+  ASTRien jjtn001 = new ASTRien(JJTRIEN);
+  boolean jjtc001 = true;
+  jjtree.openNodeScope(jjtn001);
+}
     try {
 /*@egen*/
     <VOID>/*@bgen(jjtree)*/

@@ -1,11 +1,11 @@
 package fr.m1comp5.Typechecker;
-import fr.m1comp5.Analyzer.mjj.generated.*;
-import fr.m1comp5.Memory.MemoryObject;
-import fr.m1comp5.Memory.ObjectNature;
-import fr.m1comp5.Memory.ObjectType;
-import fr.m1comp5.Memory.SymbolTable;
-import fr.m1comp5.Memory.Stack;
-import fr.m1comp5.Memory.StackException;
+import fr.m1comp5.MemoryObject;
+import fr.m1comp5.ObjectNature;
+import fr.m1comp5.ObjectType;
+import fr.m1comp5.SymbolTable;
+import fr.m1comp5.Stack;
+import fr.m1comp5.StackException;
+import fr.m1comp5.mjj.generated.*;
 
 import java.util.ArrayList;
 import java.util.List;
