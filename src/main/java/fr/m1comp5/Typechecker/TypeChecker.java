@@ -24,14 +24,14 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTroot node, Object data) {
+    public Object visit(ASTRoot node, Object data) {
         return visitChildren(node, data);
     } 
    
 
      @Override
-     public Object visit(ASTclasse node, Object data) {
-        ASTident classNameNode = (ASTident) node.jjtGetChild(0);
+     public Object visit(ASTClasse node, Object data) {
+        ASTIdent classNameNode = (ASTIdent) node.jjtGetChild(0);
         String className = (String) classNameNode.jjtGetValue(); 
         if (lookupSymbol(className) != null) {
             throw new TypeCheckException("La classe " + className + " est déjà définie.");
@@ -56,7 +56,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
     
     @Override
-    public Object visit(ASTident node, Object data) {
+    public Object visit(ASTIdent node, Object data) {
         Object value = node.jjtGetValue();
         if (value instanceof String) {
             String ident = (String) value;
@@ -72,17 +72,17 @@ public class TypeChecker implements MiniJajaVisitor {
 
 
     @Override
-    public Object visit(ASTvnil node, Object data) {
+    public Object visit(ASTVnil node, Object data) {
         return ObjectType.EPSILON;
     }
 
     @Override
-    public Object visit(ASTdecls node, Object data) {
+    public Object visit(ASTDecls node, Object data) {
         return visitChildren(node, data);
     }
 
     @Override
-    public Object visit(ASTcst node, Object data) {
+    public Object visit(ASTCst node, Object data) {
         ObjectType cstType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         String cstName = (String) node.jjtGetChild(1).jjtAccept(this, data);
         Object  cstValue =  node.jjtGetChild(2).jjtAccept(this, data);
@@ -102,14 +102,14 @@ public class TypeChecker implements MiniJajaVisitor {
     }
     
    @Override
-    public Object visit(ASTvars node, Object data) {
+    public Object visit(ASTVars node, Object data) {
         return visitChildren(node, data);
     }
 
     @Override
-    public Object visit(ASTvar node, Object data) {
+    public Object visit(ASTVar node, Object data) {
 
-        ASTident identNode = (ASTident) node.jjtGetChild(1);
+        ASTIdent identNode = (ASTIdent) node.jjtGetChild(1);
         ObjectType varType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         String varName = identNode.jjtGetValue().toString();
         if (lookupSymbol(varName) != null) {
@@ -127,7 +127,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTtableau node, Object data) {
+    public Object visit(ASTTableau node, Object data) {
         String arrayName = (String) node.jjtGetChild(1).jjtAccept(this, data);  // nom 
         ObjectType arrayType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data); // type 
 
@@ -145,12 +145,12 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTomega node, Object data) {
+    public Object visit(ASTOmega node, Object data) {
         return ObjectType.EPSILON;
     }
 
     @Override
-    public Object visit(ASTmethode node, Object data) {
+    public Object visit(ASTMethode node, Object data) {
             Object returnTypeObject = node.jjtGetChild(0).jjtAccept(this, data);
         if (!(returnTypeObject instanceof ObjectType)) {
             throw new TypeCheckException("Expected ObjectType but found " + returnTypeObject.getClass().getSimpleName());
@@ -161,7 +161,7 @@ public class TypeChecker implements MiniJajaVisitor {
         List<ObjectType> paramTypes = new ArrayList<>();
 
         // Récupérer les types des paramètres 
-        ASTentetes entetesNode = (ASTentetes) node.jjtGetChild(2);
+        ASTEntetes entetesNode = (ASTEntetes) node.jjtGetChild(2);
         collectParamTypes(entetesNode, paramTypes, data);
 
         // Construire la signature de la méthode
@@ -208,23 +208,23 @@ public class TypeChecker implements MiniJajaVisitor {
         return null;
     }
 
-    private void collectParamTypes(ASTentetes entetesNode, List<ObjectType> paramTypes, Object data) {
+    private void collectParamTypes(ASTEntetes entetesNode, List<ObjectType> paramTypes, Object data) {
         for (int i = 0; i < entetesNode.jjtGetNumChildren(); i++) {
             SimpleNode child = (SimpleNode) entetesNode.jjtGetChild(i);
-            if (child instanceof ASTentete) {
+            if (child instanceof ASTEntete) {
                 ObjectType paramType = (ObjectType) child.jjtGetChild(0).jjtAccept(this, data);
                 if (paramType == null) {
                     throw new TypeCheckException("Parameter type cannot be null.");
                 }
                 paramTypes.add(paramType);
-            } else if (child instanceof ASTentetes) {
-                collectParamTypes((ASTentetes) child, paramTypes, data);
+            } else if (child instanceof ASTEntetes) {
+                collectParamTypes((ASTEntetes) child, paramTypes, data);
             }
         }
     }
 
     @Override
-    public Object visit(ASTmain node, Object data) {
+    public Object visit(ASTMain node, Object data) {
 
         if (lookupSymbol("main") != null) {
             throw new TypeCheckException("Main method is already defined.");
@@ -250,32 +250,32 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTenil node, Object data) {
+    public Object visit(ASTEnil node, Object data) {
         return ObjectType.EPSILON;
     }
 
     @Override
-    public Object visit(ASTentetes node, Object data) {
+    public Object visit(ASTEntetes node, Object data) {
         return visitChildren(node, data);
     }
 
     @Override
-    public Object visit(ASTentete node, Object data) {
+    public Object visit(ASTEntete node, Object data) {
         return visitChildren(node, data);
     }
 
     @Override
-    public Object visit(ASTinil node, Object data) {
+    public Object visit(ASTInil node, Object data) {
         return ObjectType.EPSILON;
     }
 
     @Override
-    public Object visit(ASTinstrs node, Object data) {
+    public Object visit(ASTInstrs node, Object data) {
         return visitChildren(node, data);
     }
     
     @Override
-    public Object visit(ASTretour node, Object data) {
+    public Object visit(ASTRetour node, Object data) {
         ObjectType returnType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         MemoryObject mo = lookupSymbol(currentMethod); // Récupérer la méthode courante
         if (mo != null && returnType != mo.getType()) {
@@ -286,17 +286,17 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTecrire node, Object data) {
+    public Object visit(ASTEcrire node, Object data) {
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
     @Override
-    public Object visit(ASTecrireln node, Object data) {
+    public Object visit(ASTEcrireLn node, Object data) {
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
     @Override
-    public Object visit(ASTsi node, Object data) {
+    public Object visit(ASTSi node, Object data) {
         ObjectType conditionType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         if (conditionType != ObjectType.BOOLEAN) {
             throw new TypeCheckException("Condition in if statement must be boolean.");
@@ -305,7 +305,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTtantque node, Object data) {
+    public Object visit(ASTTantQue node, Object data) {
         ObjectType conditionType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         if (conditionType != ObjectType.BOOLEAN) {
             throw new TypeCheckException("Condition in while statement must be boolean.");
@@ -314,7 +314,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
     
     @Override
-    public Object visit(ASTaffectation node, Object data) {
+    public Object visit(ASTAffectation node, Object data) {
         String identName = (String)  node.jjtGetChild(0).jjtAccept(this, data);
         
         ObjectType assignedType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
@@ -333,7 +333,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTincrement node, Object data) {
+    public Object visit(ASTIncrement node, Object data) {
         String varName = (String) node.jjtGetChild(0).jjtAccept(this, data); //  nom de la variable
         MemoryObject mo = lookupSymbol(varName); 
         
@@ -346,15 +346,15 @@ public class TypeChecker implements MiniJajaVisitor {
         return ObjectType.INT;
     }
     @Override
-    public Object visit(ASTappelI node, Object data) {
+    public Object visit(ASTAppelI node, Object data) {
         String methodName = (String) node.jjtGetChild(0).jjtAccept(this, data);
     
         // Construire la signature de la méthode à partir des paramètres
         Object paramsData = node.jjtGetChild(1);
-        if (!(paramsData instanceof ASTlistexp)) {
+        if (!(paramsData instanceof ASTListExp)) {
             throw new TypeCheckException("Expected ASTlistexp for method parameters.");
         }
-        ASTlistexp paramsNode = (ASTlistexp) paramsData;
+        ASTListExp paramsNode = (ASTListExp) paramsData;
         List<ObjectType> actualParamTypes = new ArrayList<>();
         collectParamTypesFromListexp(paramsNode, actualParamTypes, data);
     
@@ -393,11 +393,11 @@ public class TypeChecker implements MiniJajaVisitor {
     
     // liste des expressions : exp, liste des expressions |exp , exnil |epsilon 
     @Override
-    public Object visit(ASTlistexp node, Object data) {
+    public Object visit(ASTListExp node, Object data) {
         if (node.jjtGetNumChildren() == 2) {
             SimpleNode firstChild = (SimpleNode) node.jjtGetChild(0);
             SimpleNode secondChild = (SimpleNode) node.jjtGetChild(1);
-            if (firstChild instanceof ASTexp) {
+            if (firstChild instanceof ASTExp) {
                 ObjectType paramType = (ObjectType) firstChild.jjtAccept(this, data);
                 if (paramType == null) {
                     throw new TypeCheckException("Parameter type cannot be null.");
@@ -405,13 +405,13 @@ public class TypeChecker implements MiniJajaVisitor {
             }else {
                 throw new TypeCheckException("Unexpected node type in ASTlistexp: " + firstChild.getClass().getSimpleName());
             }
-            if (secondChild instanceof ASTlistexp) {
+            if (secondChild instanceof ASTListExp) {
                 return secondChild.jjtAccept(this, data);
-            } else if (!(secondChild instanceof ASTexnil)) {
+            } else if (!(secondChild instanceof ASTExnil)) {
                 throw new TypeCheckException("Unexpected node type in ASTlistexp: " + secondChild.getClass().getSimpleName());
             }
         } else if (node.jjtGetNumChildren() == 1) {
-            if (node.jjtGetChild(0) instanceof ASTexnil) {
+            if (node.jjtGetChild(0) instanceof ASTExnil) {
                 return ObjectType.EPSILON;
             }
         }
@@ -419,16 +419,16 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTexp node, Object data) {
+    public Object visit(ASTExp node, Object data) {
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
     
-    private void collectParamTypesFromListexp(ASTlistexp listexpNode, List<ObjectType> paramTypes, Object data) {
+    private void collectParamTypesFromListexp(ASTListExp listexpNode, List<ObjectType> paramTypes, Object data) {
         if (listexpNode.jjtGetNumChildren() == 2) {
             SimpleNode firstChild = (SimpleNode) listexpNode.jjtGetChild(0);
             SimpleNode secondChild = (SimpleNode) listexpNode.jjtGetChild(1);
     
-            if (firstChild instanceof ASTexp) {
+            if (firstChild instanceof ASTExp) {
                 ObjectType paramType = (ObjectType) firstChild.jjtAccept(this, data);
                 if (paramType == null) {
                     throw new TypeCheckException("Parameter type cannot be null.");
@@ -436,29 +436,29 @@ public class TypeChecker implements MiniJajaVisitor {
                 paramTypes.add(paramType);
             }
     
-            if (secondChild instanceof ASTlistexp) {
-                collectParamTypesFromListexp((ASTlistexp) secondChild, paramTypes, data);
-            } else if (!(secondChild instanceof ASTexnil)) {
+            if (secondChild instanceof ASTListExp) {
+                collectParamTypesFromListexp((ASTListExp) secondChild, paramTypes, data);
+            } else if (!(secondChild instanceof ASTExnil)) {
                 throw new TypeCheckException("Unexpected node type in ASTlistexp: " + secondChild.getClass().getSimpleName());
             }
         } 
         else if (listexpNode.jjtGetNumChildren() == 1) {
-            if (listexpNode.jjtGetChild(0) instanceof ASTexnil) {
+            if (listexpNode.jjtGetChild(0) instanceof ASTExnil) {
                 return;
             }
 
         } 
     }
     @Override
-    public Object visit(ASTappelE node, Object data) {
+    public Object visit(ASTAppelE node, Object data) {
         String methodName = (String) node.jjtGetChild(0).jjtAccept(this, data);
     
         // Construire la signature de la méthode à partir des paramètres
         Object paramsData = node.jjtGetChild(1);
-        if (!(paramsData instanceof ASTlistexp)) {
+        if (!(paramsData instanceof ASTListExp)) {
             throw new TypeCheckException("Expected ASTlistexp for method parameters.");
         }
-        ASTlistexp paramsNode = (ASTlistexp) paramsData;
+        ASTListExp paramsNode = (ASTListExp) paramsData;
         List<ObjectType> actualParamTypes = new ArrayList<>();
         collectParamTypesFromListexp(paramsNode, actualParamTypes, data);
     
@@ -497,32 +497,32 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTexnil node, Object data) {
+    public Object visit(ASTExnil node, Object data) {
         return ObjectType.EPSILON;
     }
 
     @Override
-    public Object visit(ASTnot node, Object data) {
+    public Object visit(ASTNot node, Object data) {
         return visitUnaryOperation(node, data, ObjectType.BOOLEAN);
     }
 
     @Override
-    public Object visit(ASTneg node, Object data) {
+    public Object visit(ASTNeg node, Object data) {
         return visitUnaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTet node, Object data) {
+    public Object visit(ASTEt node, Object data) {
         return visitBinaryOperation(node, data, ObjectType.BOOLEAN);
     }
 
     @Override
-    public Object visit(ASTou node, Object data) {
+    public Object visit(ASTOu node, Object data) {
         return visitBinaryOperation(node, data, ObjectType.BOOLEAN);
     }
 
     @Override
-    public Object visit(ASTeq node, Object data) {
+    public Object visit(ASTEq node, Object data) {
         ObjectType leftType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         ObjectType rightType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
         
@@ -533,7 +533,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTsup node, Object data) {
+    public Object visit(ASTSup node, Object data) {
         ObjectType leftType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         ObjectType rightType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
         
@@ -544,27 +544,27 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTadd node, Object data) {
+    public Object visit(ASTAdd node, Object data) {
         return visitBinaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTsub node, Object data) {
+    public Object visit(ASTSub node, Object data) {
         return visitBinaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTmul node, Object data) {
+    public Object visit(ASTMul node, Object data) {
         return visitBinaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTsomme node, Object data) {
+    public Object visit(ASTSomme node, Object data) {
         return visitBinaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTdiv node, Object data) {
+    public Object visit(ASTDiv node, Object data) {
         Object value = node.jjtGetChild(1).jjtAccept(this, data);
         if (value instanceof Integer) {
             int rightValue = (Integer) value;
@@ -578,8 +578,8 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTlongeur node, Object data) {
-        ASTident identNode = (ASTident) node.jjtGetChild(0);
+    public Object visit(ASTLongeur node, Object data) {
+        ASTIdent identNode = (ASTIdent) node.jjtGetChild(0);
         Object value = identNode.jjtGetValue();
         if (value instanceof String) {
             return ObjectType.INT; //  le type INT pour la longueur d'une chaîne
@@ -589,38 +589,38 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTvrai node, Object data) {
+    public Object visit(ASTVrai node, Object data) {
         return ObjectType.BOOLEAN;
     }
 
     @Override
-    public Object visit(ASTfaux node, Object data) {
+    public Object visit(ASTFaux node, Object data) {
         return ObjectType.BOOLEAN;
     }
 
 
     @Override
-    public Object visit(ASTtab node, Object data) {
+    public Object visit(ASTTab node, Object data) {
         return visitChildren(node, data);
     }
 
     @Override
-    public Object visit(ASTrien node, Object data) {
+    public Object visit(ASTRien node, Object data) {
         return ObjectType.VOID;
     }
 
     @Override
-    public Object visit(ASTentier node, Object data) {
+    public Object visit(ASTEntier node, Object data) {
         return ObjectType.INT;
     }
 
     @Override
-    public Object visit(ASTbooleen node, Object data) {
+    public Object visit(ASTBooleen node, Object data) {
         return ObjectType.BOOLEAN;
     }
 
     @Override
-    public Object visit(ASTnbre node, Object data) {
+    public Object visit(ASTNbre node, Object data) {
         Object value = node.jjtGetValue();
         if (value instanceof Integer) {
             return ObjectType.INT;
@@ -630,7 +630,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTchaine node, Object data) {
+    public Object visit(ASTChaine node, Object data) {
         Object value = node.jjtGetValue();
         if (value instanceof String) {
             String chaine = (String) value;
