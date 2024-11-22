@@ -107,6 +107,13 @@ public class SymbolTable
         return true;
     }
 
+    public boolean update (String ident, Object value) {
+        if (ident == null || value == null) return false;
+        MemoryObject mo = get(ident);
+        mo.setValue(value);
+        return true;
+    }
+
     /**
      * Remove an element from the symbol table
      * @param mo Memory object to remove from the symbol table

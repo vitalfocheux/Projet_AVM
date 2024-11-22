@@ -73,7 +73,7 @@ public class TypeChecker implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTVnil node, Object data) {
-        return ObjectType.EPSILON;
+        return ObjectType.OMEGA;
     }
 
     @Override
@@ -146,7 +146,7 @@ public class TypeChecker implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTOmega node, Object data) {
-        return ObjectType.EPSILON;
+        return ObjectType.OMEGA;
     }
 
     @Override
@@ -251,7 +251,7 @@ public class TypeChecker implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTEnil node, Object data) {
-        return ObjectType.EPSILON;
+        return ObjectType.OMEGA;
     }
 
     @Override
@@ -266,7 +266,7 @@ public class TypeChecker implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTInil node, Object data) {
-        return ObjectType.EPSILON;
+        return ObjectType.OMEGA;
     }
 
     @Override
@@ -352,7 +352,7 @@ public class TypeChecker implements MiniJajaVisitor {
         // Construire la signature de la méthode à partir des paramètres
         Object paramsData = node.jjtGetChild(1);
         if (!(paramsData instanceof ASTListExp)) {
-            throw new TypeCheckException("Expected ASTlistexp for method parameters.");
+            throw new TypeCheckException("Expected ASTListExp for method parameters.");
         }
         ASTListExp paramsNode = (ASTListExp) paramsData;
         List<ObjectType> actualParamTypes = new ArrayList<>();
@@ -403,16 +403,16 @@ public class TypeChecker implements MiniJajaVisitor {
                     throw new TypeCheckException("Parameter type cannot be null.");
                 }
             }else {
-                throw new TypeCheckException("Unexpected node type in ASTlistexp: " + firstChild.getClass().getSimpleName());
+                throw new TypeCheckException("Unexpected node type in ASTListExp: " + firstChild.getClass().getSimpleName());
             }
             if (secondChild instanceof ASTListExp) {
                 return secondChild.jjtAccept(this, data);
             } else if (!(secondChild instanceof ASTExnil)) {
-                throw new TypeCheckException("Unexpected node type in ASTlistexp: " + secondChild.getClass().getSimpleName());
+                throw new TypeCheckException("Unexpected node type in ASTListExp: " + secondChild.getClass().getSimpleName());
             }
         } else if (node.jjtGetNumChildren() == 1) {
             if (node.jjtGetChild(0) instanceof ASTExnil) {
-                return ObjectType.EPSILON;
+                return ObjectType.OMEGA;
             }
         }
         return null;
@@ -439,7 +439,7 @@ public class TypeChecker implements MiniJajaVisitor {
             if (secondChild instanceof ASTListExp) {
                 collectParamTypesFromListexp((ASTListExp) secondChild, paramTypes, data);
             } else if (!(secondChild instanceof ASTExnil)) {
-                throw new TypeCheckException("Unexpected node type in ASTlistexp: " + secondChild.getClass().getSimpleName());
+                throw new TypeCheckException("Unexpected node type in ASTListExp: " + secondChild.getClass().getSimpleName());
             }
         } 
         else if (listexpNode.jjtGetNumChildren() == 1) {
@@ -456,7 +456,7 @@ public class TypeChecker implements MiniJajaVisitor {
         // Construire la signature de la méthode à partir des paramètres
         Object paramsData = node.jjtGetChild(1);
         if (!(paramsData instanceof ASTListExp)) {
-            throw new TypeCheckException("Expected ASTlistexp for method parameters.");
+            throw new TypeCheckException("Expected ASTListExp for method parameters.");
         }
         ASTListExp paramsNode = (ASTListExp) paramsData;
         List<ObjectType> actualParamTypes = new ArrayList<>();
@@ -498,7 +498,7 @@ public class TypeChecker implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTExnil node, Object data) {
-        return ObjectType.EPSILON;
+        return ObjectType.OMEGA;
     }
 
     @Override

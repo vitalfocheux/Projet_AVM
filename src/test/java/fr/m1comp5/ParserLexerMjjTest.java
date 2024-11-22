@@ -1,11 +1,10 @@
 package fr.m1comp5;
 
-import fr.m1comp5.Analyzer.mjj.generated.MiniJaja;
-import fr.m1comp5.Analyzer.mjj.generated.ParseException;
-
-import fr.m1comp5.Analyzer.mjj.generated.SimpleNode;
 import java.io.IOException;
 
+import fr.m1comp5.Analyzer.mjj.generated.MiniJaja;
+import fr.m1comp5.Analyzer.mjj.generated.ParseException;
+import fr.m1comp5.Analyzer.mjj.generated.SimpleNode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;

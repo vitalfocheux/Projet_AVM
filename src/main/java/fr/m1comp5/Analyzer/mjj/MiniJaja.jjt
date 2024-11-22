@@ -229,8 +229,16 @@ private void listexp1() : {}
 
 private void exp() : {}
 {
-    <NOT> exp1() exp3() #Not(1) |
+    <NOT> exp1() #Not |
     exp1() exp3()
+}
+
+private void exp3() : {}
+{
+    [
+        <AND> exp1() exp3() #Et(2) |
+        <OR> exp1() exp3() #Ou(2)
+    ]
 }
 
 private void exp1() : {}
@@ -238,31 +246,28 @@ private void exp1() : {}
     exp2() exp4()
 }
 
+private void exp4() : {}
+{
+    [
+        <EQUAL> exp2() #Eq(2) |
+        <SUP> exp2() #Sup(2)
+    ]
+}
+
 private void exp2() : {}
 {
     terme() exp5() |
-    <SUB> terme() exp5() #Neg(1)
+    <SUB> terme() #Neg
 }
 
-private void exp3() : {}
-{
-    <AND> exp1() exp3() #Et(2) |
-    <OR> exp1() exp3() #Ou(2)  |
-    empty()
-}
-
-private void exp4() : {}
-{
-    <EQUAL> exp2() exp4() #Eq(2) |
-    <SUP> exp2() exp4() #Sup(2)  |
-    empty()
-}
 
 private void exp5() : {}
 {
-    <ADD> terme() exp5() #Add(2) |
-    <SUB> terme() exp5() #Sub(2) |
-    empty()
+    (
+        <ADD> terme() #Add(2) |
+        <SUB> terme() #Sub(2)
+    ) exp5() |
+    {}
 }
 
 private void terme() : {}
@@ -272,9 +277,11 @@ private void terme() : {}
 
 private void terme1() : {}
 {
-    <MUL> fact() terme1() #Mul(2) |
-    <DIV> fact() terme1() #Div(2) |
-    empty()
+    (
+        <MUL> fact() #Mul(2) |
+        <DIV> fact() #Div(2)
+    ) terme1() |
+    {}
 }
 
 private void fact() : {}
