@@ -1,0 +1,6 @@
+mvn archetype:generate \
+    -DgroupId=fr.m1comp5 \
+    -DartifactId=module_name \
+    -Dversion=1.0.0 \
+    -DarchetypeArtifactId=maven-archetype-quickstart \
+    -DinteractiveMode=false
