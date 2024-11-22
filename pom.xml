@@ -97,12 +97,6 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>fr.m1comp5.Main</mainClass>
-                    <options>
-                        <option>--module-path</option>
-                        <option>/opt/javafx-sdk/lib</option>
-                        <option>--add-modules</option>
-                        <option>javafx.controls,javafx.fxml</option>
-                    </options>
                 </configuration>
             </plugin>
         </plugins>
