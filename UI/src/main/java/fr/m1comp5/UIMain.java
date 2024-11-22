@@ -1,4 +1,4 @@
-package fr.m1comp5.ui;
+package fr.m1comp5;
 
 import javafx.application.Application;
 import javafx.stage.Stage;

@@ -1,8 +1,9 @@
-package fr.m1comp5.ui;
+package fr.m1comp5;
 
-//import fr.m1comp5.mjj.generated.MiniJaja;
-//import fr.m1comp5.mjj.generated.ParseException;
-//import fr.m1comp5.mjj.generated.SimpleNode;
+import fr.m1comp5.mjj.InterpreterMjj;
+import fr.m1comp5.mjj.generated.MiniJaja;
+import fr.m1comp5.mjj.generated.ParseException;
+import fr.m1comp5.mjj.generated.SimpleNode;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -101,21 +102,33 @@ public class IDE {
         runIcon.setFitWidth(16);
         Button runButton = new Button();
         runButton.setGraphic(runIcon);
-        runButton.setOnAction(e -> {runMjj();});
+        runButton.setOnAction(e -> {
+            runMjj();System.out.println("oui");
+        });
 
         ImageView undoIcon = new ImageView(new Image(getClass().getResourceAsStream("/icon/undo.png")));
-        runIcon.setFitHeight(16);
-        runIcon.setFitWidth(16);
+        undoIcon.setFitHeight(16);
+        undoIcon.setFitWidth(16);
         Button undoButton = new Button();
-        runButton.setGraphic(runIcon);
-        runButton.setOnAction(e -> {undoMjj();});
+        undoButton.setGraphic(undoIcon);
+        undoButton.setOnAction(e -> {
+            undoMjj();
+            System.out.println("Undo button clicked");
+        });
 
         ImageView redoIcon = new ImageView(new Image(getClass().getResourceAsStream("/icon/redo.png")));
-        runIcon.setFitHeight(16);
-        runIcon.setFitWidth(16);
+        redoIcon.setFitHeight(20);
+        redoIcon.setFitWidth(20);
         Button redoButton = new Button();
-        runButton.setGraphic(runIcon);
-        runButton.setOnAction(e -> {redoMjj();});
+        redoButton.setGraphic(redoIcon);
+        redoButton.setOnAction(e -> {
+            redoMjj();
+            System.out.println("Redo button clicked");
+        });
+
+        runButton.setStyle("-fx-background-color: transparent;");
+        undoButton.setStyle("-fx-background-color: transparent;");
+        redoButton.setStyle("-fx-background-color: transparent;");
 
         toolBar.getItems().addAll(runButton,undoButton,redoButton);
     }
@@ -225,23 +238,24 @@ public class IDE {
     }
     private void runMjj() {
         mjj = editor.getText();
-        console.appendText(mjj);
-//        MiniJaja mjjTree = new MiniJaja(new ByteArrayInputStream(mjj.getBytes()));
-//        console.setText("");  // Vider la console avant d'exécuter
-//        try
-//        {
-//            SimpleNode n = mjjTree.start();
-//            console.appendText("Compilation successfull");
-//            n.dump("");
-//        }
-//        catch (ParseException pe)
-//        {
-//            console.appendText("Syntax error in code");
-//        }
-//        catch (Exception exp)
-//        {
-//            console.appendText(exp.getMessage());
-//        }
+        MiniJaja mjjTree = new MiniJaja(new ByteArrayInputStream(mjj.getBytes()));
+        console.setText("");  // Vider la console avant d'exécuter
+        try
+        {
+            SimpleNode n = mjjTree.start();
+            InterpreterMjj interpreter = new InterpreterMjj(n);
+            console.appendText("Compilation successfull");
+            interpreter.interpret();
+            n.dump("");
+        }
+        catch (ParseException pe)
+        {
+            console.appendText("Syntax error in code");
+        }
+        catch (Exception exp)
+        {
+            console.appendText(exp.getMessage());
+        }
     }
     private void undoMjj() {
         editor.undo();
