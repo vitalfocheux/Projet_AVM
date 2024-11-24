@@ -269,11 +269,34 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTLoad node, Object data) {
+        String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        try
+        {
+            MemoryObject mo = mem.getSymbolTable().get(id);
+            mem.getStack().push(new MemoryObject(null, mo.getValue(), ObjectNature.CST, mo.getType()));
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTALoad node, Object data) {
+        String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        try
+        {
+            MemoryObject mo = mem.getSymbolTable().get(id);
+            int index = (int) mem.getStack().pop().getValue();
+            mem.getStack().push(new MemoryObject(null, mem.getHeap().accessValue((int) mo.getValue(), index), ObjectNature.CST, mo.getType()));
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
