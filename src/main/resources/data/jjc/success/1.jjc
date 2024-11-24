@@ -1,0 +1,51 @@
+init
+push(0)
+new(x,entier,var,0)
+push(4)
+newarray(t,entier)
+push(9)
+new(fct,entier,meth,0)
+goto(29)
+new(max,entier,var,1)
+push(5)
+new(y,entier,var,0)
+load(max)
+push(0)
+sup
+not
+if(24)
+load(max)
+inc(y)
+load(max)
+push(1)
+sub
+store(max)
+goto(12)
+load(y)
+swap //retrait de y
+pop
+swap // adr retour <-> val. résultat
+return
+push(4)
+load(x)
+sup
+not
+if(43)
+load(x)
+push(1)
+invoke(fct)
+swap //retrait du paramètre
+pop
+astore(t)
+push(1)
+inc(x)
+goto(29)
+push(0) //valeur pour les méthodes void
+swap // retrait de somme
+pop
+swap // retrait de t
+pop
+swap // retrait de x
+pop
+pop // retrait du main
+jcstop

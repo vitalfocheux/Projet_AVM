@@ -182,10 +182,10 @@ private void instrs1() : {}
 
 private void instr() : {}
 {
-    ident() instr2()                                           |
-    <RETURN> exp() #Retour                                     |
-    <WRITE> <LPAR> instr3() <RPAR> #Ecrire(1)                  |
-    <WRITELN> <LPAR> instr3() <RPAR> #EcrireLn(1)              |
+    ident() instr2()                                                        |
+    <RETURN> exp() #Retour                                                  |
+    <WRITE> <LPAR> instr3() <RPAR> #Ecrire(1)                               |
+    <WRITELN> <LPAR> instr3() <RPAR> #EcrireLn(1)                           |
     <IF> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> ELSE() #Si(3) |
     <WHILE> <LPAR> exp() <RPAR> <LCBRACKET> instrs() <RCBRACKET> #TantQue(2)
 }
@@ -260,12 +260,14 @@ private void exp2() : {}
     <SUB> terme() #Neg
 }
 
+
 private void exp5() : {}
 {
-    [
-        <ADD> exp2() #Add(2) |
-        <SUB> exp2() #Sub(2)
-    ]
+    (
+        <ADD> terme() #Add(2) |
+        <SUB> terme() #Sub(2)
+    ) exp5() |
+    {}
 }
 
 private void terme() : {}
@@ -275,19 +277,20 @@ private void terme() : {}
 
 private void terme1() : {}
 {
-    [
-        <MUL> terme() #Mul(2) |
-        <DIV> terme() #Div(2)
-    ]
+    (
+        <MUL> fact() #Mul(2) |
+        <DIV> fact() #Div(2)
+    ) terme1() |
+    {}
 }
 
 private void fact() : {}
 {
-    ident() fact1()                 |
+    ident() fact1()                          |
     <LENGTH> <LPAR> ident() <RPAR>  #Longeur(1) |
-    <TRUE> #Vrai                      |
-    <FALSE> #Faux                     |
-    nbre()                            |
+    <TRUE> #Vrai                             |
+    <FALSE> #Faux                            |
+    nbre()                                   |
     <LPAR> exp() <RPAR> #Exp(1)
 }
 
@@ -319,11 +322,11 @@ private void empty() : {}
     {}
 }
 
-void nbre() #Nbre : {int x;} {
-	<NUMBER> {
-		try { x = Integer.parseInt(token.image);
+void nbre() #Nbre : {int x; Token t;} {
+	t = <NUMBER> {
+		try { x = Integer.parseInt(t.image);
 		} catch (NumberFormatException ee) {
-		   System.err.println("Error: " + token.image + " is not a number.");
+		   System.err.println(ee.getMessage());
 		   x = 0;
 		}
 		jjtThis.jjtSetValue(x);

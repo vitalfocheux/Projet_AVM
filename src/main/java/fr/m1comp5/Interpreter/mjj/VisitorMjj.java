@@ -1,9 +1,10 @@
 package fr.m1comp5.Interpreter.mjj;
 
-import fr.m1comp5.Analyzer.jjc.generated.ASTAnd;
-import fr.m1comp5.Analyzer.jjc.generated.ASTOr;
 import fr.m1comp5.Analyzer.mjj.generated.*;
-import fr.m1comp5.Memory.*;
+import fr.m1comp5.Memory.ObjectType;
+import fr.m1comp5.Memory.MemoryObject;
+import fr.m1comp5.Memory.ObjectNature;
+import fr.m1comp5.Memory.SymbolTable;
 
 public class VisitorMjj implements MiniJajaVisitor {
     private String toDisplay;
@@ -57,6 +58,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         }
     }
 
+
     @Override
     public Object visit(ASTDecls node, Object data) {
         for (int i = 0; i < node.jjtGetNumChildren(); i++) {
@@ -97,13 +99,8 @@ public class VisitorMjj implements MiniJajaVisitor {
         }
 
         MemoryObject mo = new MemoryObject(varIdent,value, ObjectNature.CST, varType);
-        try
-        {
-            symbolTable.put(mo);
-        }
-        catch (SymbolTableException ignored)
-        {
-        }
+        symbolTable.put(mo);
+
         return null;
     }
 
@@ -121,13 +118,8 @@ public class VisitorMjj implements MiniJajaVisitor {
         }
 
         MemoryObject mo = new MemoryObject(varIdent,value, ObjectNature.VAR, varType);
-        try
-        {
-            symbolTable.put(mo);
-        }
-        catch (SymbolTableException ignored)
-        {
-        }
+        symbolTable.put(mo);
+
         return null;
     }
 
@@ -138,7 +130,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTOmega node, Object data) {
-        return "OMEGA";
+        return "EMPTY";
     }
 
     @Override
@@ -272,13 +264,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         String varIdent = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
         MemoryObject mo = symbolTable.get(varIdent);
         int val = (int) mo.getValue() + 1;
-        try
-        {
-            symbolTable.put(new MemoryObject(varIdent,val,mo.getNature(),mo.getType()));
-        }
-        catch (SymbolTableException ignored)
-        {
-        }
+        symbolTable.put(new MemoryObject(varIdent,val,mo.getNature(),mo.getType()));
         return val;
     }
 

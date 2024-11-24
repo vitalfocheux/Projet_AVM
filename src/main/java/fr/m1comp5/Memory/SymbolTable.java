@@ -105,6 +105,7 @@ public class SymbolTable
         }
         ++count;
         bucket.add(mo);
+        System.out.println("Saving in symbol table: " + mo.toString());
         if (needToRehash())
         {
             rehash();
@@ -129,7 +130,7 @@ public class SymbolTable
      * @param mo Memory object to remove from the symbol table
      * @return True if the object was removed and false otherwise
      */
-    public void remove(MemoryObject mo)
+    public boolean remove(MemoryObject mo)
     {
         if (mo == null)
         {
@@ -154,6 +155,7 @@ public class SymbolTable
             lmo.remove(idx);
             --count;
         }
+        return idx != -1;
     }
 
     /**

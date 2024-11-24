@@ -1,12 +1,12 @@
 package fr.m1comp5.Compiler;
 
 import fr.m1comp5.Analyzer.jjc.generated.*;
+import fr.m1comp5.Analyzer.jjc.generated.ASTNot;
 import fr.m1comp5.Analyzer.mjj.generated.*;
 import fr.m1comp5.Analyzer.mjj.generated.ASTAdd;
 import fr.m1comp5.Analyzer.mjj.generated.ASTDiv;
 import fr.m1comp5.Analyzer.mjj.generated.ASTMul;
 import fr.m1comp5.Analyzer.mjj.generated.ASTNeg;
-import fr.m1comp5.Analyzer.mjj.generated.ASTNot;
 import fr.m1comp5.Analyzer.mjj.generated.ASTRoot;
 import fr.m1comp5.Analyzer.mjj.generated.ASTSub;
 import fr.m1comp5.Analyzer.mjj.generated.ASTSup;
@@ -353,7 +353,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTNot node, Object data) {
+    public Object visit(fr.m1comp5.Analyzer.mjj.generated.ASTNot node, Object data) {
         return compileOp1(node, data);
     }
 
