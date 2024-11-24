@@ -1,9 +1,6 @@
 package fr.m1comp5;
 
-import fr.m1comp5.Memory.MemoryObject;
-import fr.m1comp5.Memory.ObjectNature;
-import fr.m1comp5.Memory.ObjectType;
-import fr.m1comp5.Memory.SymbolTable;
+import fr.m1comp5.Memory.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,14 +25,15 @@ public class SymbolTableTest {
     }
 
     @Test
-    public void testPutNull(){
+    public void testPutNull() throws SymbolTableException
+    {
         Assertions.assertFalse(symbolTable.put(null));
         Assertions.assertEquals(symbolTable.getCount(), 0);
         Assertions.assertEquals(symbolTable.getSize(), 32);
     }
 
     @Test
-    public void testPut(){
+    public void testPut() throws SymbolTableException {
         MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         Assertions.assertTrue(symbolTable.put(obj));
         Assertions.assertEquals(symbolTable.getCount(), 1);
@@ -44,7 +42,7 @@ public class SymbolTableTest {
     }
 
     @Test
-    public void testPutMany(){
+    public void testPutMany() throws SymbolTableException {
         int size = symbolTable.getSize();
         for(int i = 0; i < size; ++i){
             MemoryObject obj = new MemoryObject("id"+i, i, ObjectNature.VAR, ObjectType.INT);
@@ -56,11 +54,11 @@ public class SymbolTableTest {
     }
 
     @Test
-    public void testPutSameTwice(){
+    public void testPutSameTwice() throws SymbolTableException{
         MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         Assertions.assertTrue(symbolTable.put(obj));
-        Assertions.assertTrue(symbolTable.put(obj));
-        Assertions.assertEquals(symbolTable.getCount(), 2);
+        Assertions.assertThrows(SymbolTableException.class, () -> {symbolTable.put(obj);});
+        Assertions.assertEquals(symbolTable.getCount(), 1);
         Assertions.assertEquals(obj, symbolTable.get("id"));
     }
 
@@ -70,7 +68,7 @@ public class SymbolTableTest {
     }
 
     @Test
-    public void testGetNotEmptyReturnNull(){
+    public void testGetNotEmptyReturnNull() throws SymbolTableException {
         int size = symbolTable.getSize();
         for(int i = 0; i < size; ++i){
             MemoryObject obj = new MemoryObject("id"+i, i, ObjectNature.VAR, ObjectType.INT);
@@ -94,7 +92,7 @@ public class SymbolTableTest {
     }
 
     @Test
-    public void testRemove(){
+    public void testRemove() throws SymbolTableException {
         int size = symbolTable.getSize();
         for(int i = 0; i < size; ++i){
             MemoryObject obj = new MemoryObject("id"+i, i, ObjectNature.VAR, ObjectType.INT);
@@ -113,7 +111,7 @@ public class SymbolTableTest {
     }
 
     @Test
-    public void testStressed(){
+    public void testStressed() throws SymbolTableException {
         for(int i = 0; i < 10000; ++i){
             MemoryObject obj = new MemoryObject("id"+i, i, ObjectNature.VAR, ObjectType.INT);
             Assertions.assertTrue(symbolTable.put(obj));
