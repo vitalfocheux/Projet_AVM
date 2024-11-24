@@ -113,12 +113,12 @@ public class SymbolTable
         return true;
     }
 
-    public void update(String ident, Object value) throws SymbolTableException {
-        if (ident == null || value == null)
+    public void update(String id, Object value) throws SymbolTableException {
+        if (id == null || value == null)
         {
             throw new SymbolTableException("The value and the identifier must not be null");
         }
-        MemoryObject mo = get(ident);
+        MemoryObject mo = get(id);
         if (mo != null)
         {
             mo.setValue(value);
@@ -134,12 +134,12 @@ public class SymbolTable
     {
         if (mo == null)
         {
-            return;
+            return false;
         }
         List<MemoryObject> lmo = buckets.get(hashFunction(mo.getId()));
         if (lmo == null)
         {
-            return;
+            return false;
         }
         int idx = -1;
         for (int i = 0; i < lmo.size(); ++i)

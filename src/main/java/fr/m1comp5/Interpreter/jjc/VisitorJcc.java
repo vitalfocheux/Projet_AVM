@@ -78,7 +78,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTNew node, Object data) {
-        String varIdent = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         ObjectType type = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
         ObjectNature nature = (ObjectNature) node.jjtGetChild(2).jjtAccept(this, data);
         int pos = (int) node.jjtGetChild(3).jjtAccept(this, data);
@@ -87,17 +87,33 @@ public class VisitorJcc implements JajaCodeVisitor {
             case VAR :
                 try
                 {
-                    mem.identVal(varIdent, type, pos);
-                } catch (Exception ignored)
+                    mem.identVal(id, type, pos);
+                } catch (Exception e)
                 {
+                    System.err.println(e.getMessage());
                 }
                  break;
             case CST :
-//                MemoryObject mo = mem.getStack().pop();
-//                mem.declCst(varIdent, mo.getValue(), type);
+                try
+                {
+                    MemoryObject mo = mem.getStack().pop();
+                    mem.declCst(id, mo.getValue(), type);
+                }
+                catch (Exception e)
+                {
+                    System.err.println(e.getMessage());
+                }
                 break;
-            case TAB: break;
-            case METH: break;
+            case METH:
+                try
+                {
+                    MemoryObject mo = mem.getStack().pop();
+                    mem.declMeth(id, mo.getValue(), type);
+                }
+                catch (Exception e)
+                {
+                    System.err.println(e.getMessage());
+                }
         }
         addr++;
         return null;
@@ -110,7 +126,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         ObjectType arrayType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
         try
         {
-            mem.declTab(id, (Integer) mem.getStack().getTop().getValue(), arrayType);
+            mem.declTab(id, mem.getStack().getTop().getValue(), arrayType);
         }
         catch (Exception e)
         {
@@ -121,6 +137,18 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTInvoke node, Object data) {
+        String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        try
+        {
+            mem.declCst(null, addr + 1, ObjectType.INT);
+            addr = (int) mem.getVal(id);
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+
+
         return null;
     }
 
@@ -131,26 +159,111 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTReturn node, Object data) {
+        try
+        {
+            MemoryObject mo = mem.getStack().pop();
+            addr = (int) mo.getValue();
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
         return null;
     }
 
     @Override
     public Object visit(ASTWrite node, Object data) {
+        StringBuilder sb = new StringBuilder();
+        try
+        {
+            Object msg = mem.getStack().pop().getValue();
+            if (msg instanceof String)
+            {
+                sb.append(((String) msg).replace("\"", ""));
+            }
+            else
+            {
+                sb.append(msg);
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
+        toDisplay += sb.toString();
         return null;
     }
 
     @Override
     public Object visit(ASTWriteLn node, Object data) {
+        StringBuilder sb = new StringBuilder();
+        try
+        {
+            Object msg = mem.getStack().pop().getValue();
+            if (msg instanceof String)
+            {
+                sb.append(((String) msg).replace("\"", ""));
+            }
+            else
+            {
+                sb.append(msg);
+            }
+            sb.append('\n');
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
+        toDisplay += sb.toString();
         return null;
     }
 
     @Override
     public Object visit(ASTPush node, Object data) {
+        Object value = node.jjtGetChild(0).jjtAccept(this, data);
+        ObjectType valType = null;
+        if (value instanceof  Integer)
+        {
+            valType = ObjectType.INT;
+        }
+        else if (value instanceof Boolean)
+        {
+            valType = ObjectType.BOOLEAN;
+        }
+        else if (value instanceof String)
+        {
+            valType = ObjectType.OMEGA;
+        }
+        try
+        {
+            mem.getStack().push(new MemoryObject(null, value, ObjectNature.CST ,valType));
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTPop node, Object data) {
+        try
+        {
+            MemoryObject mo = mem.getStack().pop();
+            mem.getSymbolTable().remove(mo);
+            if (mo.getNature() == ObjectNature.TAB)
+            {
+                mem.getHeap().decrementReference((int) mo.getValue());
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
