@@ -63,14 +63,13 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTSwap node, Object data) {
-        try {
-            MemoryObject fst = mem.getStack().pop();
-            MemoryObject scd = mem.getStack().pop();
-            mem.getStack().push(fst);
-            mem.getStack().push(scd);
-        } catch (Exception e) {
+        try
+        {
+            mem.getStack().swap();
+        }
+        catch (Exception e)
+        {
             System.err.println(e.getMessage());
-            e.printStackTrace();
         }
         addr++;
         return null;
@@ -154,7 +153,15 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTLength node, Object data) {
-        return null;
+        String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        try
+        {
+            return mem.getHeap().getArraySize((int) mem.getSymbolTable().get(id).getValue());
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("The ident is not an ident for an array");
+        }
     }
 
     @Override
@@ -302,37 +309,112 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTStore node, Object data) {
+        String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        try
+        {
+            MemoryObject last = mem.getStack().pop();
+            MemoryObject mo = mem.getSymbolTable().get(id);
+            if (last.getType() == mo.getType())
+            {
+                mem.assignValue(mo.getId(), last.getValue());
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTAStore node, Object data) {
+        String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        try
+        {
+            MemoryObject val = mem.getStack().pop();
+            MemoryObject idx = mem.getStack().pop();
+            MemoryObject mo = mem.getSymbolTable().get(id);
+            if (val.getType() == mo.getType())
+            {
+                mem.assignValueArray(mo.getId(), idx.getValue(), val.getValue());
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTIf node, Object data) {
+        int address = (int) node.jjtGetChild(0).jjtAccept(this, data);
+        try
+        {
+            MemoryObject last = mem.getStack().pop();
+            if (last.getType() == ObjectType.BOOLEAN)
+            {
+                if ((boolean) last.getValue())
+                {
+                    addr = address;
+                }
+                else
+                {
+                    ++addr;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
         return null;
     }
 
     @Override
     public Object visit(ASTGoTo node, Object data) {
+        addr = (int) node.jjtGetChild(0).jjtAccept(this, data);
         return null;
     }
 
     @Override
     public Object visit(ASTInc node, Object data) {
+        String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        try
+        {
+            MemoryObject last = mem.getStack().pop();
+            mem.assignValue(id, (int) last.getValue() + (int) mem.getSymbolTable().get(id).getValue());
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTAInc node, Object data) {
+        String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        try
+        {
+            MemoryObject value = mem.getStack().pop();
+            MemoryObject index = mem.getStack().pop();
+            mem.assignValueArray(id, index.getValue(), (int) mem.getHeap().accessValue((int) mem.getSymbolTable().get(id).getValue(), (int) index.getValue()) + (int) value.getValue());
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTNop node, Object data) {
-        addr++;
+        ++addr;
         return null;
     }
 
@@ -349,51 +431,193 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTNeg node, Object data) {
+        try
+        {
+            MemoryObject last = mem.getStack().pop();
+            if (last.getType() == ObjectType.INT)
+            {
+                mem.getStack().push(new MemoryObject(null, -((int)last.getValue()), ObjectNature.CST, ObjectType.INT));
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTNot node, Object data) {
+        try
+        {
+            MemoryObject last = mem.getStack().pop();
+            if (last.getType() == ObjectType.BOOLEAN)
+            {
+                mem.getStack().push(new MemoryObject(null, !((boolean) last.getValue()), ObjectNature.CST, ObjectType.BOOLEAN));
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTAdd node, Object data) {
+        try
+        {
+            MemoryObject secondOperand = mem.getStack().pop();
+            MemoryObject firstOperand = mem.getStack().pop();
+            if (secondOperand.getType() == firstOperand.getType() && firstOperand.getType() == ObjectType.INT)
+            {
+                mem.getStack().push(new MemoryObject(null, (int) firstOperand.getValue() + (int) secondOperand.getValue(), ObjectNature.CST, ObjectType.INT));
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTSub node, Object data) {
+        try
+        {
+            MemoryObject secondOperand = mem.getStack().pop();
+            MemoryObject firstOperand = mem.getStack().pop();
+            if (secondOperand.getType() == firstOperand.getType() && firstOperand.getType() == ObjectType.INT)
+            {
+                mem.getStack().push(new MemoryObject(null, (int) firstOperand.getValue() - (int) secondOperand.getValue(), ObjectNature.CST, ObjectType.INT));
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTMul node, Object data) {
+        try
+        {
+            MemoryObject secondOperand = mem.getStack().pop();
+            MemoryObject firstOperand = mem.getStack().pop();
+            if (secondOperand.getType() == firstOperand.getType() && firstOperand.getType() == ObjectType.INT)
+            {
+                mem.getStack().push(new MemoryObject(null, (int) firstOperand.getValue() * (int) secondOperand.getValue(), ObjectNature.CST, ObjectType.INT));
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTDiv node, Object data) {
+        try
+        {
+            MemoryObject secondOperand = mem.getStack().pop();
+            MemoryObject firstOperand = mem.getStack().pop();
+            if ((int) secondOperand.getValue() == 0)
+            {
+                throw new Exception("Can't divide by zero");
+            }
+            if (secondOperand.getType() == firstOperand.getType() && firstOperand.getType() == ObjectType.INT)
+            {
+                mem.getStack().push(new MemoryObject(null, (int) firstOperand.getValue() / (int) secondOperand.getValue(), ObjectNature.CST, ObjectType.INT));
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTCmp node, Object data) {
+        try
+        {
+            MemoryObject secondOperand = mem.getStack().pop();
+            MemoryObject firstOperand = mem.getStack().pop();
+            if (secondOperand.getType() == firstOperand.getType())
+            {
+                mem.getStack().push(new MemoryObject(null, firstOperand.equals(secondOperand), ObjectNature.CST, ObjectType.BOOLEAN));
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTSup node, Object data) {
+        try
+        {
+            MemoryObject secondOperand = mem.getStack().pop();
+            MemoryObject firstOperand = mem.getStack().pop();
+            if (secondOperand.getType() == firstOperand.getType() && firstOperand.getType() == ObjectType.INT)
+            {
+                mem.getStack().push(new MemoryObject(null, (int) firstOperand.getValue() > (int) secondOperand.getValue(), ObjectNature.CST, ObjectType.BOOLEAN));
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTOr node, Object data) {
+        try
+        {
+            MemoryObject secondOperand = mem.getStack().pop();
+            MemoryObject firstOperand = mem.getStack().pop();
+            if (secondOperand.getType() == firstOperand.getType() && firstOperand.getType() == ObjectType.BOOLEAN)
+            {
+                mem.getStack().push(new MemoryObject(null, (boolean) firstOperand.getValue() || (boolean) secondOperand.getValue(), ObjectNature.CST, ObjectType.BOOLEAN));
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTAnd node, Object data) {
+        try
+        {
+            MemoryObject secondOperand = mem.getStack().pop();
+            MemoryObject firstOperand = mem.getStack().pop();
+            if (secondOperand.getType() == firstOperand.getType() && firstOperand.getType() == ObjectType.BOOLEAN)
+            {
+                mem.getStack().push(new MemoryObject(null, (boolean) firstOperand.getValue() && (boolean) secondOperand.getValue(), ObjectNature.CST, ObjectType.BOOLEAN));
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        ++addr;
         return null;
     }
 
@@ -419,45 +643,41 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTSorte node, Object data) {
-        return null;
+        ObjectNature nature = null;
+        String type = (String) node.jjtGetValue();
+        if (type.equals("var"))
+        {
+            nature = ObjectNature.VAR;
+        }
+        else if (type.equals("cst"))
+        {
+            nature = ObjectNature.CST;
+        }
+        else if (type.equals("meth"))
+        {
+            nature = ObjectNature.METH;
+        }
+        return nature;
     }
 
     @Override
     public Object visit(ASTJcNbre node, Object data) {
-        return null;
+        return node.jjtGetValue();
     }
 
     @Override
     public Object visit(ASTJcVrai node, Object data) {
-        return null;
+        return node.jjtGetValue();
     }
 
     @Override
     public Object visit(ASTJcFalse node, Object data) {
-        return null;
+        return node.jjtGetValue();
     }
 
     @Override
     public Object visit(ASTJcChaine node, Object data) {
-        return null;
+        return node.jjtGetValue();
     }
 
-
-    ObjectType getTypeFromString(String type)
-    {
-        ObjectType ftype = null;
-        if (type.equals("booleen"))
-        {
-            ftype = ObjectType.BOOLEAN;
-        }
-        else if (type.equals("entier"))
-        {
-            ftype = ObjectType.INT;
-        }
-        else if (type.equals("void"))
-        {
-            ftype = ObjectType.VOID;
-        }
-        return ftype;
-    }
 }

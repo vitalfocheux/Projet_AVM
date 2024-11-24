@@ -415,4 +415,10 @@ public class Heap
         he.incrementReferenceNumber();
     }
 
+    public int getArraySize(int address) throws HeapException
+    {
+        HeapElement he = getHeapElement(address);
+        return he.getSize();
+    }
+
 }
