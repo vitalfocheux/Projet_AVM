@@ -93,7 +93,7 @@ public class TypeChecker implements MiniJajaVisitor {
             MemoryObject mo = new MemoryObject(cstName, cstValue, ObjectNature.CST, cstType);
             try {
                 ((SymbolTable) stack.getTop().getValue()).put(mo);
-            } catch (StackException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -118,7 +118,7 @@ public class TypeChecker implements MiniJajaVisitor {
             MemoryObject mo = new MemoryObject(varName, null, ObjectNature.VAR, varType);
             try {
                 ((SymbolTable) stack.getTop().getValue()).put(mo);
-            } catch (StackException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -137,7 +137,7 @@ public class TypeChecker implements MiniJajaVisitor {
             MemoryObject mo = new MemoryObject(arrayName, null, ObjectNature.TAB, arrayType);
             try {
                 ((SymbolTable) stack.getTop().getValue()).put(mo);
-            } catch (StackException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -183,7 +183,7 @@ public class TypeChecker implements MiniJajaVisitor {
             MemoryObject mo = new MemoryObject(methodSignature, null, ObjectNature.METH, returnType, paramTypes);
             try {
                 ((SymbolTable) stack.getTop().getValue()).put(mo);
-            } catch (StackException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             currentMethod = methodSignature; // Enregistrer la méthode courante
