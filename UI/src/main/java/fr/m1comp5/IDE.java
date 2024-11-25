@@ -224,6 +224,7 @@ public class IDE {
         newTab.setClosable(true);
 
         tabPane.getTabs().add(newTab);
+        tabPane.getSelectionModel().select(newTab);
     }
     private void openFile() {
         FileChooser fileChooser = new FileChooser();
@@ -234,7 +235,7 @@ public class IDE {
                 new FileChooser.ExtensionFilter("All Files", "*.*")
         );
 
-        File file = fileChooser.showOpenDialog(null);
+        File file = fileChooser.showOpenDialog(tabPane.getScene().getWindow()); // Pass correct context
         if (file != null) {
             try (FileReader reader = new FileReader(file)) {
                 StringBuilder content = new StringBuilder();
@@ -243,9 +244,10 @@ public class IDE {
                     content.append((char) str);
                 }
 
+                // Create a new tab for the opened file
                 Tab newTab = new Tab(file.getName());
                 TextArea editor = new TextArea(content.toString());
-                editor.setStyle("-fx-background-color: #3e3e42; -fx-text-fill: black;");
+                editor.setStyle("-fx-background-color: #3e3e42; -fx-text-fill: white;");
                 newTab.setContent(editor);
                 newTab.setClosable(true);
 
