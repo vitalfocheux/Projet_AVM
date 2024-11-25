@@ -15,9 +15,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +31,8 @@ public class IDE {
     private MenuItem undo;
     private MenuItem redo;
     private MenuItem run;
-    private TabPane tabPane;
+    private MenuItem closeFolder;
+    private TabPane editorsPane;
     private Map<Tab, File> fileMap = new HashMap<>();
     private String jjc;
     private TextArea console;
@@ -46,7 +44,7 @@ public class IDE {
         borderPane = new BorderPane();
         menuBar = new MenuBar();
         toolBar = new ToolBar();
-        tabPane = new TabPane();
+        editorsPane = new TabPane();
         console = new TextArea();
         folderTreeOpened = false;
         jjcWindowOpened = false;
@@ -63,7 +61,7 @@ public class IDE {
 
         SplitPane splitPane = new SplitPane();
         splitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
-        splitPane.getItems().addAll(tabPane, console);
+        splitPane.getItems().addAll(editorsPane, console);
         splitPane.setDividerPositions(0.75);
 
         //Adding elements to borderpane
@@ -87,8 +85,8 @@ public class IDE {
         openFile = new MenuItem("Open File (Ctrl+O)");
         saveFile = new MenuItem("Save File (Ctrl+S)");
         openFolder = new MenuItem("Open Folder");
-        openFolder.setOnAction(event -> openFolderDialog());
-        fileMenu.getItems().addAll(newFile, openFile, saveFile, openFolder);
+        closeFolder = new MenuItem("Close Folder");
+        fileMenu.getItems().addAll(newFile, openFile, saveFile, openFolder, closeFolder);
 
         Menu editMenu = new Menu("Edit");
         undo = new MenuItem("Undo (Ctrl+Z)");
@@ -147,11 +145,11 @@ public class IDE {
         Tab tab = new Tab(title, editor);
         tab.setClosable(true);
 
-        tabPane.getTabs().add(tab);
-        tabPane.getSelectionModel().select(tab);
+        editorsPane.getTabs().add(tab);
+        editorsPane.getSelectionModel().select(tab);
     }
     private TextArea getActiveEditor() {
-        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+        Tab selectedTab = editorsPane.getSelectionModel().getSelectedItem();
         if (selectedTab != null && selectedTab.getContent() instanceof TextArea) {
             return (TextArea) selectedTab.getContent();
         }
@@ -159,46 +157,52 @@ public class IDE {
     }
 
     private void shortcutAndAction() {
-        TextArea editor = getActiveEditor();
-        if (editor == null) {
-            return;
-        }
         // Set button action
-        newFile.setOnAction(e -> {
-            newFile();
-        });
-        openFile.setOnAction(e -> {
-            openFile();
-        });
-        saveFile.setOnAction(e -> {
-            saveFile();
+        newFile.setOnAction(e -> {newFile();});
+        openFile.setOnAction(e -> {openFile();});
+        saveFile.setOnAction(e -> {saveFile();});
+        openFolder.setOnAction(e -> {openFolderDialog();});
+        closeFolder.setOnAction(e -> {
+            SplitPane innerSplitPane = new SplitPane();
+            innerSplitPane.setOrientation(javafx.geometry.Orientation.HORIZONTAL);
+            if (jjcWindowOpened) {
+                TextArea rightPanel = new TextArea();
+                rightPanel.setText("Right Panel in Center");
+                rightPanel.setEditable(false);
+                innerSplitPane.getItems().addAll(editorsPane, rightPanel);
+                innerSplitPane.setDividerPositions(0.15,0.7);
+            }
+            else {
+                innerSplitPane.getItems().addAll(editorsPane);
+            }
+            SplitPane splitPane = new SplitPane();
+            splitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
+            splitPane.getItems().addAll(innerSplitPane, console);
+            splitPane.setDividerPositions(0.75);
         });
         undo.setOnAction(event -> {
-            if (editor.isUndoable()) {
-                undoMjj();
-            }
-        });
+            TextArea editor = getActiveEditor();
+            if (editor != null) {undoMjj();}});
         redo.setOnAction(event -> {
-            if (editor.isRedoable()) {
-                redoMjj();
+            TextArea editor = getActiveEditor();
+            if (editor != null) {redoMjj();}});
+        run.setOnAction(event -> {runMjj();});
+
+        editorsPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            if (newTab != null && newTab.getContent() instanceof TextArea editor) {
+                keyBindings(editor);
             }
         });
-        run.setOnAction(event -> {
-            runMjj();
-        });
+    }
 
-        // Set keyboard shortcut
+    private void keyBindings(TextArea editor)  {
         editor.setOnKeyPressed(event -> {
             if (event.isControlDown() && event.getCode() == KeyCode.Z) {
-                if (editor.isUndoable()) {
-                    undoMjj();
-                }
-                event.consume(); // Consume the event to prevent it from propagating
+                undoMjj();
+                event.consume(); // Avoid propagation of event
             }
             else if (event.isControlDown() && event.getCode() == KeyCode.Y) {
-                if (editor.isRedoable()) {
-                    redoMjj();
-                }
+                redoMjj();
                 event.consume();
             }
             else if (event.isShiftDown() && event.getCode() == KeyCode.F10) {
@@ -223,8 +227,9 @@ public class IDE {
         newTab.setContent(editor);
         newTab.setClosable(true);
 
-        tabPane.getTabs().add(newTab);
-        tabPane.getSelectionModel().select(newTab);
+        editorsPane.getTabs().add(newTab);
+        fileMap.put(newTab,null);
+        editorsPane.getSelectionModel().select(newTab);
     }
     private void openFile() {
         FileChooser fileChooser = new FileChooser();
@@ -235,7 +240,7 @@ public class IDE {
                 new FileChooser.ExtensionFilter("All Files", "*.*")
         );
 
-        File file = fileChooser.showOpenDialog(tabPane.getScene().getWindow()); // Pass correct context
+        File file = fileChooser.showOpenDialog(editorsPane.getScene().getWindow()); // Pass correct context
         if (file != null) {
             try (FileReader reader = new FileReader(file)) {
                 StringBuilder content = new StringBuilder();
@@ -247,12 +252,11 @@ public class IDE {
                 // Create a new tab for the opened file
                 Tab newTab = new Tab(file.getName());
                 TextArea editor = new TextArea(content.toString());
-                editor.setStyle("-fx-background-color: #3e3e42; -fx-text-fill: white;");
                 newTab.setContent(editor);
                 newTab.setClosable(true);
 
-                tabPane.getTabs().add(newTab);
-                tabPane.getSelectionModel().select(newTab);
+                editorsPane.getTabs().add(newTab);
+                editorsPane.getSelectionModel().select(newTab);
 
                 fileMap.put(newTab, file); // Link the file to the tab
                 console.appendText("File opened: " + file.getAbsolutePath() + "\n");
@@ -262,7 +266,7 @@ public class IDE {
         }
     }
     private void saveFile(){
-        Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+        Tab activeTab = editorsPane.getSelectionModel().getSelectedItem();
         if (activeTab == null) {
             console.appendText("No active tab to save.\n");
             return;
@@ -295,13 +299,12 @@ public class IDE {
     }
 
     private void openFolderDialog() {
-        TextArea editor = getActiveEditor();
         DirectoryChooser directoryChooser = new DirectoryChooser();
 
         File selectedDirectory = directoryChooser.showDialog(null);
 
         if (selectedDirectory != null) {
-            TreeView<String> folderTreeView = createFolderTreeView(selectedDirectory); // Creates view for folder tree
+            TreeView<String> folderTreeView = createFolderTreeView(selectedDirectory);
 
             SplitPane innerSplitPane = new SplitPane();
             innerSplitPane.setOrientation(javafx.geometry.Orientation.HORIZONTAL);
@@ -311,10 +314,11 @@ public class IDE {
                 TextArea rightPanel = new TextArea();
                 rightPanel.setText("Right Panel in Center");
                 rightPanel.setEditable(false);
-                innerSplitPane.getItems().addAll(folderTreeView, editor, rightPanel);
+                innerSplitPane.getItems().addAll(folderTreeView, editorsPane, rightPanel);
                 innerSplitPane.setDividerPositions(0.15,0.7);
-            } else {
-                innerSplitPane.getItems().addAll(folderTreeView, editor);
+            }
+            else {
+                innerSplitPane.getItems().addAll(folderTreeView, editorsPane);
                 innerSplitPane.setDividerPositions(0.15);
             }
             SplitPane splitPane = new SplitPane();
