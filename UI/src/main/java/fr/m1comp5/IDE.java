@@ -158,71 +158,6 @@ public class IDE {
         return null;
     }
 
-    private void openFolderDialog() {
-        TextArea editor = getActiveEditor();
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-
-        File selectedDirectory = directoryChooser.showDialog(null);
-
-        if (selectedDirectory != null) {
-            TreeView<String> folderTreeView = createFolderTreeView(selectedDirectory); // Creates view for folder tree
-
-            SplitPane innerSplitPane = new SplitPane();
-            innerSplitPane.setOrientation(javafx.geometry.Orientation.HORIZONTAL);
-
-            // Creates resizable view for text,folder tree and if needed jjc view
-            if (jjcWindowOpened) {
-                TextArea rightPanel = new TextArea();
-                rightPanel.setText("Right Panel in Center");
-                rightPanel.setEditable(false);
-                innerSplitPane.getItems().addAll(folderTreeView, editor, rightPanel);
-                innerSplitPane.setDividerPositions(0.15,0.7);
-            } else {
-                innerSplitPane.getItems().addAll(folderTreeView, editor);
-                innerSplitPane.setDividerPositions(0.15);
-            }
-            SplitPane splitPane = new SplitPane();
-            splitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
-            splitPane.getItems().addAll(innerSplitPane, console);
-            splitPane.setDividerPositions(0.75);
-
-            borderPane.setCenter(splitPane);
-        }
-    }
-
-    /**
-     * Creates the view for the folder tree
-     * @param directory the directory to display
-     * @return the tree view of the folder
-     */
-    private TreeView<String> createFolderTreeView(File directory) {
-        TreeItem<String> rootItem = createDirectoryTree(directory);
-        TreeView<String> treeView = new TreeView<>(rootItem);
-        treeView.setPrefWidth(250);
-        return treeView;
-    }
-
-    /**
-     * Creates the tree of folder/files that is to be used in createFolderTreeView
-     * @param directory the directory to search through
-     * @return A tree of item (files and folders here) to display
-     */
-    private TreeItem<String> createDirectoryTree(File directory) {
-        TreeItem<String> rootItem = new TreeItem<>(directory.getName());
-        File[] files = directory.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    TreeItem<String> folderItem = createDirectoryTree(file);
-                    rootItem.getChildren().add(folderItem);
-                } else {
-                    rootItem.getChildren().add(new TreeItem<>(file.getName()));
-                }
-            }
-        }
-        return rootItem;
-    }
-
     private void shortcutAndAction() {
         TextArea editor = getActiveEditor();
         if (editor == null) {
@@ -280,39 +215,7 @@ public class IDE {
             }
         });
     }
-    private void runMjj() {
-        TextArea editor = getActiveEditor();
-        if (editor == null) {return;}
-        mjj = editor.getText();
-        MiniJaja mjjTree = new MiniJaja(new ByteArrayInputStream(mjj.getBytes()));
-        console.clear();  // Vider la console avant d'exécuter
-        try
-        {
-            SimpleNode n = mjjTree.start();
-            InterpreterMjj interpreter = new InterpreterMjj(n);
-            console.appendText("Compilation successfull");
-            console.appendText(interpreter.interpret());
-            n.dump("");
-        }
-        catch (ParseException pe)
-        {
-            console.appendText("Syntax error in code");
-        }
-        catch (Exception exp)
-        {
-            console.appendText(exp.getMessage());
-        }
-    }
-    private void undoMjj() {
-        TextArea editor = getActiveEditor();
-        if (editor == null) {return;}
-        editor.undo();
-    }
-    private void redoMjj() {
-        TextArea editor = getActiveEditor();
-        if (editor == null) {return;}
-        editor.redo();
-    }
+
     private void newFile() {
         Tab newTab = new Tab("New file");
         TextArea editor = new TextArea();
@@ -387,5 +290,102 @@ public class IDE {
         } catch (IOException e) {
             console.appendText("Error saving file: " + e.getMessage() + "\n");
         }
+    }
+
+    private void openFolderDialog() {
+        TextArea editor = getActiveEditor();
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+
+        File selectedDirectory = directoryChooser.showDialog(null);
+
+        if (selectedDirectory != null) {
+            TreeView<String> folderTreeView = createFolderTreeView(selectedDirectory); // Creates view for folder tree
+
+            SplitPane innerSplitPane = new SplitPane();
+            innerSplitPane.setOrientation(javafx.geometry.Orientation.HORIZONTAL);
+
+            // Creates resizable view for text,folder tree and if needed jjc view
+            if (jjcWindowOpened) {
+                TextArea rightPanel = new TextArea();
+                rightPanel.setText("Right Panel in Center");
+                rightPanel.setEditable(false);
+                innerSplitPane.getItems().addAll(folderTreeView, editor, rightPanel);
+                innerSplitPane.setDividerPositions(0.15,0.7);
+            } else {
+                innerSplitPane.getItems().addAll(folderTreeView, editor);
+                innerSplitPane.setDividerPositions(0.15);
+            }
+            SplitPane splitPane = new SplitPane();
+            splitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
+            splitPane.getItems().addAll(innerSplitPane, console);
+            splitPane.setDividerPositions(0.75);
+
+            borderPane.setCenter(splitPane);
+        }
+    }
+    /**
+     * Creates the view for the folder tree
+     * @param directory the directory to display
+     * @return the tree view of the folder
+     */
+    private TreeView<String> createFolderTreeView(File directory) {
+        TreeItem<String> rootItem = createDirectoryTree(directory);
+        TreeView<String> treeView = new TreeView<>(rootItem);
+        treeView.setPrefWidth(250);
+        return treeView;
+    }
+    /**
+     * Creates the tree of folder/files that is to be used in createFolderTreeView
+     * @param directory the directory to search through
+     * @return A tree of item (files and folders here) to display
+     */
+    private TreeItem<String> createDirectoryTree(File directory) {
+        TreeItem<String> rootItem = new TreeItem<>(directory.getName());
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    TreeItem<String> folderItem = createDirectoryTree(file);
+                    rootItem.getChildren().add(folderItem);
+                } else {
+                    rootItem.getChildren().add(new TreeItem<>(file.getName()));
+                }
+            }
+        }
+        return rootItem;
+    }
+
+    private void runMjj() {
+        TextArea editor = getActiveEditor();
+        if (editor == null) {return;}
+        mjj = editor.getText();
+        MiniJaja mjjTree = new MiniJaja(new ByteArrayInputStream(mjj.getBytes()));
+        console.clear();  // Vider la console avant d'exécuter
+        try
+        {
+            SimpleNode n = mjjTree.start();
+            InterpreterMjj interpreter = new InterpreterMjj(n);
+            console.appendText("Compilation successfull");
+            console.appendText(interpreter.interpret());
+            n.dump("");
+        }
+        catch (ParseException pe)
+        {
+            console.appendText("Syntax error in code");
+        }
+        catch (Exception exp)
+        {
+            console.appendText(exp.getMessage());
+        }
+    }
+    private void undoMjj() {
+        TextArea editor = getActiveEditor();
+        if (editor == null) {return;}
+        editor.undo();
+    }
+    private void redoMjj() {
+        TextArea editor = getActiveEditor();
+        if (editor == null) {return;}
+        editor.redo();
     }
 }
