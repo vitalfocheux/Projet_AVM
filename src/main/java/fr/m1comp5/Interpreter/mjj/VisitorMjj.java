@@ -36,11 +36,13 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTClasse node, Object data) {
-        String ident = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
+        String id = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
         try {
-            //symbolTable.put(new MemoryObject(ident, ObjectType.EPSILON, ObjectNature.VAR, ObjectType.EPSILON));
-            node.jjtGetChild(1).jjtAccept(this, data); //Visit vars or vnil
-            node.jjtGetChild(2).jjtAccept(this, data); //Visit main
+            memory.declVar(id, null, ObjectType.OMEGA);
+            node.jjtGetChild(1).jjtAccept(this, MjjInterpreterMode.DEFAULT); //Visit vars or vnil
+            node.jjtGetChild(2).jjtAccept(this, MjjInterpreterMode.DEFAULT);
+            node.jjtGetChild(2).jjtAccept(this, MjjInterpreterMode.REMOVE);
+            memory.removeDecl(id);
         } catch (Exception e) {
             System.out.println("Exception is : "+ e.getMessage());
             throw new RuntimeException(e);
@@ -73,6 +75,23 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTMethode node, Object data) {
+        ObjectType type = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
+        String id = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
+        try
+        {
+            if (data == MjjInterpreterMode.DEFAULT)
+            {
+                memory.declMeth(id, node, type);
+            }
+            else
+            {
+                memory.removeDecl(id);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e.getMessage());
+        }
         return null;
     }
 
@@ -102,13 +121,20 @@ public class VisitorMjj implements MiniJajaVisitor {
             value = node.jjtGetChild(2).jjtAccept(this, data); // Retrieve the initialized value
         }
 
-        MemoryObject mo = new MemoryObject(varIdent,value, ObjectNature.CST, varType);
         try
         {
-            memory.getSymbolTable().put(mo);
+            if (data == MjjInterpreterMode.DEFAULT)
+            {
+                memory.declCst(varIdent, value, varType);
+            }
+            else
+            {
+                memory.removeDecl(varIdent);
+            }
         }
-        catch (SymbolTableException ignored)
+        catch (Exception e)
         {
+            throw new RuntimeException(e.getMessage());
         }
 
         return null;
@@ -126,14 +152,20 @@ public class VisitorMjj implements MiniJajaVisitor {
         if (node.jjtGetNumChildren() > 2) {
             value = node.jjtGetChild(2).jjtAccept(this, data); // Retrieve the initialized value
         }
-
-        MemoryObject mo = new MemoryObject(varIdent,value, ObjectNature.VAR, varType);
         try
         {
-            memory.getSymbolTable().put(mo);
+            if (data == MjjInterpreterMode.DEFAULT)
+            {
+                memory.declVar(varIdent, value, varType);
+            }
+            else
+            {
+                memory.removeDecl(varIdent);
+            }
         }
-        catch (SymbolTableException ignored)
+        catch (Exception e)
         {
+            throw new RuntimeException(e.getMessage());
         }
         return null;
     }
@@ -145,7 +177,14 @@ public class VisitorMjj implements MiniJajaVisitor {
         int arraySize = (int) node.jjtGetChild(2).jjtAccept(this, data);
         try
         {
-            memory.declTab(id, arraySize, type);
+            if (data == MjjInterpreterMode.DEFAULT)
+            {
+                memory.declTab(id, arraySize, type);
+            }
+            else
+            {
+                memory.removeDecl(id);
+            }
         } catch (Exception e)
         {
             throw new RuntimeException(e.getMessage());
@@ -160,8 +199,9 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTMain node, Object data) {
-        node.jjtGetChild(0).jjtAccept(this, data); // Visit vars
-        node.jjtGetChild(1).jjtAccept(this, data); // Visit instrs
+        node.jjtGetChild(0).jjtAccept(this, MjjInterpreterMode.DEFAULT);
+        node.jjtGetChild(1).jjtAccept(this, MjjInterpreterMode.DEFAULT);
+        node.jjtGetChild(0).jjtAccept(this, MjjInterpreterMode.REMOVE);
         return null;
     }
 
@@ -251,11 +291,10 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTTantQue node, Object data) {
-        Object value = node.jjtGetChild(0).jjtAccept(this, data);
         try {
-            if ((boolean) value) {
+            while ((boolean) node.jjtGetChild(0).jjtAccept(this, data))
+            {
                 node.jjtGetChild(1).jjtAccept(this, data);
-                node.jjtAccept(this, data);
             }
         } catch (Exception e) {
             System.out.println("Exception is : "+ e.getMessage());
@@ -296,7 +335,7 @@ public class VisitorMjj implements MiniJajaVisitor {
             int val = (int) node.jjtGetChild(1).jjtAccept(this, data);
             if (node.jjtGetChild(0) instanceof ASTTab tab)
             {
-                String id = (String) tab.jjtGetChild(0).jjtAccept(this, data);
+                String id = (String) ((ASTIdent) tab.jjtGetChild(0)).jjtGetValue();
                 int idx = (int) tab.jjtGetChild(1).jjtAccept(this, data);
                 Object idxVal = node.jjtGetChild(0).jjtAccept(this, data);
                 memory.assignValueArray(id, idx, (int) idxVal + val);
@@ -315,17 +354,27 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTIncrement node, Object data) {
-        String varIdent = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
-        MemoryObject mo = memory.getSymbolTable().get(varIdent);
-        int val = (int) mo.getValue() + 1;
         try
         {
-            memory.getSymbolTable().put(new MemoryObject(varIdent,val,mo.getNature(),mo.getType()));
+            if (node.jjtGetChild(0) instanceof ASTTab tab)
+            {
+                String id = (String) ((ASTIdent) tab.jjtGetChild(0)).jjtGetValue();
+                int idx = (int) tab.jjtGetChild(1).jjtAccept(this, data);
+                Integer idxVal = (Integer) node.jjtGetChild(0).jjtAccept(this, data);
+                memory.assignValueArray(id, idx, ++idxVal);
+            }
+            else
+            {
+                String id = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
+                Integer val = (Integer) node.jjtGetChild(0).jjtAccept(this, data);
+                memory.assignValue(id, ++val);
+            }
         }
-        catch (SymbolTableException ignored)
+        catch (Exception e)
         {
+            throw new RuntimeException(e.getMessage());
         }
-        return val;
+        return null;
     }
 
     @Override
@@ -335,9 +384,6 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTListExp node, Object data) {
-        for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-            node.jjtGetChild(i).jjtAccept(this, data);
-        }
         return null;
     }
 

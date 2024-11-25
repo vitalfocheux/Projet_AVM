@@ -66,6 +66,17 @@ public class Memory {
         stack.push(mo);
     }
 
+    public void removeDecl(String id) throws StackException, HeapException
+    {
+        MemoryObject mo = symbolTable.get(id);
+        if (mo.getNature() == ObjectNature.TAB)
+        {
+            heap.decrementReference((int) mo.getValue());
+        }
+        stack.eraseVariable(id);
+        symbolTable.remove(mo);
+    }
+
     public MemoryObject assignValue(String ident, Object value) throws StackException, SymbolTableException, HeapException {
         MemoryObject mo = stack.searchVariableFromTop(ident);
         if (mo == null) throw new SymbolTableException("Unknown symbol");
@@ -114,6 +125,24 @@ public class Memory {
             throw new RuntimeException("The index must be an integer");
         }
         heap.setValue((Integer) mo.getValue(), (Integer) index, value);
+    }
+
+    public void assignType(String id, ObjectType type) throws StackException
+    {
+        MemoryObject mo = stack.searchVariableFromTop(id);
+        if (mo == null)
+        {
+            return;
+        }
+        mo.setType(type);
+    }
+
+    public void expParam(Object lexp, Object ent)
+    {
+        if (lexp == null && ent == null)
+        {
+            return;
+        }
     }
     
     public Object getVal(String ident) throws SymbolTableException {

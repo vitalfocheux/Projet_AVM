@@ -149,4 +149,22 @@ public class Stack {
         stackList.set(top, mo2);
         stackList.set(top - 1, mo1);
     }
+    public void eraseVariable(String id) throws StackException
+    {
+        if (stackList.isEmpty())
+        {
+            throw new StackException("Can't search variable in an empty stack");
+        }
+        for (int i = 0; i <= top; ++i)
+        {
+            MemoryObject mo = stackList.get(i);
+            if (mo.getId().equals(id))
+            {
+                stackList.remove(i);
+                --top;
+                break;
+            }
+        }
+
+    }
 }
