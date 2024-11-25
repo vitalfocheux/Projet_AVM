@@ -11,11 +11,17 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class IDE {
     private BorderPane borderPane;
@@ -28,7 +34,8 @@ public class IDE {
     private MenuItem undo;
     private MenuItem redo;
     private MenuItem run;
-    private TextArea editor;
+    private TabPane tabPane;
+    private Map<Tab, File> fileMap = new HashMap<>();
     private String jjc;
     private TextArea console;
     private String mjj;
@@ -39,7 +46,7 @@ public class IDE {
         borderPane = new BorderPane();
         menuBar = new MenuBar();
         toolBar = new ToolBar();
-        editor = new TextArea();
+        tabPane = new TabPane();
         console = new TextArea();
         folderTreeOpened = false;
         jjcWindowOpened = false;
@@ -47,8 +54,6 @@ public class IDE {
 
     public void mainScreen(Stage primaryStage) {
         setTop();
-
-        editor.setStyle("-fx-background-color: #3e3e42; -fx-text-fill: black;");
 
 //        terminal.setStyle("-fx-background-color: black; -fx-text-fill: black;");
         console.setEditable(false);
@@ -58,7 +63,7 @@ public class IDE {
 
         SplitPane splitPane = new SplitPane();
         splitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
-        splitPane.getItems().addAll(editor, console);
+        splitPane.getItems().addAll(tabPane, console);
         splitPane.setDividerPositions(0.75);
 
         //Adding elements to borderpane
@@ -66,8 +71,8 @@ public class IDE {
 
         //Styling borderpane
         borderPane.setStyle("-fx-background-color: #3e3e42;");
-        BorderPane.setMargin(editor, new javafx.geometry.Insets(10));
-        BorderPane.setMargin(console, new javafx.geometry.Insets(10));
+//        BorderPane.setMargin(editor, new javafx.geometry.Insets(10));
+//        BorderPane.setMargin(console, new javafx.geometry.Insets(10));
 
         Scene scene = new Scene(borderPane, 1200, 800);
 
@@ -78,12 +83,9 @@ public class IDE {
 
     private void createMenu() {
         Menu fileMenu = new Menu("File");
-        ImageView newFileIcon = new ImageView(new Image(getClass().getResourceAsStream("/icon/new-file.png")));
-        newFileIcon.setFitHeight(16);
-        newFileIcon.setFitWidth(16);
-        newFile = new MenuItem("New"/*, newFileIcon*/);
-        openFile = new MenuItem("Open File");
-        saveFile = new MenuItem("Save File");
+        newFile = new MenuItem("New (Ctrl+N)");
+        openFile = new MenuItem("Open File (Ctrl+O)");
+        saveFile = new MenuItem("Save File (Ctrl+S)");
         openFolder = new MenuItem("Open Folder");
         openFolder.setOnAction(event -> openFolderDialog());
         fileMenu.getItems().addAll(newFile, openFile, saveFile, openFolder);
@@ -97,7 +99,7 @@ public class IDE {
         menuBar.getMenus().addAll(fileMenu,editMenu);
     }
     private void createToolBar() {
-        ImageView runIcon = new ImageView(new Image(getClass().getResourceAsStream("/icon/run.png")));
+        ImageView runIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon/run.png"))));
         runIcon.setFitHeight(16);
         runIcon.setFitWidth(16);
         Button runButton = new Button();
@@ -106,7 +108,7 @@ public class IDE {
             runMjj();System.out.println("oui");
         });
 
-        ImageView undoIcon = new ImageView(new Image(getClass().getResourceAsStream("/icon/undo.png")));
+        ImageView undoIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon/undo.png"))));
         undoIcon.setFitHeight(16);
         undoIcon.setFitWidth(16);
         Button undoButton = new Button();
@@ -116,7 +118,7 @@ public class IDE {
             System.out.println("Undo button clicked");
         });
 
-        ImageView redoIcon = new ImageView(new Image(getClass().getResourceAsStream("/icon/redo.png")));
+        ImageView redoIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon/redo.png"))));
         redoIcon.setFitHeight(20);
         redoIcon.setFitWidth(20);
         Button redoButton = new Button();
@@ -139,7 +141,25 @@ public class IDE {
         borderPane.setTop(topBar);
     }
 
+    private void addTab(String title, String content) {
+        TextArea editor = new TextArea(content);
+        editor.setStyle("-fx-background-color: #3e3e42; -fx-text-fill: black;");
+        Tab tab = new Tab(title, editor);
+        tab.setClosable(true);
+
+        tabPane.getTabs().add(tab);
+        tabPane.getSelectionModel().select(tab);
+    }
+    private TextArea getActiveEditor() {
+        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab != null && selectedTab.getContent() instanceof TextArea) {
+            return (TextArea) selectedTab.getContent();
+        }
+        return null;
+    }
+
     private void openFolderDialog() {
+        TextArea editor = getActiveEditor();
         DirectoryChooser directoryChooser = new DirectoryChooser();
 
         File selectedDirectory = directoryChooser.showDialog(null);
@@ -204,7 +224,20 @@ public class IDE {
     }
 
     private void shortcutAndAction() {
+        TextArea editor = getActiveEditor();
+        if (editor == null) {
+            return;
+        }
         // Set button action
+        newFile.setOnAction(e -> {
+            newFile();
+        });
+        openFile.setOnAction(e -> {
+            openFile();
+        });
+        saveFile.setOnAction(e -> {
+            saveFile();
+        });
         undo.setOnAction(event -> {
             if (editor.isUndoable()) {
                 undoMjj();
@@ -226,26 +259,39 @@ public class IDE {
                     undoMjj();
                 }
                 event.consume(); // Consume the event to prevent it from propagating
-            } else if (event.isControlDown() && event.getCode() == KeyCode.Y) {
+            }
+            else if (event.isControlDown() && event.getCode() == KeyCode.Y) {
                 if (editor.isRedoable()) {
                     redoMjj();
                 }
                 event.consume();
-            } else if (event.isShiftDown() && event.getCode() == KeyCode.F10) {
+            }
+            else if (event.isShiftDown() && event.getCode() == KeyCode.F10) {
                 runMjj();
+            }
+            else if (event.isControlDown() && event.getCode() == KeyCode.S) {
+                saveFile();
+            }
+            else if (event.isControlDown() && event.getCode() == KeyCode.O) {
+                openFile();
+            }
+            else if (event.isControlDown() && event.getCode() == KeyCode.N) {
+                newFile();
             }
         });
     }
     private void runMjj() {
+        TextArea editor = getActiveEditor();
+        if (editor == null) {return;}
         mjj = editor.getText();
         MiniJaja mjjTree = new MiniJaja(new ByteArrayInputStream(mjj.getBytes()));
-        console.setText("");  // Vider la console avant d'exécuter
+        console.clear();  // Vider la console avant d'exécuter
         try
         {
             SimpleNode n = mjjTree.start();
             InterpreterMjj interpreter = new InterpreterMjj(n);
             console.appendText("Compilation successfull");
-            interpreter.interpret();
+            console.appendText(interpreter.interpret());
             n.dump("");
         }
         catch (ParseException pe)
@@ -258,9 +304,88 @@ public class IDE {
         }
     }
     private void undoMjj() {
+        TextArea editor = getActiveEditor();
+        if (editor == null) {return;}
         editor.undo();
     }
     private void redoMjj() {
+        TextArea editor = getActiveEditor();
+        if (editor == null) {return;}
         editor.redo();
+    }
+    private void newFile() {
+        Tab newTab = new Tab("New file");
+        TextArea editor = new TextArea();
+        editor.setStyle("-fx-background-color: #3e3e42; -fx-text-fill: black;");
+        newTab.setContent(editor);
+        newTab.setClosable(true);
+
+        tabPane.getTabs().add(newTab);
+    }
+    private void openFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("MiniJaja Files", "*.mjj"),
+                new FileChooser.ExtensionFilter("Jajacode Files", "*.jjc"),
+                new FileChooser.ExtensionFilter("All Files", "*.*")
+        );
+
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            try (FileReader reader = new FileReader(file)) {
+                StringBuilder content = new StringBuilder();
+                int str;
+                while ((str = reader.read()) != -1) {
+                    content.append((char) str);
+                }
+
+                Tab newTab = new Tab(file.getName());
+                TextArea editor = new TextArea(content.toString());
+                editor.setStyle("-fx-background-color: #3e3e42; -fx-text-fill: black;");
+                newTab.setContent(editor);
+                newTab.setClosable(true);
+
+                tabPane.getTabs().add(newTab);
+                tabPane.getSelectionModel().select(newTab);
+
+                fileMap.put(newTab, file); // Link the file to the tab
+                console.appendText("File opened: " + file.getAbsolutePath() + "\n");
+            } catch (IOException ex) {
+                console.appendText("Error opening file: " + ex.getMessage() + "\n");
+            }
+        }
+    }
+    private void saveFile(){
+        Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+        if (activeTab == null) {
+            console.appendText("No active tab to save.\n");
+            return;
+        }
+
+        TextArea activeEditor = (TextArea) activeTab.getContent();
+        File file = fileMap.get(activeTab);
+
+        if (file == null) {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save File");
+            file = fileChooser.showSaveDialog(null);
+            if (file != null) {
+                fileMap.put(activeTab, file); // Link the file to the tab
+            } else {
+                return;
+            }
+        }
+
+        // Save the file
+        writeToFile(file, activeEditor.getText());
+        console.appendText("File saved: " + file.getAbsolutePath() + "\n");
+    }
+    private void writeToFile(File file, String content) {
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(content);
+        } catch (IOException e) {
+            console.appendText("Error saving file: " + e.getMessage() + "\n");
+        }
     }
 }
