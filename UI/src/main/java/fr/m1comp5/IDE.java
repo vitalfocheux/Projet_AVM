@@ -31,7 +31,6 @@ public class IDE {
     private MenuItem undo;
     private MenuItem redo;
     private MenuItem run;
-    private MenuItem closeFolder;
     private TabPane editorsPane;
     private Map<Tab, File> fileMap = new HashMap<>();
     private String jjc;
@@ -45,38 +44,38 @@ public class IDE {
         menuBar = new MenuBar();
         toolBar = new ToolBar();
         editorsPane = new TabPane();
+
         console = new TextArea();
+        console.setEditable(false);
+        console.setWrapText(true);
+
         folderTreeOpened = false;
         jjcWindowOpened = false;
+        setStyle();
+    }
+
+    public void setStyle() {
+        borderPane.setStyle("-fx-background-color: #3e3e42;");
+        editorsPane.setStyle("-fx-background-color: #3e3e42;");
+        console.setStyle("-fx-control-inner-background: #3e3e42; -fx-text-fill: white;");
+
+        menuBar.setStyle("-fx-background-color: #F0EBE4B3;");
+        toolBar.setStyle("-fx-background-color: #252526;");
     }
 
     public void mainScreen(Stage primaryStage) {
         setTop();
-
-//        terminal.setStyle("-fx-background-color: black; -fx-text-fill: black;");
-        console.setEditable(false);
-        console.setWrapText(true);
+        setCenter();
 
         shortcutAndAction();
 
-        SplitPane splitPane = new SplitPane();
-        splitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
-        splitPane.getItems().addAll(editorsPane, console);
-        splitPane.setDividerPositions(0.75);
-
-        //Adding elements to borderpane
-        borderPane.setCenter(splitPane);
-
-        //Styling borderpane
-        borderPane.setStyle("-fx-background-color: #3e3e42;");
-//        BorderPane.setMargin(editor, new javafx.geometry.Insets(10));
-//        BorderPane.setMargin(console, new javafx.geometry.Insets(10));
-
+        // Creates the window
         Scene scene = new Scene(borderPane, 1200, 800);
 
         primaryStage.setTitle("AVM IDE");
         primaryStage.setScene(scene);
         primaryStage.show();
+
     }
 
     private void createMenu() {
@@ -84,9 +83,8 @@ public class IDE {
         newFile = new MenuItem("New (Ctrl+N)");
         openFile = new MenuItem("Open File (Ctrl+O)");
         saveFile = new MenuItem("Save File (Ctrl+S)");
-        openFolder = new MenuItem("Open Folder");
-        closeFolder = new MenuItem("Close Folder");
-        fileMenu.getItems().addAll(newFile, openFile, saveFile, openFolder, closeFolder);
+        openFolder = new MenuItem("Open Folder (Ctrl+D)");
+        fileMenu.getItems().addAll(newFile, openFile, saveFile, openFolder);
 
         Menu editMenu = new Menu("Edit");
         undo = new MenuItem("Undo (Ctrl+Z)");
@@ -103,7 +101,7 @@ public class IDE {
         Button runButton = new Button();
         runButton.setGraphic(runIcon);
         runButton.setOnAction(e -> {
-            runMjj();System.out.println("oui");
+            runMjj();
         });
 
         ImageView undoIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon/undo.png"))));
@@ -113,40 +111,69 @@ public class IDE {
         undoButton.setGraphic(undoIcon);
         undoButton.setOnAction(e -> {
             undoMjj();
-            System.out.println("Undo button clicked");
         });
 
         ImageView redoIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon/redo.png"))));
-        redoIcon.setFitHeight(20);
-        redoIcon.setFitWidth(20);
+        redoIcon.setFitHeight(16);
+        redoIcon.setFitWidth(16);
         Button redoButton = new Button();
         redoButton.setGraphic(redoIcon);
         redoButton.setOnAction(e -> {
             redoMjj();
-            System.out.println("Redo button clicked");
+        });
+
+        ImageView folderIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon/folder.png"))));
+        folderIcon.setFitHeight(16);
+        folderIcon.setFitWidth(16);
+        Button folderButton = new Button();
+        folderButton.setGraphic(folderIcon);
+        folderButton.setOnAction(e -> {
+            if (folderTreeOpened) {
+                closeFolder();
+            } else {
+                openFolderDialog();
+            }
         });
 
         runButton.setStyle("-fx-background-color: transparent;");
         undoButton.setStyle("-fx-background-color: transparent;");
         redoButton.setStyle("-fx-background-color: transparent;");
+        folderButton.setStyle("-fx-background-color: transparent;");
 
-        toolBar.getItems().addAll(runButton,undoButton,redoButton);
+        toolBar.getItems().addAll(runButton,undoButton,redoButton,folderButton);
     }
+    /**
+     * Set elements at the top of the window (editor + console)
+     */
     private void setTop() {
         createMenu();
         createToolBar();
         VBox topBar = new VBox(menuBar, toolBar);
         borderPane.setTop(topBar);
     }
+    /**
+     * Set elements at the center of the window (editor + console)
+     */
+    private void setCenter() {
+        SplitPane splitPane = new SplitPane();
+        splitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
+        splitPane.getItems().addAll(editorsPane, console);
+        splitPane.setDividerPositions(0.75);
+        splitPane.setStyle("-fx-background-color: #3e3e42;");
+        //Adding elements to borderpane
+        borderPane.setCenter(splitPane);
+    }
 
-    private void addTab(String title, String content) {
+    private void addTab(String title, String content, File file) {
         TextArea editor = new TextArea(content);
-        editor.setStyle("-fx-background-color: #3e3e42; -fx-text-fill: black;");
         Tab tab = new Tab(title, editor);
         tab.setClosable(true);
 
         editorsPane.getTabs().add(tab);
         editorsPane.getSelectionModel().select(tab);
+        editor.setStyle("-fx-control-inner-background: #3e3e42; -fx-text-fill: white;");
+        editorsPane.setStyle("-fx-control-inner-background: #3e3e42; -fx-text-fill: white;");
+        fileMap.put(tab,file);
     }
     private TextArea getActiveEditor() {
         Tab selectedTab = editorsPane.getSelectionModel().getSelectedItem();
@@ -162,24 +189,6 @@ public class IDE {
         openFile.setOnAction(e -> {openFile();});
         saveFile.setOnAction(e -> {saveFile();});
         openFolder.setOnAction(e -> {openFolderDialog();});
-        closeFolder.setOnAction(e -> {
-            SplitPane innerSplitPane = new SplitPane();
-            innerSplitPane.setOrientation(javafx.geometry.Orientation.HORIZONTAL);
-            if (jjcWindowOpened) {
-                TextArea rightPanel = new TextArea();
-                rightPanel.setText("Right Panel in Center");
-                rightPanel.setEditable(false);
-                innerSplitPane.getItems().addAll(editorsPane, rightPanel);
-                innerSplitPane.setDividerPositions(0.15,0.7);
-            }
-            else {
-                innerSplitPane.getItems().addAll(editorsPane);
-            }
-            SplitPane splitPane = new SplitPane();
-            splitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
-            splitPane.getItems().addAll(innerSplitPane, console);
-            splitPane.setDividerPositions(0.75);
-        });
         undo.setOnAction(event -> {
             TextArea editor = getActiveEditor();
             if (editor != null) {undoMjj();}});
@@ -188,48 +197,52 @@ public class IDE {
             if (editor != null) {redoMjj();}});
         run.setOnAction(event -> {runMjj();});
 
-        editorsPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
-            if (newTab != null && newTab.getContent() instanceof TextArea editor) {
-                keyBindings(editor);
+        if (getActiveEditor() != null) {
+            keyBindingsEditor(getActiveEditor());
+        }
+        keyBindingsWindow();
+    }
+    private void keyBindingsWindow()  {
+        borderPane.setOnKeyPressed(e -> {
+            if (e.isControlDown()) {
+                switch (e.getCode()) {
+                    case S: saveFile();break;
+                    case O: openFile();break;
+                    case N: newFile();break;
+                    case TAB: switchTab();break;
+                    case D: openFolderDialog();break;
+                }
+            }
+        });
+    }
+    private void keyBindingsEditor(TextArea editor)  {
+        editor.setOnKeyPressed(e -> {
+            if (e.isControlDown() && e.getCode() == KeyCode.Z) {
+                undoMjj();
+                e.consume(); // Avoid propagation of event
+            }
+            else if (e.isControlDown() && e.getCode() == KeyCode.Y) {
+                redoMjj();
+                e.consume();
+            }
+            else if (e.isShiftDown() && e.getCode() == KeyCode.F10) {
+                System.out.println("zouzou");
+                runMjj();
             }
         });
     }
 
-    private void keyBindings(TextArea editor)  {
-        editor.setOnKeyPressed(event -> {
-            if (event.isControlDown() && event.getCode() == KeyCode.Z) {
-                undoMjj();
-                event.consume(); // Avoid propagation of event
-            }
-            else if (event.isControlDown() && event.getCode() == KeyCode.Y) {
-                redoMjj();
-                event.consume();
-            }
-            else if (event.isShiftDown() && event.getCode() == KeyCode.F10) {
-                runMjj();
-            }
-            else if (event.isControlDown() && event.getCode() == KeyCode.S) {
-                saveFile();
-            }
-            else if (event.isControlDown() && event.getCode() == KeyCode.O) {
-                openFile();
-            }
-            else if (event.isControlDown() && event.getCode() == KeyCode.N) {
-                newFile();
-            }
-        });
+    private void switchTab() {
+        int ctr = editorsPane.getTabs().size();
+        if (ctr > 1) {
+            int id = editorsPane.getSelectionModel().getSelectedIndex();
+            int next = (id+1) % ctr;
+            editorsPane.getSelectionModel().select(next);
+        }
     }
 
     private void newFile() {
-        Tab newTab = new Tab("New file");
-        TextArea editor = new TextArea();
-        editor.setStyle("-fx-background-color: #3e3e42; -fx-text-fill: black;");
-        newTab.setContent(editor);
-        newTab.setClosable(true);
-
-        editorsPane.getTabs().add(newTab);
-        fileMap.put(newTab,null);
-        editorsPane.getSelectionModel().select(newTab);
+        addTab("New file", "", null);
     }
     private void openFile() {
         FileChooser fileChooser = new FileChooser();
@@ -248,18 +261,7 @@ public class IDE {
                 while ((str = reader.read()) != -1) {
                     content.append((char) str);
                 }
-
-                // Create a new tab for the opened file
-                Tab newTab = new Tab(file.getName());
-                TextArea editor = new TextArea(content.toString());
-                newTab.setContent(editor);
-                newTab.setClosable(true);
-
-                editorsPane.getTabs().add(newTab);
-                editorsPane.getSelectionModel().select(newTab);
-
-                fileMap.put(newTab, file); // Link the file to the tab
-                console.appendText("File opened: " + file.getAbsolutePath() + "\n");
+                addTab(file.getName(), content.toString(), file);
             } catch (IOException ex) {
                 console.appendText("Error opening file: " + ex.getMessage() + "\n");
             }
@@ -305,6 +307,7 @@ public class IDE {
 
         if (selectedDirectory != null) {
             TreeView<String> folderTreeView = createFolderTreeView(selectedDirectory);
+            folderTreeView.setStyle("-fx-control-inner-background: #3e3e42; -fx-text-fill: white;");
 
             SplitPane innerSplitPane = new SplitPane();
             innerSplitPane.setOrientation(javafx.geometry.Orientation.HORIZONTAL);
@@ -321,12 +324,15 @@ public class IDE {
                 innerSplitPane.getItems().addAll(folderTreeView, editorsPane);
                 innerSplitPane.setDividerPositions(0.15);
             }
+            // Creates new center layout
             SplitPane splitPane = new SplitPane();
             splitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
             splitPane.getItems().addAll(innerSplitPane, console);
             splitPane.setDividerPositions(0.75);
-
+            // Updates view
             borderPane.setCenter(splitPane);
+
+            folderTreeOpened = true;
         }
     }
     /**
@@ -360,6 +366,28 @@ public class IDE {
         }
         return rootItem;
     }
+    private void closeFolder() {
+        SplitPane innerSplitPane = new SplitPane();
+        innerSplitPane.setOrientation(javafx.geometry.Orientation.HORIZONTAL);
+        if (jjcWindowOpened) {
+            TextArea rightPanel = new TextArea();
+            rightPanel.setText("Right Panel in Center");
+            rightPanel.setEditable(false);
+            innerSplitPane.getItems().addAll(editorsPane, rightPanel);
+            innerSplitPane.setDividerPositions(0.7);
+        }
+        else {
+            innerSplitPane.getItems().addAll(editorsPane);
+        }
+        // Creates new center layout without folder tree view
+        SplitPane splitPane = new SplitPane();
+        splitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
+        splitPane.getItems().addAll(innerSplitPane, console);
+        splitPane.setDividerPositions(0.75);
+        // Updates view
+        borderPane.setCenter(splitPane);
+        folderTreeOpened = false;
+    }
 
     private void runMjj() {
         TextArea editor = getActiveEditor();
@@ -371,7 +399,6 @@ public class IDE {
         {
             SimpleNode n = mjjTree.start();
             InterpreterMjj interpreter = new InterpreterMjj(n);
-            console.appendText("Compilation successfull");
             console.appendText(interpreter.interpret());
             n.dump("");
         }
