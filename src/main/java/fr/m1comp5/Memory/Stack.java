@@ -155,7 +155,7 @@ public class Stack {
         {
             throw new StackException("Can't search variable in an empty stack");
         }
-        for (int i = 0; i <= top; ++i)
+        for (int i = top; i >= 0; --i)
         {
             MemoryObject mo = stackList.get(i);
             if (mo.getId().equals(id))

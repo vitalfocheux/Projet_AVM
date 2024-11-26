@@ -1,9 +1,8 @@
 package fr.m1comp5.Memory;
 
-import fr.m1comp5.Analyzer.mjj.generated.ASTEnil;
-import fr.m1comp5.Analyzer.mjj.generated.ASTEntete;
-import fr.m1comp5.Analyzer.mjj.generated.ASTEntetes;
-import fr.m1comp5.Analyzer.mjj.generated.ASTIdent;
+import fr.m1comp5.Analyzer.mjj.generated.*;
+import fr.m1comp5.Interpreter.mjj.MjjInterpreterMode;
+import fr.m1comp5.Interpreter.mjj.VisitorMjj;
 
 public class Memory {
     private SymbolTable symbolTable;
@@ -142,11 +141,54 @@ public class Memory {
         mo.setType(type);
     }
 
-    public void expParam(Object lexp, Object ent)
+    public ASTEntetes getParams(String id) throws StackException
+    {
+        MemoryObject mo = stack.searchVariableFromTop(id);
+        if (mo.getNature() != ObjectNature.METH || !(mo.getValue() instanceof ASTMethode method))
+        {
+            return null;
+        }
+        return (ASTEntetes) method.jjtGetChild(2);
+    }
+
+    public ASTVars getDecls(String id) throws StackException
+    {
+        MemoryObject mo = stack.searchVariableFromTop(id);
+        if (mo.getNature() != ObjectNature.METH || !(mo.getValue() instanceof ASTMethode method))
+        {
+            return null;
+        }
+        return (ASTVars) method.jjtGetChild(3);
+    }
+
+    public ASTInstrs getBody(String id) throws StackException
+    {
+        MemoryObject mo = stack.searchVariableFromTop(id);
+        if (mo.getNature() != ObjectNature.METH || !(mo.getValue() instanceof ASTMethode method))
+        {
+            return null;
+        }
+        return (ASTInstrs) method.jjtGetChild(4);
+    }
+
+
+    public void expParam(ASTListExp lexp, ASTEntetes ent, VisitorMjj visitor) throws SymbolTableException, StackException
     {
         if (lexp == null && ent == null)
         {
             return;
+        }
+        Object currEntetes = ent;
+        Object currListExp = lexp;
+        while(!(currEntetes instanceof ASTEnil) && !(currListExp instanceof ASTExnil))
+        {
+            ASTEntete entete = (ASTEntete) ((ASTEntetes) currEntetes).jjtGetChild(0);
+            String id = (String) ((ASTIdent) entete.jjtGetChild(1)).jjtGetValue();
+            ObjectType type = (ObjectType) entete.jjtGetChild(0).jjtAccept(visitor, MjjInterpreterMode.DEFAULT);
+            Object value = ((ASTListExp) currListExp).jjtGetChild(0).jjtAccept(visitor, MjjInterpreterMode.DEFAULT);
+            declVar(id, value, type);
+            currEntetes = ((ASTEntetes) currEntetes).jjtGetChild(1);
+            currListExp = ((ASTListExp) currListExp).jjtGetChild(1);
         }
     }
     
@@ -155,6 +197,11 @@ public class Memory {
         if (mo == null) throw new SymbolTableException("Var "+ ident +" was not found");
         if (mo.getValue() == null || mo.getValue() == ObjectType.OMEGA) throw new SymbolTableException("Var "+ ident +" was not initialized");
         return mo.getValue();
+    }
+
+    public String classVariable() throws StackException
+    {
+        return stack.getBase().getId();
     }
 
     public ObjectNature getNature(String ident) throws SymbolTableException {

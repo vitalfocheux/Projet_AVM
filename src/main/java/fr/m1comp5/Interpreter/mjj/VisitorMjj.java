@@ -379,6 +379,20 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTAppelI node, Object data) {
+        String funcID = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
+        ASTListExp lexp = (ASTListExp) node.jjtGetChild(1);
+        try
+        {
+            memory.expParam(lexp, (ASTEntetes) memory.getParams(funcID), this);
+            memory.getDecls(funcID).jjtAccept(this, MjjInterpreterMode.DEFAULT);
+            memory.getBody(funcID).jjtAccept(this, MjjInterpreterMode.DEFAULT);
+            memory.getDecls(funcID).jjtAccept(this, MjjInterpreterMode.REMOVE);
+            memory.getBody(funcID).jjtAccept(this, MjjInterpreterMode.REMOVE);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e.getMessage());
+        }
         return null;
     }
 
@@ -500,7 +514,18 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTAppelE node, Object data) {
-        return null;
+        try
+        {
+            ASTAppelI appelI = new ASTAppelI(MiniJajaTreeConstants.JJTAPPELI);
+            appelI.jjtAddChild(node.jjtGetChild(0),0);
+            appelI.jjtAddChild(node.jjtGetChild(1),1);
+            appelI.jjtAccept(this,data);
+            return memory.getVal(memory.classVariable());
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     @Override
