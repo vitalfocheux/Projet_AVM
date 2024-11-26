@@ -1,5 +1,10 @@
 package fr.m1comp5.Memory;
 
+import fr.m1comp5.Analyzer.mjj.generated.ASTEnil;
+import fr.m1comp5.Analyzer.mjj.generated.ASTEntete;
+import fr.m1comp5.Analyzer.mjj.generated.ASTEntetes;
+import fr.m1comp5.Analyzer.mjj.generated.ASTIdent;
+
 public class Memory {
     private SymbolTable symbolTable;
     private Stack stack;
