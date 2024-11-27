@@ -1,22 +1,10 @@
 package fr.m1comp5;
 
-import fr.m1comp5.UI.JavaFxIDE;
-import fr.m1comp5.UI.MiniJajaWindow;
 import javafx.application.Application;
-import javafx.stage.Stage;
-import static javafx.application.Application.launch;
+import fr.m1comp5.UI.MiniJajaWindow;
 
-public class Main /*extends Application*/ {
-
-//    @Override
-//    public void start(Stage primaryStage) throws Exception {
-//        JavaFxIDE testJavaFx = new JavaFxIDE();
-//        testJavaFx.mainScreen(primaryStage);
-//    }
-
+public class Main {
     public static void main(String[] args) {
-        MiniJajaWindow mjjwindow = new MiniJajaWindow();
-        mjjwindow.showWindow();
-        //launch(args);
+        Application.launch(MiniJajaWindow.class, args);
     }
 }
