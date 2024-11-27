@@ -85,7 +85,7 @@ public class Memory {
         MemoryObject mo = stack.searchVariableFromTop(ident);
         if (mo == null) throw new SymbolTableException("Unknown symbol");
         if (value == null) throw new RuntimeException("Cannot assign null value");
-        if (!(value.getClass().equals(mo.getValue().getClass())))
+        if (mo.getType() != ObjectType.OMEGA && !(value.getClass().equals(mo.getValue().getClass())))
         {
             throw new RuntimeException("Cannot assign value of type " + value.getClass() + " to " + mo.getType());
         }

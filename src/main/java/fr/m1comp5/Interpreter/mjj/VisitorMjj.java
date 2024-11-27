@@ -239,6 +239,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         try
         {
             memory.assignValue(memory.classVariable(), val);
+            System.out.println("Return value is " + memory.getVal(memory.classVariable()));
         }
         catch (Exception e)
         {
