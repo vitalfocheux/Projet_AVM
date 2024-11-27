@@ -10,7 +10,7 @@
 
     <groupId>fr.m1comp5</groupId>
     <artifactId>UI</artifactId>
-    <version>1.0.0</version>
+    <version>1.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -32,17 +32,17 @@
         <dependency>
             <groupId>fr.m1comp5</groupId>
             <artifactId>Analyzer</artifactId>
-            <version>1.0.0</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>fr.m1comp5</groupId>
             <artifactId>Interpreter</artifactId>
-            <version>1.0.0</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>fr.m1comp5</groupId>
             <artifactId>Compiler</artifactId>
-            <version>1.0.0</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
