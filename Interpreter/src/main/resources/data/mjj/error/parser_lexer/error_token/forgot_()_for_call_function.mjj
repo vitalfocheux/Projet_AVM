@@ -1,0 +1,11 @@
+class error {
+
+    int sum(){
+        return 1 + 2;
+    }
+
+    main{
+        return sum;
+    }
+
+}

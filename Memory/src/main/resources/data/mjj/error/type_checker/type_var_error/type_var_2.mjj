@@ -1,0 +1,7 @@
+class error {
+
+    main {
+
+        boolean a = 0;
+    }
+}

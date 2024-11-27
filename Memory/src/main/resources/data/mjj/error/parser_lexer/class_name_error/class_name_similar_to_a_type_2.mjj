@@ -1,0 +1,7 @@
+class boolean {
+
+    main{
+        return 0;
+    }
+
+}
