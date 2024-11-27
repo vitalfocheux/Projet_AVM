@@ -327,7 +327,7 @@ public class VisitorMjj implements MiniJajaVisitor {
             }
             else
             {
-                String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+                String id = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
                 memory.assignValue(id, val);
             }
         } catch (Exception e) {
