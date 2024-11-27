@@ -41,11 +41,11 @@ public class InterpreterMjjTest {
     static Stream<Arguments> fileProvider() throws IOException {
         Stream<Arguments> res = UtilsTest.fileProvider("src/main/resources/data/mjj/success");
 
-        res = res.filter(arg -> {
-            String filepath = (String) arg.get()[0];
-            filepath = Paths.get(filepath).getFileName().toString();
-            return !(filepath.contains("1.mjj") || filepath.contains("tas.mjj") || filepath.contains("synomynie.mjj") || filepath.contains("fact.mjj"));
-        });
+//        res = res.filter(arg -> {
+//            String filepath = (String) arg.get()[0];
+//            filepath = Paths.get(filepath).getFileName().toString();
+//            return !(filepath.contains("1.mjj") || filepath.contains("tas.mjj") || filepath.contains("synomynie.mjj") || filepath.contains("fact.mjj"));
+//        });
 
         return res;
     }
