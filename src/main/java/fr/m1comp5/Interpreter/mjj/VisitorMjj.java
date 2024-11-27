@@ -235,9 +235,16 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTRetour node, Object data) {
-        Object returnValue = node.jjtGetChild(0).jjtAccept(this, data);
-        toDisplay +=  "Return value is : "+returnValue+"\n";
-        return returnValue;
+        Object val = node.jjtGetChild(0).jjtAccept(this, data);
+        try
+        {
+            memory.assignValue(memory.classVariable(), val);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e.getMessage());
+        }
+        return null;
     }
 
     @Override
