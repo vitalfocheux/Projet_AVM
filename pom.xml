@@ -88,10 +88,10 @@
         </sonar.coverage.jacoco.xmlReportPaths>
   </properties>
   <modules>
-    <module>UI</module>
-    <module>Memory</module>
     <module>Analyzer</module>
+    <module>Memory</module>
     <module>Compiler</module>
     <module>Interpreter</module>
+    <module>UI</module>
   </modules>
 </project>
