@@ -32,6 +32,10 @@ public class Heap
         }
     }
 
+    public Map<Integer, List<HeapBlock>> getBlocks(){
+        return blocks;
+    }
+
     private boolean isPowerOfTwo(int number)
     {
         if (number == 0)
@@ -159,7 +163,7 @@ public class Heap
     }
 
     /* TODO : Overload with allocateInHeap(int size, ObjectType type, Object value) */
-    public int allocateInHeap(int size, ObjectType type) throws HeapException
+    public int allocateInHeap(int size, ObjectType type, Object value) throws HeapException
     {
         while (size > getMaximumBlockSize())
         {
@@ -178,7 +182,14 @@ public class Heap
         }
         else
         {
-            hb = getFreeBlock(elementSize);
+            try
+            {
+                hb = getFreeBlock(elementSize);
+            }
+            catch (HeapException he)
+            {
+                hb = getNextUpperFreeBlock(elementSize);
+            }
         }
         if (hb.getSize() != elementSize)
         {
@@ -187,8 +198,24 @@ public class Heap
         }
         hb.setBlockUsed();
         elements.add(new HeapElement(hb.getAddress(), size, type));
-        System.out.println(blocks);
+        for (int i = 0; i < size; ++i)
+        {
+            setValue(hb.getAddress(), i, value);
+        }
         return hb.getAddress();
+    }
+
+    public int allocateInHeap(int size, ObjectType type) throws HeapException
+    {
+        if (type == ObjectType.INT)
+        {
+            return allocateInHeap(size, type, 0);
+        }
+        else if (type == ObjectType.BOOLEAN)
+        {
+            return allocateInHeap(size, type, false);
+        }
+        return allocateInHeap(size, type, null);
     }
 
     private void growHeap()
@@ -250,6 +277,11 @@ public class Heap
     public ObjectType getTypeOfElement(int address) throws HeapException
     {
         return getHeapElement(address).getType();
+    }
+
+    public int getSizeOfElement(int address) throws HeapException
+    {
+        return getHeapElement(address).getSize();
     }
 
     private boolean accessedIndexOk(HeapElement he, int index)
@@ -360,13 +392,13 @@ public class Heap
 
     private boolean canAssembleBlocks(HeapBlock hb1, HeapBlock hb2)
     {
-        return hb1 != hb2 && hb1.getAddress() == hb2.getEndAddress() || hb1.getEndAddress() == hb2.getAddress() && hb1.getSize() == hb2.getSize();
+        return hb1 != hb2 && ((hb1.getAddress() == hb2.getEndAddress() || hb1.getEndAddress() == hb2.getAddress()) && hb1.getSize() == hb2.getSize());
     }
 
     private void addNewBlock(List<HeapBlock> toAdd, HeapBlock hb1, HeapBlock hb2)
     {
         int newBlockSize = hb1.getSize() * 2;
-        if (hb1.getAddress() > hb2.getEndAddress())
+        if (hb1.getAddress() > hb2.getAddress())
         {
             toAdd.add(new HeapBlock(hb2.getAddress(), newBlockSize));
         }
@@ -385,6 +417,7 @@ public class Heap
             {
                 cleanBlockMemory(hb);
                 hb.setBlockFree();
+                break;
             }
         }
     }
@@ -413,6 +446,12 @@ public class Heap
     {
         HeapElement he = getHeapElement(address);
         he.incrementReferenceNumber();
+    }
+
+    public int getArraySize(int address) throws HeapException
+    {
+        HeapElement he = getHeapElement(address);
+        return he.getSize();
     }
 
 }
