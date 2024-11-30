@@ -9,8 +9,8 @@ public class Memory {
     private Stack stack;
     private Heap heap;
 
-    public Memory(SymbolTable symbolTable) throws HeapException {
-        this.symbolTable = symbolTable;
+    public Memory() throws HeapException {
+        symbolTable = new SymbolTable();
         stack = new Stack();
         heap = new Heap();
 
@@ -31,7 +31,7 @@ public class Memory {
 
     public void declVar(String ident, Object value, ObjectType type) throws StackException, SymbolTableException {
         MemoryObject mo = new MemoryObject(ident, value, ObjectNature.VAR, type);
-        symbolTable.put(mo);
+        symbolTable.putObjectInCurrentScope(mo);
         stack.push(mo);
     }
 
@@ -41,24 +41,24 @@ public class Memory {
         {
             throw new Exception("IdentVal must happen on an object with ");
         }
-        symbolTable.remove(mo);
+        symbolTable.removeObjectFromCurrentScope(mo);
         mo.setId(ident);
         mo.setType(type);
         mo.setNature(ObjectNature.VAR);
-        symbolTable.put(mo);
+        symbolTable.putObjectInCurrentScope(mo);
     }
 
     public void declCst(String ident, Object value, ObjectType type) throws StackException, SymbolTableException {
         MemoryObject mo;
         if (value == null || value == ObjectType.OMEGA) mo = new MemoryObject(ident, null, ObjectNature.VCST, type);
         else mo = new MemoryObject(ident, value, ObjectNature.CST, type);
-        symbolTable.put(mo);
+        symbolTable.putObjectInCurrentScope(mo);
         stack.push(mo);
     }
 
     public void declMeth(String ident, Object value, ObjectType type) throws StackException, SymbolTableException {
         MemoryObject mo = new MemoryObject(ident, value, ObjectNature.METH, type);
-        symbolTable.put(mo);
+        symbolTable.putObjectInCurrentScope(mo);
         stack.push(mo);
     }
 
@@ -66,11 +66,11 @@ public class Memory {
     {
         int address = heap.allocateInHeap((Integer) value, type);
         MemoryObject mo = new MemoryObject(id, address, ObjectNature.TAB, type);
-        symbolTable.put(mo);
+        symbolTable.putObjectInCurrentScope(mo);
         stack.push(mo);
     }
 
-    public void removeDecl(String id) throws StackException, HeapException
+    public void removeDecl(String id) throws StackException, HeapException, SymbolTableException
     {
         MemoryObject mo = symbolTable.get(id);
         if (mo.getNature() == ObjectNature.TAB)
@@ -78,14 +78,14 @@ public class Memory {
             heap.decrementReference((int) mo.getValue());
         }
         stack.eraseVariable(id);
-        symbolTable.remove(mo);
+        symbolTable.removeObjectFromCurrentScope(mo);
     }
 
     public MemoryObject assignValue(String ident, Object value) throws StackException, SymbolTableException, HeapException {
         MemoryObject mo = stack.searchVariableFromTop(ident);
         if (mo == null) throw new SymbolTableException("Unknown symbol");
         if (value == null) throw new RuntimeException("Cannot assign null value");
-        if (mo.getType() != ObjectType.OMEGA && !(value.getClass().equals(mo.getValue().getClass())))
+        if (mo.getType() != ObjectType.OMEGA && (!(value.getClass().equals(mo.getValue().getClass())) && !mo.getValue().equals("OMEGA")))
         {
             throw new RuntimeException("Cannot assign value of type " + value.getClass() + " to " + mo.getType());
         }
@@ -113,7 +113,7 @@ public class Memory {
                 break;
 
         }
-        symbolTable.update(ident, value);
+        symbolTable.updateObjInCurrentScope(ident, value);
         return mo;
     }
 
@@ -141,36 +141,47 @@ public class Memory {
         mo.setType(type);
     }
 
-    public ASTEntetes getParams(String id) throws StackException
+    public Node getParams(String id) throws StackException
     {
         MemoryObject mo = stack.searchVariableFromTop(id);
         if (mo.getNature() != ObjectNature.METH || !(mo.getValue() instanceof ASTMethode method))
         {
             return null;
         }
-        return (ASTEntetes) method.jjtGetChild(2);
+        return method.jjtGetChild(2);
     }
 
-    public ASTVars getDecls(String id) throws StackException
+    public void removeParams(String id) throws StackException, HeapException, SymbolTableException
+    {
+        Object params = getParams(id);
+        while(!(params instanceof ASTEnil))
+        {
+            ASTEntete entete = (ASTEntete) ((ASTEntetes) params).jjtGetChild(0);
+            String varID = (String) ((ASTIdent) entete.jjtGetChild(1)).jjtGetValue();
+            removeDecl(varID);
+            params = ((ASTEntetes) params).jjtGetChild(1);
+        }
+    }
+
+    public Node getDecls(String id) throws StackException
     {
         MemoryObject mo = stack.searchVariableFromTop(id);
         if (mo.getNature() != ObjectNature.METH || !(mo.getValue() instanceof ASTMethode method))
         {
             return null;
         }
-        return (ASTVars) method.jjtGetChild(3);
+        return method.jjtGetChild(3);
     }
 
-    public ASTInstrs getBody(String id) throws StackException
+    public Node getBody(String id) throws StackException
     {
         MemoryObject mo = stack.searchVariableFromTop(id);
         if (mo.getNature() != ObjectNature.METH || !(mo.getValue() instanceof ASTMethode method))
         {
             return null;
         }
-        return (ASTInstrs) method.jjtGetChild(4);
+        return method.jjtGetChild(4);
     }
-
 
     public void expParam(ASTListExp lexp, ASTEntetes ent, VisitorMjj visitor) throws SymbolTableException, StackException
     {

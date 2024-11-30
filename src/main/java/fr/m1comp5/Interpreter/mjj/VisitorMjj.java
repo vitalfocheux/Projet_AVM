@@ -10,7 +10,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     public VisitorMjj() {
         try
         {
-            this.memory = new Memory(new SymbolTable());
+            this.memory = new Memory();
         }
         catch (HeapException he)
         {
@@ -38,11 +38,13 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTClasse node, Object data) {
         String id = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
         try {
+            memory.getSymbolTable().newScope();
             memory.declVar(id, null, ObjectType.OMEGA);
             node.jjtGetChild(1).jjtAccept(this, MjjInterpreterMode.DEFAULT); //Visit vars or vnil
             node.jjtGetChild(2).jjtAccept(this, MjjInterpreterMode.DEFAULT);
             node.jjtGetChild(2).jjtAccept(this, MjjInterpreterMode.REMOVE);
             memory.removeDecl(id);
+            memory.getSymbolTable().popScope();
         } catch (Exception e) {
             System.out.println("Exception is : "+ e.getMessage());
             throw new RuntimeException(e);
@@ -78,7 +80,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTMethode node, Object data) {
         ObjectType type = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
-        String id = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
+        String id = (String) ((ASTIdent) node.jjtGetChild(1)).jjtGetValue();
         try
         {
             if (data == MjjInterpreterMode.DEFAULT)
@@ -176,7 +178,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTTableau node, Object data) {
         ObjectType type = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
-        String id = (String) node.jjtGetChild(1).jjtAccept(this, data);
+        String id = (String) ((ASTIdent) node.jjtGetChild(1)).jjtGetValue();
         int arraySize = (int) node.jjtGetChild(2).jjtAccept(this, data);
         try
         {
@@ -197,14 +199,24 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTOmega node, Object data) {
-        return "EMPTY";
+        return "OMEGA";
     }
 
     @Override
     public Object visit(ASTMain node, Object data) {
+        memory.getSymbolTable().newScope();
         node.jjtGetChild(0).jjtAccept(this, MjjInterpreterMode.DEFAULT);
         node.jjtGetChild(1).jjtAccept(this, MjjInterpreterMode.DEFAULT);
         node.jjtGetChild(0).jjtAccept(this, MjjInterpreterMode.REMOVE);
+        try
+        {
+            memory.getSymbolTable().popScope();
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+
         return null;
     }
 
@@ -320,7 +332,7 @@ public class VisitorMjj implements MiniJajaVisitor {
             Object val = node.jjtGetChild(1).jjtAccept(this, data);
             if (node.jjtGetChild(0) instanceof ASTTab tab)
             {
-                String id = (String) tab.jjtGetChild(0).jjtAccept(this, data);
+                String id = (String) ((ASTIdent) tab.jjtGetChild(0)).jjtGetValue();
                 int idx = (int) tab.jjtGetChild(1).jjtAccept(this, data);
                 if (idx < 0 || idx >= memory.getHeap().getArraySize((int) memory.getSymbolTable().get(id).getValue()))
                 {
@@ -391,14 +403,20 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTAppelI node, Object data) {
         String funcID = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
-        ASTListExp lexp = (ASTListExp) node.jjtGetChild(1);
+        Node lexp = node.jjtGetChild(1);
         try
         {
-            memory.expParam(lexp, (ASTEntetes) memory.getParams(funcID), this);
+            memory.getSymbolTable().newScope();
+            Node params = memory.getParams(funcID);
+            if (lexp instanceof ASTListExp liExo && params instanceof ASTEntetes entetes)
+            {
+                memory.expParam(liExo, entetes, this);
+            }
             memory.getDecls(funcID).jjtAccept(this, MjjInterpreterMode.DEFAULT);
             memory.getBody(funcID).jjtAccept(this, MjjInterpreterMode.DEFAULT);
             memory.getDecls(funcID).jjtAccept(this, MjjInterpreterMode.REMOVE);
-            memory.getBody(funcID).jjtAccept(this, MjjInterpreterMode.REMOVE);
+            memory.removeParams(funcID);
+            memory.getSymbolTable().popScope();
         }
         catch (Exception e)
         {

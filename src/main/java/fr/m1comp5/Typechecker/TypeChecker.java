@@ -1,11 +1,6 @@
 package fr.m1comp5.Typechecker;
 import fr.m1comp5.Analyzer.mjj.generated.*;
-import fr.m1comp5.Memory.MemoryObject;
-import fr.m1comp5.Memory.ObjectNature;
-import fr.m1comp5.Memory.ObjectType;
-import fr.m1comp5.Memory.SymbolTable;
-import fr.m1comp5.Memory.Stack;
-import fr.m1comp5.Memory.StackException;
+import fr.m1comp5.Memory.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +12,7 @@ public class TypeChecker implements MiniJajaVisitor {
 
     public TypeChecker() {
         try {
-            stack.push(new MemoryObject("global", new SymbolTable(), ObjectNature.VAR, ObjectType.VOID)); // Initialiser la table des symboles globale
+            stack.push(new MemoryObject("global", new HashTable(), ObjectNature.VAR, ObjectType.VOID)); // Initialiser la table des symboles globale
         } catch (StackException e) {
             e.printStackTrace();
         }
@@ -92,7 +87,7 @@ public class TypeChecker implements MiniJajaVisitor {
         } else {
             MemoryObject mo = new MemoryObject(cstName, cstValue, ObjectNature.CST, cstType);
             try {
-                ((SymbolTable) stack.getTop().getValue()).put(mo);
+                ((HashTable) stack.getTop().getValue()).put(mo);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -117,7 +112,7 @@ public class TypeChecker implements MiniJajaVisitor {
         } else {
             MemoryObject mo = new MemoryObject(varName, null, ObjectNature.VAR, varType);
             try {
-                ((SymbolTable) stack.getTop().getValue()).put(mo);
+                ((HashTable) stack.getTop().getValue()).put(mo);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -136,7 +131,7 @@ public class TypeChecker implements MiniJajaVisitor {
         } else {
             MemoryObject mo = new MemoryObject(arrayName, null, ObjectNature.TAB, arrayType);
             try {
-                ((SymbolTable) stack.getTop().getValue()).put(mo);
+                ((HashTable) stack.getTop().getValue()).put(mo);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -182,7 +177,7 @@ public class TypeChecker implements MiniJajaVisitor {
         } else {
             MemoryObject mo = new MemoryObject(methodSignature, null, ObjectNature.METH, returnType, paramTypes);
             try {
-                ((SymbolTable) stack.getTop().getValue()).put(mo);
+                ((HashTable) stack.getTop().getValue()).put(mo);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -673,7 +668,7 @@ public class TypeChecker implements MiniJajaVisitor {
             if (stack.empty()) {
                 throw new StackException("The stack is empty, cannot lookup symbol");
             }
-            SymbolTable symbolTable = (SymbolTable) stack.getTop().getValue(); 
+            HashTable symbolTable = (HashTable) stack.getTop().getValue();
             
             return symbolTable.get(name);
         } catch (StackException e) {

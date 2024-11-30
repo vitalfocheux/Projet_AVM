@@ -4,7 +4,7 @@
 /************************************************/
 
 class C {
-  int x;
+  int x = 0;
   int y = 10;
   boolean b1 = false;
   boolean b2 = true;
@@ -36,7 +36,6 @@ class C {
 		x++;
 	};
 	f(10); // x = 11;
-	write(x);
    }
 }
 

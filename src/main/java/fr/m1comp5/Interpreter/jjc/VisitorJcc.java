@@ -58,6 +58,7 @@ public class VisitorJcc implements JajaCodeVisitor {
     @Override
     public Object visit(ASTInit node, Object data) {
         addr++;
+        mem.getSymbolTable().newScope();
         return null;
     }
 
@@ -260,7 +261,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         try
         {
             MemoryObject mo = mem.getStack().pop();
-            mem.getSymbolTable().remove(mo);
+            mem.getSymbolTable().removeObjectFromCurrentScope(mo);
             if (mo.getNature() == ObjectNature.TAB)
             {
                 mem.getHeap().decrementReference((int) mo.getValue());
