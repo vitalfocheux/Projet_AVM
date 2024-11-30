@@ -8,7 +8,7 @@ options {
 PARSER_BEGIN(MiniJaja)
 package fr.m1comp5.Analyzer.mjj.generated;
 
-public class MiniJaja
+import org.javacc.jjtree.JJTreeParserConstants;public class MiniJaja
 {
 }
 PARSER_END(MiniJaja)
@@ -79,7 +79,7 @@ SKIP :
 <DEFAULT> TOKEN :
 {
     <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])*> |
-    <NUMBER: (["0"-"9"])+>                                          |
+    <NUMBER: (["0"-"9"])+>                                               |
     <STRING:  "\"" (~["\""])* "\"">
 }
 
@@ -88,7 +88,7 @@ public SimpleNode start() #Root : {}
     classe() {return jjtThis;}
 }
 
-private void classe() #Classe(3) : {}
+private void classe() #Classe : {}
 {
     <CLASS> ident() <LCBRACKET> decls() methmain() <RCBRACKET>
 }
@@ -98,15 +98,10 @@ private void ident() #Ident : {Token t;}
     t = <IDENTIFIER> {jjtThis.value = t.image;}
 }
 
-private void decls() : {}
+private void decls() #Decls : {}
 {
-    decl() decls1() |
-    empty() #Vnil
-}
-
-private void decls1() : {}
-{
-    <SEMICOLON> decls() #Decls(2)
+    decl() <SEMICOLON> decls() |
+    empty() {Node ln = jjtree.popNode(); ASTVnil vnil = new ASTVnil(MiniJajaTreeConstants.JJTVNIL); vnil.jjtSetParent(ln.jjtGetParent()); jjtree.pushNode(vnil);}
 }
 
 private void decl() : {}
@@ -121,15 +116,10 @@ private void decl1() : {}
     var1()
 }
 
-private void vars() : {}
+private void vars() #Vars : {}
 {
-    var() vars1() |
-    empty() #Vnil
-}
-
-private void vars1() : {}
-{
-    <SEMICOLON> vars() #Vars(2)
+    var() <SEMICOLON> vars() |
+    empty() {Node ln = jjtree.popNode(); ASTVnil vnil = new ASTVnil(MiniJajaTreeConstants.JJTVNIL); vnil.jjtSetParent(ln.jjtGetParent()); jjtree.pushNode(vnil);}
 }
 
 private void var() : {}
@@ -156,15 +146,15 @@ private void methmain() #Main(2) : {}
     <MAIN> <LCBRACKET> vars() instrs() <RCBRACKET>
 }
 
-private void entetes() : {}
+private void entetes() #Entetes : {}
 {
     entete() entetes1() |
-    empty() #Enil
+    empty() {Node ln = jjtree.popNode(); ASTEnil enil = new ASTEnil(MiniJajaTreeConstants.JJTENIL); enil.jjtSetParent(ln.jjtGetParent()); jjtree.pushNode(enil);}
 }
 
 private void entetes1() : {}
 {
-    <COMMA> entetes() #Entetes(2) |
+    <COMMA> entetes() |
     empty() #Enil
 }
 
@@ -173,15 +163,10 @@ private void entete() : {}
     type() ident() #Entete(2)
 }
 
-private void instrs() : {}
+private void instrs() #Instrs : {}
 {
-    instr() instrs1() |
-    empty() #Inil
-}
-
-private void instrs1() : {}
-{
-    <SEMICOLON> instrs() #Instrs(2)
+    instr() <SEMICOLON> instrs()  |
+    empty() {Node ln = jjtree.popNode(); ASTInil inil = new ASTInil(MiniJajaTreeConstants.JJTINIL); inil.jjtSetParent(ln.jjtGetParent()); jjtree.pushNode(inil);}
 }
 
 private void instr() : {}
@@ -339,7 +324,31 @@ void nbre() #Nbre : {int x; Token t;} {
 	}
 }
 
-void chaine() #Chaine : {Token t;}
+private void chaine() #Chaine : {Token t;}
 {
   t = <STRING> {jjtThis.value = t.image;}
+}
+
+
+/**
+* Definitions of null nodes
+*/
+private void toIgnoreVnil() #Vnil : {}
+{
+    empty()
+}
+
+private void toIgnoreEnil() #Enil : {}
+{
+    empty()
+}
+
+private void toIgnoreInil() #Inil : {}
+{
+    empty()
+}
+
+private void toIgnoreExnil() #Exnil : {}
+{
+    empty()
 }

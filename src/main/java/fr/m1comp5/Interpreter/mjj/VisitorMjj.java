@@ -67,7 +67,9 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTDecls node, Object data) {
-        for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+        System.err.println(node.jjtGetNumChildren());
+        for (int i = 0; i < node.jjtGetNumChildren(); ++i)
+        {
             node.jjtGetChild(i).jjtAccept(this, data);
         }
         return null;
@@ -97,6 +99,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTVars node, Object data) {
+        System.err.println(node.jjtGetNumChildren());
         for (int i = 0; i < node.jjtGetNumChildren(); i++) {
             node.jjtGetChild(i).jjtAccept(this, data);
         }

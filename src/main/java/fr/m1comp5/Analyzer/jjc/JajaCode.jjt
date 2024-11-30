@@ -1,4 +1,5 @@
 options {
+    STATIC = false;
     NODE_DEFAULT_VOID = true;
     MULTI = true;
     VISITOR = true;
