@@ -1,4 +1,4 @@
-package fr.m1comp5.Memory;
+package fr.m1comp5;
 
 import java.util.ArrayList;
 import java.util.List;

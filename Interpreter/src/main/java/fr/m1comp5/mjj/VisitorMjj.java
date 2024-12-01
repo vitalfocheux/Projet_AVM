@@ -1,7 +1,7 @@
-package fr.m1comp5.Interpreter.mjj;
+package fr.m1comp5.mjj;
 
-import fr.m1comp5.Analyzer.mjj.generated.*;
-import fr.m1comp5.Memory.*;
+import fr.m1comp5.*;
+import fr.m1comp5.mjj.generated.*;
 
 public class VisitorMjj implements MiniJajaVisitor {
     private String toDisplay;

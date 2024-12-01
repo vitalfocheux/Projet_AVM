@@ -1,11 +1,13 @@
 package fr.m1comp5.Typechecker;
-import fr.m1comp5.Analyzer.mjj.generated.*;
-import fr.m1comp5.Memory.*;
+
+import fr.m1comp5.*;
+import fr.m1comp5.mjj.generated.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TypeChecker implements MiniJajaVisitor {
+public class TypeChecker implements MiniJajaVisitor
+{
 
     private Stack stack = new Stack(); // Pile pour gérer les portées
     private String currentMethod = null; // Méthode courante

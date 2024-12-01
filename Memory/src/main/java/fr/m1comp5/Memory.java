@@ -1,8 +1,8 @@
 package fr.m1comp5;
 
-import fr.m1comp5.Analyzer.mjj.generated.*;
-import fr.m1comp5.Interpreter.mjj.MjjInterpreterMode;
-import fr.m1comp5.Interpreter.mjj.VisitorMjj;
+import fr.m1comp5.mjj.MjjInterpreterMode;
+import fr.m1comp5.mjj.generated.*;
+import fr.m1comp5.mjj.VisitorMjj;
 
 public class Memory {
     private SymbolTable symbolTable;
