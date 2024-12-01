@@ -9,7 +9,6 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>fr.m1comp5</groupId>
   <artifactId>Memory</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>Memory</name>
