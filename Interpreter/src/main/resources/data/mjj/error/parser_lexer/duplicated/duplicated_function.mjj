@@ -1,0 +1,14 @@
+class error {
+
+    int sum(){
+        return 1;
+    }
+
+    int sum(){
+        return 2;
+    }
+
+    void main(){
+        return sum();
+    }
+}

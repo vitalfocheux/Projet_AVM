@@ -1,0 +1,12 @@
+class Boolean {
+
+    main {
+
+        boolean a = false;
+        boolean b = false;
+
+        return a || b;
+
+    }
+
+}

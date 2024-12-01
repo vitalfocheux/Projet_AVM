@@ -1,0 +1,12 @@
+class equal {
+
+    main {
+
+        int a = 42;
+        int b = 42;
+
+        return a == b;
+
+    }
+
+}

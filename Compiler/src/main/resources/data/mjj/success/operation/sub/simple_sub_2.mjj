@@ -1,0 +1,9 @@
+class add {
+
+    main {
+
+        return 54 - (12); // 42
+
+    }
+
+}

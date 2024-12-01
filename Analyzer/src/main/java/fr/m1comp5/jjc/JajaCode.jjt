@@ -1,0 +1,230 @@
+options {
+    STATIC = false;
+    NODE_DEFAULT_VOID = true;
+    MULTI = true;
+    VISITOR = true;
+}
+
+PARSER_BEGIN(JajaCode)
+package fr.m1comp5.jjc.generated;
+
+public class JajaCode
+{
+}
+PARSER_END(JajaCode)
+
+/* To skip */
+SKIP :
+{
+    " "                                              |
+    "\t"                                             |
+    "\r"                                             |
+    "\n"
+ }
+
+/* JajaCode instructions */
+<DEFAULT> TOKEN :
+{
+    <INIT: "init">        |
+    <SWAP: "swap">        |
+    <NEW: "new">          |
+    <NEWA: "newarray">    |
+    <INVOKE: "invoke">    |
+    <LENGTH: "length">    |
+    <RETURN: "return">    |
+    <WRITE: "write">      |
+    <WRITELN: "writeln">  |
+    <PUSH: "push">        |
+    <POP: "pop">          |
+    <LOAD: "load">        |
+    <ALOAD: "aload">      |
+    <STORE: "store">      |
+    <ASTORE: "astore">    |
+    <IF: "if">            |
+    <GOTO: "goto">        |
+    <INC: "inc">          |
+    <AINC: "ainc">        |
+    <NOP: "nop">          |
+    <JCSTOP: "jcstop">
+}
+
+/* JajaCode operations */
+<DEFAULT> TOKEN :
+{
+    <NEG: "neg"> |
+    <NOT: "not"> |
+    <ADD: "add"> |
+    <SUB: "sub"> |
+    <MUL: "mul"> |
+    <DIV: "div"> |
+    <CMP: "cmp"> |
+    <SUP: "sup"> |
+    <OR: "or">   |
+    <AND: "and">
+}
+
+/* JajaCode separators */
+<DEFAULT> TOKEN :
+{
+    <SEMICOLON: ";">    |
+    <COMMA: "," >       |
+    <LPAR: "(">         |
+    <RPAR: ")">
+}
+
+/* JajaCode types */
+<DEFAULT> TOKEN :
+{
+    <INT: "entier">     |
+    <BOOL: "booleen">   |
+    <VOID: "void">
+}
+
+/* JajaCode object types */
+<DEFAULT> TOKEN :
+{
+    <VAR: "var">    |
+    <CST: "cst">    |
+    <METH: "meth">
+}
+
+/* JajaCode values */
+<DEFAULT> TOKEN :
+{
+    <TRUE: "vrai">                                                       |
+    <FALSE: "false">                                                     |
+    <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])*> |
+    <NUMBER: (["0"-"9"])+>                                               |
+    <STRING:  "\"" (~["\""])* "\"">
+}
+
+public SimpleNode start() #Root : {}
+{
+    classe() {return jjtThis;}
+}
+
+private void classe() : {}
+{
+    adresse() instr() <SEMICOLON> classe() #JajaCode(3) |
+    empty() #Jcnil
+}
+
+private void instr() : {}
+{
+    <INIT> #Init                                                                         |
+    <SWAP> #Swap                                                                         |
+    <NEW> <LPAR> ident() <COMMA> type() <COMMA> sorte() <COMMA> adresse() <RPAR> #New(4) |
+    <NEWA> <LPAR> ident() <COMMA> type() <RPAR> #NewArray(2)                             |
+    <INVOKE> <LPAR> ident() <RPAR> #Invoke(1)                                            |
+    <LENGTH> <LPAR> ident() <RPAR> #Length(1)                                            |
+    <RETURN> #Return                                                                     |
+    <WRITE> #Write                                                                       |
+    <WRITELN> #WriteLn                                                                   |
+    <PUSH> <LPAR> value() <RPAR> #Push(1)                                                |
+    <POP> #Pop                                                                           |
+    <LOAD> <LPAR> ident() <RPAR> #Load(1)                                                |
+    <ALOAD> <LPAR> ident() <RPAR> #ALoad(1)                                              |
+    <STORE> <LPAR> ident() <RPAR> #Store(1)                                              |
+    <ASTORE> <LPAR> ident() <RPAR> #AStore(1)                                            |
+    <IF> <LPAR> adresse() <RPAR> #If(1)                                                  |
+    <GOTO> <LPAR> adresse() <RPAR> #GoTo(1)                                              |
+    <INC> <LPAR> ident() <RPAR> #Inc(1)                                                  |
+    <AINC> <LPAR> ident() <RPAR> #AInc(1)                                                |
+    <NOP> #Nop                                                                           |
+    <JCSTOP> #JcStop                                                                     |
+    oper()
+}
+
+private void ident() #JcIdent : {Token t;}
+{
+    t = <IDENTIFIER> {jjtThis.value = t.image;}
+}
+
+private void value() : {}
+{
+    number()     |
+    trueValue()  |
+    falseValue() |
+    string()     |
+    empty() #Jcnil
+}
+
+private void adresse() : {Token t;}
+{
+    number()
+}
+
+private void oper() : {}
+{
+    oper1() |
+    oper2()
+}
+
+private void oper1() : {}
+{
+    <NEG> #Neg |
+    <NOT> #Not
+}
+
+private void oper2() : {}
+{
+    <ADD> #Add |
+    <SUB> #Sub |
+    <MUL> #Mul |
+    <DIV> #Div |
+    <CMP> #Cmp |
+    <SUP> #Sup |
+    <OR> #Or   |
+    <AND> #And
+}
+
+private void type() #Type : {Token t;}
+{
+    t = <INT>  {jjtThis.value = t.image;} |
+    t = <BOOL> {jjtThis.value = t.image;} |
+    t = <VOID> {jjtThis.value = t.image;}
+
+}
+
+private void sorte() #Sorte : {Token t;}
+{
+    t = <VAR>  {jjtThis.value = t.image;} |
+    t = <CST> {jjtThis.value = t.image;} |
+    t = <METH> {jjtThis.value = t.image;}
+}
+
+private void number() #JcNbre : {int x = 0; Token t;}
+{
+    t = <NUMBER>
+    {
+        try
+        {
+            x = Integer.parseInt(t.image);
+        }
+        catch (Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+        jjtThis.value = x;
+    }
+}
+
+private void trueValue() #JcVrai : {boolean x = true;}
+{
+    <TRUE> {jjtThis.jjtSetValue(x);}
+}
+
+private void falseValue() #JcFalse : {boolean x = false;}
+{
+    <FALSE> {jjtThis.jjtSetValue(x);}
+}
+
+private void string() #JcChaine : {Token t;}
+{
+    t = <STRING> {jjtThis.value = t.image;}
+}
+
+private void empty() : {}
+{
+    {}
+}

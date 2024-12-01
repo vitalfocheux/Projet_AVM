@@ -1,0 +1,11 @@
+class division {
+
+    main {
+
+        int a = 42;
+        int b = -3;
+        return a / b;
+
+    }
+
+}

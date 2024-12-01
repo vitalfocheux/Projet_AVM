@@ -1,0 +1,11 @@
+class increment {
+
+    main {
+
+        int a = 41;
+        a++;
+        return a; // Grammaire refuse d'incrementer a avec le return
+
+    }
+
+}
