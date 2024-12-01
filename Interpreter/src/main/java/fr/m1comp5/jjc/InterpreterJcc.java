@@ -10,9 +10,10 @@ public class InterpreterJcc {
     private VisitorJcc VisitorJcc;
     private List<Node> instrs;
 
-    public InterpreterJcc(Node root, Memory mem) {
+    public InterpreterJcc(Node root, Memory mem, List<Node> instrs) {
         this.root = root;
         VisitorJcc = new VisitorJcc(mem);
+        this.instrs = instrs;
     }
 
     public String interpret() {
