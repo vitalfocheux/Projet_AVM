@@ -1,8 +1,6 @@
 package fr.m1comp5;
 
-import fr.m1comp5.mjj.MjjInterpreterMode;
 import fr.m1comp5.mjj.generated.*;
-import fr.m1comp5.mjj.VisitorMjj;
 
 public class Memory {
     private SymbolTable symbolTable;
@@ -183,26 +181,6 @@ public class Memory {
         return method.jjtGetChild(4);
     }
 
-    public void expParam(ASTListExp lexp, ASTEntetes ent, VisitorMjj visitor) throws SymbolTableException, StackException
-    {
-        if (lexp == null && ent == null)
-        {
-            return;
-        }
-        Object currEntetes = ent;
-        Object currListExp = lexp;
-        while(!(currEntetes instanceof ASTEnil) && !(currListExp instanceof ASTExnil))
-        {
-            ASTEntete entete = (ASTEntete) ((ASTEntetes) currEntetes).jjtGetChild(0);
-            String id = (String) ((ASTIdent) entete.jjtGetChild(1)).jjtGetValue();
-            ObjectType type = (ObjectType) entete.jjtGetChild(0).jjtAccept(visitor, MjjInterpreterMode.DEFAULT);
-            Object value = ((ASTListExp) currListExp).jjtGetChild(0).jjtAccept(visitor, MjjInterpreterMode.DEFAULT);
-            declVar(id, value, type);
-            currEntetes = ((ASTEntetes) currEntetes).jjtGetChild(1);
-            currListExp = ((ASTListExp) currListExp).jjtGetChild(1);
-        }
-    }
-    
     public Object getVal(String ident) throws SymbolTableException {
         MemoryObject mo = symbolTable.get(ident);
         if (mo == null) throw new SymbolTableException("Var "+ ident +" was not found");

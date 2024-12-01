@@ -409,7 +409,7 @@ public class VisitorMjj implements MiniJajaVisitor {
             Node params = memory.getParams(funcID);
             if (lexp instanceof ASTListExp liExo && params instanceof ASTEntetes entetes)
             {
-                memory.expParam(liExo, entetes, this);
+                expParam(liExo, entetes);
             }
             memory.getDecls(funcID).jjtAccept(this, MjjInterpreterMode.DEFAULT);
             memory.getBody(funcID).jjtAccept(this, MjjInterpreterMode.DEFAULT);
@@ -598,5 +598,25 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTChaine node, Object data) {
         return node.jjtGetValue();
+    }
+
+    public void expParam(ASTListExp lexp, ASTEntetes ent) throws SymbolTableException, StackException
+    {
+        if (lexp == null && ent == null)
+        {
+            return;
+        }
+        Object currEntetes = ent;
+        Object currListExp = lexp;
+        while(!(currEntetes instanceof ASTEnil) && !(currListExp instanceof ASTExnil))
+        {
+            ASTEntete entete = (ASTEntete) ((ASTEntetes) currEntetes).jjtGetChild(0);
+            String id = (String) ((ASTIdent) entete.jjtGetChild(1)).jjtGetValue();
+            ObjectType type = (ObjectType) entete.jjtGetChild(0).jjtAccept(this, MjjInterpreterMode.DEFAULT);
+            Object value = ((ASTListExp) currListExp).jjtGetChild(0).jjtAccept(this, MjjInterpreterMode.DEFAULT);
+            memory.declVar(id, value, type);
+            currEntetes = ((ASTEntetes) currEntetes).jjtGetChild(1);
+            currListExp = ((ASTListExp) currListExp).jjtGetChild(1);
+        }
     }
 }
