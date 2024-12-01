@@ -153,7 +153,7 @@ public class VisitorMjj implements MiniJajaVisitor {
             throw new RuntimeException("Variable name cannot be null.");
         }
         Object value = null;
-        if (node.jjtGetNumChildren() > 2) {
+        if (node.jjtGetNumChildren() > 2 && data == MjjInterpreterMode.DEFAULT) {
             value = node.jjtGetChild(2).jjtAccept(this, data); // Retrieve the initialized value
         }
         try
