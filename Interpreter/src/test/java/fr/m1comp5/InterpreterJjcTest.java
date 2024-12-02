@@ -11,6 +11,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class InterpreterJjcTest {
@@ -21,7 +23,11 @@ public class InterpreterJjcTest {
             JajaCode jjc = new JajaCode(new FileReader(filepath));
             Node root = jjc.start();
             Memory mem = new Memory(new SymbolTable());
-            InterpreterJcc interpreter = new InterpreterJcc(root, mem);
+            List<Node> instrs = new ArrayList<>();
+            for(int i = 0; i < root.jjtGetNumChildren(); i++) {
+                instrs.add(root.jjtGetChild(i));
+            }
+            InterpreterJcc interpreter = new InterpreterJcc(root, mem, instrs);
             System.out.println(interpreter.interpret());
         });
     }
