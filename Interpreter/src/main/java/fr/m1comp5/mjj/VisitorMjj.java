@@ -42,7 +42,7 @@ public class VisitorMjj implements MiniJajaVisitor {
             memory.declVar(id, null, ObjectType.OMEGA);
             node.jjtGetChild(1).jjtAccept(this, MjjInterpreterMode.DEFAULT); //Visit vars or vnil
             node.jjtGetChild(2).jjtAccept(this, MjjInterpreterMode.DEFAULT);
-            node.jjtGetChild(2).jjtAccept(this, MjjInterpreterMode.REMOVE);
+            node.jjtGetChild(1).jjtAccept(this, MjjInterpreterMode.REMOVE);
             memory.removeDecl(id);
             memory.getSymbolTable().popScope();
         } catch (Exception e) {
@@ -69,11 +69,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTDecls node, Object data) {
-        System.err.println(node.jjtGetNumChildren());
-        for (int i = 0; i < node.jjtGetNumChildren(); ++i)
-        {
-            node.jjtGetChild(i).jjtAccept(this, data);
-        }
+        RDeclsAndVars(node, data);
         return null;
     }
 
@@ -101,9 +97,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTVars node, Object data) {
-        for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-            node.jjtGetChild(i).jjtAccept(this, data);
-        }
+        RDeclsAndVars(node, data);
         return null;
     }
 
@@ -267,7 +261,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         Object value = node.jjtGetChild(0).jjtAccept(this, data);
         try {
             if (value instanceof String) {
-                toDisplay += (String) ((String) value).replace("\"","");
+                toDisplay += ((String) value).replace("\"","");
             } else {
                 toDisplay += value;
             }
@@ -600,7 +594,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         return node.jjtGetValue();
     }
 
-    public void expParam(ASTListExp lexp, ASTEntetes ent) throws SymbolTableException, StackException
+    private void expParam(ASTListExp lexp, ASTEntetes ent) throws SymbolTableException, StackException
     {
         if (lexp == null && ent == null)
         {
@@ -617,6 +611,24 @@ public class VisitorMjj implements MiniJajaVisitor {
             memory.declVar(id, value, type);
             currEntetes = ((ASTEntetes) currEntetes).jjtGetChild(1);
             currListExp = ((ASTListExp) currListExp).jjtGetChild(1);
+        }
+    }
+
+    private void RDeclsAndVars(Node node, Object data)
+    {
+        if (data == MjjInterpreterMode.DEFAULT)
+        {
+            for (int i = 0; i < node.jjtGetNumChildren(); ++i)
+            {
+                node.jjtGetChild(i).jjtAccept(this, data);
+            }
+        }
+        else if (data == MjjInterpreterMode.REMOVE)
+        {
+            for (int i = node.jjtGetNumChildren() - 1; i >= 0; --i)
+            {
+                node.jjtGetChild(i).jjtAccept(this, data);
+            }
         }
     }
 }
