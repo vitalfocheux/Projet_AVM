@@ -37,7 +37,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTRoot node, Object data) {
-        return null;
+        return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
     @Override
