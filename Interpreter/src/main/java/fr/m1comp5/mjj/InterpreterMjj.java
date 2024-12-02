@@ -24,4 +24,9 @@ public class InterpreterMjj {
     public Node getRoot() {
         return root;
     }
+
+    public String getStdout()
+    {
+        return VisitorMjj.toString();
+    }
 }

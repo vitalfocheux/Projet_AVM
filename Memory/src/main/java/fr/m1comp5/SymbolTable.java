@@ -2,217 +2,86 @@ package fr.m1comp5;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class SymbolTable
 {
-    private static final int INITIAL_SIZE = 32;
-
-    private List<List<MemoryObject>> buckets;
-    private int count;
+    private List<HashTable> scopes;
 
     public SymbolTable()
     {
-        count = 0;
-        buckets = new ArrayList<>();
-        for (int i = 0; i < INITIAL_SIZE; ++i)
+        scopes = new ArrayList<>();
+    }
+
+    public void newScope()
+    {
+        scopes.add(new HashTable());
+    }
+
+    public void popScope() throws SymbolTableException
+    {
+        if (scopes.isEmpty())
         {
-            buckets.add(null);
+            throw new SymbolTableException("Can't pop scope because scope stack is empty");
         }
+        scopes.remove(scopes.size() - 1);
     }
 
-    public List<List<MemoryObject>> getBuckets()
+    public void putObjectInCurrentScope(MemoryObject mo) throws SymbolTableException
     {
-        return buckets;
-    }
-
-    /**
-     * Compute location of an object in the symbol table based on his id,
-     * this function is useful when we need to rehash the table.
-     * This algorithm use FNV-1a hash algorithm
-     * @param key The key to put in the symbol
-     * @param size The size of the new buckets
-     * @return Location where the object will be put
-     */
-    private int hashFunction(String key, int size)
-    {
-        final int FNV_PRIME = 0x01000193;
-        int hashCode = 0x811c9dc5;
-        for (char c : key.toCharArray())
+        if (scopes.isEmpty())
         {
-            hashCode ^= c;
-            hashCode *= FNV_PRIME;
+            throw new SymbolTableException("No available scope");
         }
-        return Math.abs(hashCode % size);
-    }
-
-    /**
-     * Compute location of an object in the symbol table based on his id
-     * @param key The key to put in the symbol
-     * @return Location where the object will be put
-     */
-    private int hashFunction(String key)
-    {
-        return hashFunction(key, buckets.size());
-    }
-
-    /**
-     *
-     * @param id The id of the object in the memory
-     * @return The object if it's found and null otherwise
-     */
-    public MemoryObject get(String id)
-    {
-        List<MemoryObject> bucket = buckets.get(hashFunction(id));
-        if (bucket == null)
+        for (HashTable htb : scopes)
         {
-            return null;
-        }
-        for (MemoryObject mo : bucket)
-        {
-            if (mo.getId().equals(id))
+            List<MemoryObject> bucket = htb.accessBucket(mo.getId());
+            if (bucket != null)
             {
-                return mo;
+                for (MemoryObject moo : bucket)
+                {
+                    if (moo == mo)
+                    {
+                        throw new SymbolTableException("This object already exists in another scope");
+                    }
+                }
             }
         }
-        return null;
+        scopes.get(scopes.size() - 1).put(mo);
     }
 
-    /**
-     * Put an memory object in the table
-     * @param mo The memory object to put in the symbol table
-     * @return True if the object was put in the table and false otherwise
-     */
-    public boolean put(MemoryObject mo)
+    public void removeObjectFromCurrentScope(MemoryObject mo) throws SymbolTableException
     {
-        if (mo == null)
+        if (scopes.isEmpty())
         {
-            return false;
+            throw new SymbolTableException("No scope");
         }
-        int hash = hashFunction(mo.getId());
-        List<MemoryObject> bucket = buckets.get(hash);
-        if (bucket == null)
-        {
-            bucket = new ArrayList<>();
-            buckets.set(hash, bucket);
-        }
-        ++count;
-        bucket.add(mo);
-        System.out.println("Saving in symbol table: " + mo.toString());
-        if (needToRehash())
-        {
-            rehash();
-        }
-        return true;
+        scopes.get(scopes.size() - 1).remove(mo);
     }
 
-    public boolean update (String ident, Object value) {
-        if (ident == null || value == null) return false;
-        MemoryObject mo = get(ident);
-        mo.setValue(value);
-        return true;
-    }
-
-    /**
-     * Remove an element from the symbol table
-     * @param mo Memory object to remove from the symbol table
-     * @return True if the object was removed and false otherwise
-     */
-    public boolean remove(MemoryObject mo)
+    public MemoryObject get(String id) throws SymbolTableException
     {
-        if (mo == null)
+        if (scopes.isEmpty())
         {
-            return false;
+            throw new SymbolTableException("No available scope");
         }
-        List<MemoryObject> lmo = buckets.get(hashFunction(mo.getId()));
-        if (lmo == null)
+        for (int i = scopes.size() - 1; i >= 0; --i)
         {
-            return false;
-        }
-        int idx = -1;
-        for (int i = 0; i < lmo.size(); ++i)
-        {
-            if (Objects.equals(lmo.get(i).getId(), mo.getId()))
+            MemoryObject obj = scopes.get(i).get(id);
+            if (obj != null)
             {
-                idx = i;
-                break;
+                return obj;
             }
         }
-        if (idx != -1)
-        {
-            lmo.remove(idx);
-            --count;
-        }
-        return idx != -1;
+        throw new SymbolTableException("The object don't exist");
     }
 
-    /**
-     *
-     * @return The number of elements in the symbol table
-     */
-    public int getCount()
+    public void updateObjInCurrentScope(String id, Object val) throws SymbolTableException
     {
-        return count;
+        if (scopes.isEmpty())
+        {
+            throw new SymbolTableException("No scope");
+        }
+        scopes.get(scopes.size() - 1).update(id, val);
     }
 
-    /**
-     *
-     * @return The size of the symbol table
-     */
-    public int getSize()
-    {
-        return buckets.size();
-    }
-
-    /**
-     * Tell if the symbol table need to be rehashed,
-     * the symbol table need to be rehashed if load factor > 0.5
-     * @return True if the symbol table need to be rehashed
-     */
-    private boolean needToRehash()
-    {
-        return ((double) count / buckets.size()) > 0.5;
-    }
-
-    private void rehash()
-    {
-        int size = buckets.size() * 2;
-        List<List<MemoryObject>> newBuckets = new ArrayList<>();
-        for (int i = 0; i < size; ++i)
-        {
-            newBuckets.add(null);
-        }
-        for (List<MemoryObject> lmo : buckets)
-        {
-            if (lmo == null)
-            {
-                continue;
-            }
-            for (MemoryObject mo : lmo)
-            {
-                int hashCode = hashFunction(mo.getId(), size);
-                addToBucket(mo, newBuckets, hashCode);
-            }
-        }
-        buckets = newBuckets;
-    }
-
-    private void addToBucket(MemoryObject mo, List<List<MemoryObject>> buckets, int hashCode)
-    {
-        if (mo == null)
-        {
-            return;
-        }
-        if (buckets == null)
-        {
-            return;
-        }
-        List<MemoryObject> bucket = buckets.get(hashCode);
-        if (bucket == null)
-        {
-            bucket = new ArrayList<>();
-            buckets.set(hashCode, bucket);
-        }
-        bucket.add(mo);
-    }
 }

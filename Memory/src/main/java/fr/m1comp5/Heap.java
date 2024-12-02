@@ -11,7 +11,7 @@ public class Heap
 
     public Heap() throws HeapException
     {
-       this(1024);
+        this(1024);
     }
 
     public Heap(int heapSize) throws HeapException

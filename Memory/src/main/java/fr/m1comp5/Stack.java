@@ -74,9 +74,32 @@ public class Stack {
         if (stackList.isEmpty()) {
             throw new StackException("Can't search the object because the stack is empty");
         }
-        for (int i = base; i < top+1; ++i) {
+        for (int i = base; i <= top; ++i) {
             if (stackList.get(i).getId().equals(id)) {
                 return stackList.get(i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Search variable from the top pointer
+     * @param id The id of the variable
+     * @throws Exception
+     * @return Null if the variable is not found and the variable otherwise
+     */
+    public MemoryObject searchVariableFromTop(String id) throws StackException
+    {
+        if (stackList.isEmpty())
+        {
+            throw new StackException("Can't search the object because the stack is empty");
+        }
+        for (int i = top; i >= 0; --i)
+        {
+            MemoryObject mo = stackList.get(i);
+            if (mo.getId().equals(id))
+            {
+                return mo;
             }
         }
         return null;
@@ -94,5 +117,54 @@ public class Stack {
             throw new StackException("The base of the stack must be a positive number and must be less than the top of the stack");
         }
         base = baseValue;
+    }
+
+    /**
+     * Get the memory object at the index of the top minus s
+     * @param s The number of element to go down in the stack
+     * @return The MemoryObject at the top of the stack minus s
+     * @throws StackException If s is bigger than the stack size
+     */
+    public MemoryObject getObjectFromTheTop(int s) throws StackException
+    {
+        if (s >= stackList.size())
+        {
+            throw new StackException("Trying to access an unreachable element");
+        }
+        return stackList.get(top - s);
+    }
+
+    /**
+     * swaps the last and second last elements in the stack
+     * @throws StackException If the stack size is less than 2 elements
+     */
+    public void swap() throws StackException
+    {
+        if (stackList.size() < 2)
+        {
+            throw new StackException("There must be at least two element in the stack to perform a swap on the top of the stack");
+        }
+        MemoryObject mo1 = stackList.get(top);
+        MemoryObject mo2 = stackList.get(top - 1);
+        stackList.set(top, mo2);
+        stackList.set(top - 1, mo1);
+    }
+    public void eraseVariable(String id) throws StackException
+    {
+        if (stackList.isEmpty())
+        {
+            throw new StackException("Can't search variable in an empty stack");
+        }
+        for (int i = top; i >= 0; --i)
+        {
+            MemoryObject mo = stackList.get(i);
+            if (mo.getId().equals(id))
+            {
+                stackList.remove(i);
+                --top;
+                break;
+            }
+        }
+
     }
 }
