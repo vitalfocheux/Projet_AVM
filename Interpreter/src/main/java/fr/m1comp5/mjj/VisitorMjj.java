@@ -3,6 +3,9 @@ package fr.m1comp5.mjj;
 import fr.m1comp5.*;
 import fr.m1comp5.mjj.generated.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class VisitorMjj implements MiniJajaVisitor {
     private String toDisplay;
     private Memory memory;
@@ -118,7 +121,6 @@ public class VisitorMjj implements MiniJajaVisitor {
         if (node.jjtGetNumChildren() > 2) {
             value = node.jjtGetChild(2).jjtAccept(this, data); // Retrieve the initialized value
         }
-
         try
         {
             if (data == MjjInterpreterMode.DEFAULT)
@@ -395,16 +397,18 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTAppelI node, Object data) {
+        List<MemoryObject> instantiatedParams = null;
         String funcID = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
         Node lexp = node.jjtGetChild(1);
         try
         {
-            memory.getSymbolTable().newScope();
             Node params = memory.getParams(funcID);
             if (lexp instanceof ASTListExp liExo && params instanceof ASTEntetes entetes)
             {
-                expParam(liExo, entetes);
+                instantiatedParams = expParam(liExo, entetes);
             }
+            memory.getSymbolTable().newScope();
+            memory.declVarsFromListOfParams(instantiatedParams);
             memory.getDecls(funcID).jjtAccept(this, MjjInterpreterMode.DEFAULT);
             memory.getBody(funcID).jjtAccept(this, MjjInterpreterMode.DEFAULT);
             memory.getDecls(funcID).jjtAccept(this, MjjInterpreterMode.REMOVE);
@@ -571,7 +575,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTRien node, Object data) {
-        return null;
+        return ObjectType.VOID;
     }
 
     @Override
@@ -594,12 +598,13 @@ public class VisitorMjj implements MiniJajaVisitor {
         return node.jjtGetValue();
     }
 
-    private void expParam(ASTListExp lexp, ASTEntetes ent) throws SymbolTableException, StackException
+    private List<MemoryObject> expParam(ASTListExp lexp, ASTEntetes ent) throws SymbolTableException, StackException
     {
         if (lexp == null && ent == null)
         {
-            return;
+            return null;
         }
+        List<MemoryObject> params = new ArrayList<>();
         Object currEntetes = ent;
         Object currListExp = lexp;
         while(!(currEntetes instanceof ASTEnil) && !(currListExp instanceof ASTExnil))
@@ -608,10 +613,11 @@ public class VisitorMjj implements MiniJajaVisitor {
             String id = (String) ((ASTIdent) entete.jjtGetChild(1)).jjtGetValue();
             ObjectType type = (ObjectType) entete.jjtGetChild(0).jjtAccept(this, MjjInterpreterMode.DEFAULT);
             Object value = ((ASTListExp) currListExp).jjtGetChild(0).jjtAccept(this, MjjInterpreterMode.DEFAULT);
-            memory.declVar(id, value, type);
+            params.add(new MemoryObject(id, value, ObjectNature.VAR, type));
             currEntetes = ((ASTEntetes) currEntetes).jjtGetChild(1);
             currListExp = ((ASTListExp) currListExp).jjtGetChild(1);
         }
+        return params;
     }
 
     private void RDeclsAndVars(Node node, Object data)

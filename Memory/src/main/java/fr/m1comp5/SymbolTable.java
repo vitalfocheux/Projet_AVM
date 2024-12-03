@@ -64,15 +64,16 @@ public class SymbolTable
         {
             throw new SymbolTableException("No available scope");
         }
-        for (int i = scopes.size() - 1; i >= 0; --i)
+        MemoryObject obj = scopes.get(scopes.size() - 1).get(id);
+        if (obj == null)
         {
-            MemoryObject obj = scopes.get(i).get(id);
-            if (obj != null)
+            obj = getGlobalScopeSymbols().get(id);
+            if (obj == null)
             {
-                return obj;
+                throw new SymbolTableException("The object don't exist");
             }
         }
-        throw new SymbolTableException("The object don't exist");
+        return obj;
     }
 
     public void updateObjInCurrentScope(String id, Object val) throws SymbolTableException
@@ -82,6 +83,37 @@ public class SymbolTable
             throw new SymbolTableException("No scope");
         }
         scopes.get(scopes.size() - 1).update(id, val);
+    }
+
+    private HashTable getMainScopeSymboles() throws SymbolTableException
+    {
+        if (scopes.isEmpty())
+        {
+            throw new SymbolTableException("No scope");
+        }
+        if (scopes.size() < 2)
+        {
+            throw new SymbolTableException("Main scope don't exist");
+        }
+        return scopes.get(1);
+    }
+
+    private HashTable getGlobalScopeSymbols() throws SymbolTableException
+    {
+        if (scopes.isEmpty())
+        {
+            throw new SymbolTableException("No scope");
+        }
+        return scopes.get(0);
+    }
+
+    public void newScopeFromListOfObject(List<MemoryObject> lmo) throws SymbolTableException
+    {
+        newScope();
+        for (MemoryObject mo : lmo)
+        {
+            putObjectInCurrentScope(mo);
+        }
     }
 
 }

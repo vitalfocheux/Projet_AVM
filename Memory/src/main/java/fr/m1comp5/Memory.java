@@ -2,6 +2,8 @@ package fr.m1comp5;
 
 import fr.m1comp5.mjj.generated.*;
 
+import java.util.List;
+
 public class Memory {
     private SymbolTable symbolTable;
     private Stack stack;
@@ -31,6 +33,19 @@ public class Memory {
         MemoryObject mo = new MemoryObject(ident, value, ObjectNature.VAR, type);
         symbolTable.putObjectInCurrentScope(mo);
         stack.push(mo);
+    }
+
+    public void declVarsFromListOfParams(List<MemoryObject> fctParams) throws StackException, SymbolTableException
+    {
+        if (fctParams == null)
+        {
+            return;
+        }
+        for (MemoryObject mo : fctParams)
+        {
+            symbolTable.putObjectInCurrentScope(mo);
+            stack.push(mo);
+        }
     }
 
     public void identVal(String ident, ObjectType type, int s) throws StackException, SymbolTableException, Exception {
