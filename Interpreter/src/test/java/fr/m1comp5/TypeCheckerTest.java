@@ -225,7 +225,6 @@ public class TypeCheckerTest {
         varNode.jjtAddChild(varIdent, 1);
         varNode.jjtAddChild(omega, 2);
 
-
         // Tester l'affectation
         ASTAffectation affectnode = new ASTAffectation(0);
         ASTIdent varIdent2 = new ASTIdent(1);
