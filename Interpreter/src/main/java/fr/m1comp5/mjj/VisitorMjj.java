@@ -507,7 +507,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTLongeur node, Object data) {
-        String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        String id = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
         try
         {
             MemoryObject mo = memory.getSymbolTable().get(id);
@@ -556,7 +556,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTTab node, Object data) {
-        String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        String id = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
         int idx = (int) node.jjtGetChild(1).jjtAccept(this, data);
         try
         {
