@@ -6,10 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class TypeChecker implements MiniJajaVisitor {
 
     private Stack stack = new Stack(); // Pile pour gérer les portées
@@ -17,7 +13,7 @@ public class TypeChecker implements MiniJajaVisitor {
 
     public TypeChecker() {
         try {
-            stack.push(new MemoryObject("global", new SymbolTable(), ObjectNature.VAR, ObjectType.VOID)); // Initialiser la table des symboles globale
+            stack.push(new MemoryObject("global", new HashTable(), ObjectNature.VAR, ObjectType.VOID)); // Initialiser la table des symboles globale
             } catch (StackException e) {
                 e.printStackTrace();
 
@@ -37,9 +33,9 @@ public class TypeChecker implements MiniJajaVisitor {
         String className = (String) classNameNode.jjtGetValue(); 
 
         try {
-            ((SymbolTable) stack.getTop().getValue()).putObjectInCurrentScope(new MemoryObject(className, new SymbolTable(), null, ObjectType.VOID));    
-            stack.push(new MemoryObject(className, new SymbolTable(), null, ObjectType.VOID));
-        } catch (StackException | SymbolTableException e) {
+            //((HashTable) stack.getTop().getValue()).put(new MemoryObject(className, new HashTable(), null, ObjectType.VOID));    
+            stack.push(new MemoryObject(className, new HashTable(), null, ObjectType.VOID));
+        } catch (StackException  e) {
             e.printStackTrace();
         }
         // Visite des déclarations et méthodes dans la classe
@@ -98,7 +94,7 @@ public class TypeChecker implements MiniJajaVisitor {
         } else {
             MemoryObject mo = new MemoryObject(cstName, cstValue, ObjectNature.CST, cstType);
             try {
-                ((SymbolTable) stack.getTop().getValue()).putObjectInCurrentScope(mo);
+                ((HashTable) stack.getTop().getValue()).put(mo);
             } catch (StackException  | SymbolTableException e) {
                 e.printStackTrace();
             }
@@ -128,7 +124,7 @@ public class TypeChecker implements MiniJajaVisitor {
         else {
             MemoryObject mo = new MemoryObject(varName, null, ObjectNature.VAR, varType);
             try {
-                ((SymbolTable) stack.getTop().getValue()).putObjectInCurrentScope(mo);
+                ((HashTable) stack.getTop().getValue()).put(mo);
             } catch (StackException  | SymbolTableException e) {
                 e.printStackTrace();
             }
@@ -149,9 +145,12 @@ public class TypeChecker implements MiniJajaVisitor {
         } else {
             MemoryObject mo = new MemoryObject(arrayName, null, ObjectNature.TAB, arrayType);
             try {
-                ((SymbolTable) stack.getTop().getValue()).putObjectInCurrentScope(mo);
-            } catch (StackException  | SymbolTableException e) {
+                ((HashTable) stack.getTop().getValue()).put(mo);
+              } catch (StackException e) {
                 e.printStackTrace();
+            } catch (SymbolTableException e)
+            {
+                throw new RuntimeException(e);
             }
         }
         return null;
@@ -197,7 +196,7 @@ public class TypeChecker implements MiniJajaVisitor {
         } else {
             MemoryObject mo = new MemoryObject(methodSignature, null, ObjectNature.METH, returnType, paramTypes);
             try {
-                ((SymbolTable) stack.getTop().getValue()).putObjectInCurrentScope(mo);
+                ((HashTable) stack.getTop().getValue()).put(mo);
                 } catch (StackException | SymbolTableException e) {
                 e.printStackTrace();
             }
@@ -206,7 +205,7 @@ public class TypeChecker implements MiniJajaVisitor {
 
         // nouvelle portée pour les paramètres et les variables locales
         try {
-            stack.push(new MemoryObject("scope", new SymbolTable(), ObjectNature.VAR, ObjectType.VOID));
+            stack.push(new MemoryObject("scope", new HashTable(), ObjectNature.VAR, ObjectType.VOID));
             } catch (StackException e) {
             e.printStackTrace();
         }
@@ -249,13 +248,13 @@ public class TypeChecker implements MiniJajaVisitor {
         List<MemoryObject> methods = lookupMethode();
 
         // Crée une nouvelle portée pour le main
-        MemoryObject mainMemoryObject = new MemoryObject("main", new SymbolTable(), ObjectNature.METH, ObjectType.VOID);
+        MemoryObject mainMemoryObject = new MemoryObject("main", new HashTable(), ObjectNature.METH, ObjectType.VOID);
         stack.push(mainMemoryObject);
 
         // Ajoute les méthodes existantes à la nouvelle table
-        SymbolTable currentTable = (SymbolTable) stack.getTop().getValue();
+        HashTable currentTable = (HashTable) stack.getTop().getValue();
         for (MemoryObject method : methods) {
-            currentTable.putObjectInCurrentScope(method);
+            currentTable.put(method);
         }
             } catch (StackException  | SymbolTableException e) {
             e.printStackTrace();
@@ -731,42 +730,39 @@ public class TypeChecker implements MiniJajaVisitor {
             if (stack.empty()) {
                 throw new StackException("The stack is empty, cannot lookup symbol");
             }
-            SymbolTable symbolTable = (SymbolTable) stack.getTop().getValue(); 
+            HashTable symbolTable = (HashTable) stack.getTop().getValue();
             
             return symbolTable.get(name);
-            } catch (StackException  | SymbolTableException e) {
+            } catch (StackException e) {
             System.err.println("Error: " + e.getMessage());
             return null; 
         }
     }
      
     
-    public List<MemoryObject> lookupMethode() {
+    public List<MemoryObject> lookupMethode() {        
         List<MemoryObject> methods = new ArrayList<>();
         try {
             if (stack.empty()) {
                 throw new StackException("The stack is empty, cannot lookup symbol");
             }
 
-            SymbolTable symbolTable = (SymbolTable) stack.getTop().getValue();
+            HashTable symbolTable = (HashTable) stack.getTop().getValue();
 
-            for (HashTable currentScope : symbolTable.getScopes()) {
-                for (List<MemoryObject> bucket : currentScope.getBuckets()) {
-                    if (bucket != null) {
-                        for (MemoryObject mo : bucket) {
-                            if (mo.getNature() == ObjectNature.METH) {
-                                methods.add(mo);
-                            }
+            for (List<MemoryObject> bucket : symbolTable.getBuckets()) {
+                if (bucket != null) {
+                    for (MemoryObject mo : bucket) {
+                        if (mo.getNature() == ObjectNature.METH) {
+                            methods.add(mo);
                         }
                     }
                 }
             }
-            } catch (StackException e ) {
+        } catch (StackException e) {
             System.err.println("Error: " + e.getMessage());
         }
         return methods;
     }
-    
     @Override
     public Object visit(SimpleNode node, Object data) {
         visitChildren(node,null);
