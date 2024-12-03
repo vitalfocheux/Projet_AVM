@@ -14,7 +14,7 @@ public class TypeCheckerTest {
     @BeforeEach
     public void setUp() {
         typeChecker = new TypeChecker();
-    }
+    } 
 
     @Test
     public void testidentCorrect(){
@@ -38,31 +38,31 @@ public class TypeCheckerTest {
         }
     }
 
-    @Test
+    @Test 
     public void testTableau(){
         ASTEntier int1 = new  ASTEntier(0);
         ASTIdent tabl = new ASTIdent(0);
-        tabl.jjtSetValue("tab");
+        tabl.jjtSetValue("tab");  
         ASTVnil nill = new ASTVnil(0);
         ASTTableau tab = new ASTTableau(0);
         tab.jjtAddChild(int1, 0);
-        tab.jjtAddChild(tabl,1);
+        tab.jjtAddChild(tabl,1); 
         tab.jjtAddChild(nill, 2);
         try {
-            typeChecker.visit(tab,null );
+            typeChecker.visit(tab,null ); 
         } catch (TypeCheckException e) {
             fail("Exception thrown during Tableau declaration: " + e.getMessage());
         }
 
     }
-    @Test
+    @Test 
     public void testLong(){
         ASTIdent longueur = new ASTIdent(0);
         longueur.jjtSetValue("exemple");
         ASTLongeur longueurNode = new ASTLongeur(0);
         longueurNode.jjtAddChild(longueur, 0);
         try {
-            typeChecker.visit(longueurNode,null );
+            typeChecker.visit(longueurNode,null ); 
         } catch (TypeCheckException e) {
             fail("Exception thrown during Longueur declaration: " + e.getMessage());
         }
@@ -74,15 +74,16 @@ public class TypeCheckerTest {
         ASTEntier entier = new ASTEntier(0);
         ASTIdent varIdent = new ASTIdent(1);
         varIdent.jjtSetValue("myVar");
-        ASTOmega omega = new ASTOmega(2);
+        ASTNbre n = new ASTNbre(2);
+        n.jjtSetValue(5);
         ASTVar varNode = new ASTVar(0);
         varNode.jjtAddChild(entier, 0);
         varNode.jjtAddChild(varIdent, 1);
-        varNode.jjtAddChild(omega, 2);
+        varNode.jjtAddChild(n, 2);
         try {
             MemoryObject t = (MemoryObject) typeChecker.visit(varNode, null);
             assertEquals(t.getId(),"myVar");
-            assertEquals(t.getNature(), ObjectNature.VAR);
+            assertEquals(t.getNature(),ObjectNature.VAR);
             assertEquals(t.getType(),ObjectType.INT);
             assertEquals(t.getValue(),null);
         } catch (TypeCheckException e) {
@@ -94,7 +95,7 @@ public class TypeCheckerTest {
         ASTIdent classIdent = new ASTIdent(0);
         classIdent.jjtSetValue("MyClass");
         ASTDecls decls = new ASTDecls(1);
-        ASTMain main = new ASTMain(2);
+        ASTMain main = new ASTMain(2); 
         ASTClasse classNode = new ASTClasse(0);
         classNode.jjtAddChild(classIdent, 0);
         classNode.jjtAddChild(decls, 1);
@@ -102,41 +103,54 @@ public class TypeCheckerTest {
         Object t= typeChecker.visit(classNode, null);
         assertEquals(t, ObjectType.VOID);
 
-
-
+        ASTIdent classIdent1 = new ASTIdent(0);
+        classIdent1.jjtSetValue("MyClass");
+        ASTDecls decls1 = new ASTDecls(1);
+        ASTMain main1 = new ASTMain(2); 
+        ASTClasse classNode1 = new ASTClasse(0);
+        classNode1.jjtAddChild(classIdent1, 0);
+        classNode1.jjtAddChild(decls1, 1);
+        classNode1.jjtAddChild(main1, 2);
+        //try {
+            typeChecker.visit(classNode1, null);
+            //fail("Expected TypeCheckException to be thrown");
+       // } catch (TypeCheckException e) {
+        //    assertEquals("La classe MyClass est déjà définie.", e.getMessage());
+        //}
+    
     }
-
+   
     @Test
     public void testDuplicateClassDeclaration() {
             ASTIdent classIdent = new ASTIdent(0);
             classIdent.jjtSetValue("Pop");
             ASTDecls decls = new ASTDecls(1);
-            ASTMain main = new ASTMain(2);
+            ASTMain main = new ASTMain(2); 
             ASTClasse classNode = new ASTClasse(0);
             classNode.jjtAddChild(classIdent, 0);
             classNode.jjtAddChild(decls, 1);
             classNode.jjtAddChild(main, 2);
             Object t= typeChecker.visit(classNode, null);
             assertEquals(t, ObjectType.VOID);
-        try {
+         try {
             typeChecker.visit(classNode, null);
             typeChecker.visit(classNode, null);
         } catch (TypeCheckException e) {
-            assertEquals("La classe MyClass est déjà définie.", e.getMessage());
+            assertEquals("La classe Pop est déjà définie.", e.getMessage());
         }
     }
 
-   @Test
+   @Test 
    public void testcst(){
     ASTCst cst = new ASTCst(0);
         ASTEntier entier = new ASTEntier(0);
         ASTIdent cstIdent = new ASTIdent(1);
         ASTNbre nbre = new ASTNbre(2);
-        nbre.jjtSetValue(2);
+        nbre.jjtSetValue(2);    
         cstIdent.jjtSetValue("deux");
         cst.jjtAddChild(entier, 0);
         cst.jjtAddChild(cstIdent, 1);
-        cst.jjtAddChild(nbre, 2);
+        cst.jjtAddChild(nbre, 2); 
         try {
             typeChecker.visit(cst, null);
         } catch (TypeCheckException e) {
@@ -144,9 +158,8 @@ public class TypeCheckerTest {
         }
 
    }
-
-
-
+    
+    
     @Test
     public void testMethodDeclaration() {
 
@@ -154,7 +167,7 @@ public class TypeCheckerTest {
         ASTEntier entier = new ASTEntier(0);
         ASTIdent cstIdent = new ASTIdent(1);
         ASTNbre nbre = new ASTNbre(2);
-        nbre.jjtSetValue(0);
+        nbre.jjtSetValue(0);    
         cstIdent.jjtSetValue("zero");
         cst.jjtAddChild(entier, 0);
         cst.jjtAddChild(cstIdent, 1);
@@ -180,7 +193,7 @@ public class TypeCheckerTest {
 
         entetes.jjtAddChild(entete, 0);
         entetes.jjtAddChild(enil, 1);
-
+        
         ASTVnil var = new ASTVnil(4);
         ASTRetour retour = new ASTRetour(5);
         ASTNbre retourNbre = new ASTNbre(0);
@@ -200,7 +213,7 @@ public class TypeCheckerTest {
             fail("Exception thrown during method declaration: " + e.getMessage());
         }
     }
-
+ 
 
     public void declvariableentier(String nom){
         ASTEntier entier = new ASTEntier(0);
@@ -211,20 +224,23 @@ public class TypeCheckerTest {
          varNode.jjtAddChild(entier, 0);
          varNode.jjtAddChild(varIdent, 1);
          varNode.jjtAddChild(omega, 2);
-
+         
     }
+    
     @Test
     public void testAffectation() {
         // Déclarer la variable x avant de tester l'affectation
         ASTEntier entier = new ASTEntier(0);
-        ASTIdent varIdent = new ASTIdent(1);
+        ASTIdent varIdent = new ASTIdent(0);
         varIdent.jjtSetValue("x");
-        ASTOmega omega = new ASTOmega(2);
+        ASTNbre n = new ASTNbre(0);
+        n.jjtSetValue(5);
         ASTVar varNode = new ASTVar(0);
         varNode.jjtAddChild(entier, 0);
         varNode.jjtAddChild(varIdent, 1);
-        varNode.jjtAddChild(omega, 2);
-
+        varNode.jjtAddChild(n, 2);
+    
+    
         // Tester l'affectation
         ASTAffectation affectnode = new ASTAffectation(0);
         ASTIdent varIdent2 = new ASTIdent(1);
@@ -240,6 +256,7 @@ public class TypeCheckerTest {
             fail("Exception thrown during variable declaration: " + e.getMessage());
         }
     }
+     
     @Test
     public void testTantque(){
         ASTVrai vrai = new ASTVrai(0);
@@ -254,7 +271,7 @@ public class TypeCheckerTest {
         }
 
     }
-
+    
 
     @Test
     public void testTantqueNoBoolean() {
@@ -262,7 +279,7 @@ public class TypeCheckerTest {
         nbre.jjtSetValue(4);
         ASTInil inil = new ASTInil(1);
         ASTTantQue tantque = new ASTTantQue(0);
-        tantque.jjtAddChild(nbre, 0);  // pas booléen
+        tantque.jjtAddChild(nbre, 0);  // pas booléen 
         tantque.jjtAddChild(inil, 1);
 
         TypeCheckException exception = assertThrows(TypeCheckException.class, () -> {
@@ -271,7 +288,7 @@ public class TypeCheckerTest {
 
         assertTrue(exception.getMessage().contains("Condition in while statement must be boolean."));
     }
-
+    
     @Test
     public void testIfConditionTypeCheck() {
         ASTVrai vrai = new ASTVrai(0);
@@ -286,6 +303,7 @@ public class TypeCheckerTest {
             fail("Exception thrown during if condition check: " + e.getMessage());
         }
     }
+    
     @Test
     public void testIfConditionTypeCheck2() {
         ASTNbre nbre = new ASTNbre(0);
@@ -302,7 +320,7 @@ public class TypeCheckerTest {
     }
 
 
-    @Test
+    @Test 
     public void testNegation(){
         ASTVrai vrai = new ASTVrai(0);
         ASTNot not = new ASTNot(0);
@@ -320,7 +338,7 @@ public class TypeCheckerTest {
         ASTNbre nbre = new ASTNbre(0);
         nbre.jjtSetValue(2);
         ASTNot not = new ASTNot(0);
-        not.jjtAddChild(nbre, 0);
+        not.jjtAddChild(nbre, 0); 
 
         TypeCheckException exception = assertThrows(TypeCheckException.class, () -> {
             typeChecker.visit(not, null);
@@ -386,7 +404,7 @@ public class TypeCheckerTest {
 
         assertTrue(exception.getMessage().contains("Type mismatch"));
     }
-    @Test
+    @Test 
     public void testADDoperation(){
         ASTNbre nbre1 = new ASTNbre(0);
         nbre1.jjtSetValue(2);
@@ -476,7 +494,7 @@ public class TypeCheckerTest {
         });
         assertTrue(exception.getMessage().contains("Type mismatch"));
     }
-
+ 
     @Test
     public void testListexpvide(){
         ASTExnil exnil = new ASTExnil(0);
@@ -488,8 +506,8 @@ public class TypeCheckerTest {
             fail("Exception thrown during listexp check: " + e.getMessage());
         }
     }
-
-    @Test
+ 
+    @Test 
     public void testListexp1(){
         ASTNbre nbre1 = new ASTNbre(0);
         nbre1.jjtSetValue(2);
@@ -521,13 +539,13 @@ public class TypeCheckerTest {
         } catch (TypeCheckException e) {
             fail("Exception thrown during listexp check: " + e.getMessage());
         }
-
+        
     }
 
     @Test
     public void  testEntetes(){
         ASTEntetes entetes = new ASTEntetes(0);
-
+       
         ASTEntetes entests1 = new ASTEntetes(0);
         // entete1 : (x:entier)
         ASTEntete entete1 = new ASTEntete(0);
@@ -548,7 +566,7 @@ public class TypeCheckerTest {
         entete.jjtAddChild(ident, 1);
         entetes.jjtAddChild(entete, 0);
         entetes.jjtAddChild(entests1, 1);
-
+        
         try {
             typeChecker.visit(entetes, null);
         } catch (TypeCheckException e) {
@@ -556,8 +574,8 @@ public class TypeCheckerTest {
         }
 
     }
-
-    @Test
+     
+    @Test 
     public void testAppelI(){
         // declarer methode int zero(x:entier){return 0;}
         ASTEntier enti = new ASTEntier(0);
@@ -576,7 +594,7 @@ public class TypeCheckerTest {
 
         entetes.jjtAddChild(entete, 0);
         entetes.jjtAddChild(enil, 1);
-
+        
         ASTVnil var = new ASTVnil(0);
         ASTRetour retour = new ASTRetour(0);
         ASTNbre retourNbre = new ASTNbre(0);
@@ -600,7 +618,7 @@ public class TypeCheckerTest {
         ASTAppelI appelI = new ASTAppelI(0);
         ASTIdent ident = new ASTIdent(0);
         ident.jjtSetValue("zero");
-        //  listexp
+        //  listexp 
         ASTNbre nbre1 = new ASTNbre(0);
         nbre1.jjtSetValue(2);
         ASTNbre nbre2 = new ASTNbre(1);
@@ -611,8 +629,8 @@ public class TypeCheckerTest {
         exp.jjtAddChild(nbre1, 0);
         listexp.jjtAddChild(exp, 0);
         listexp.jjtAddChild(exnil, 1);
-
-
+       
+       
         appelI.jjtAddChild(ident, 0);
         appelI.jjtAddChild(listexp , 1);
         try {
@@ -622,7 +640,7 @@ public class TypeCheckerTest {
         }
     }
 
-    @Test
+    @Test 
     public void testAppelE(){
         // declarer methode int zero(x:entier){return 0;}
         ASTEntier enti = new ASTEntier(0);
@@ -641,7 +659,7 @@ public class TypeCheckerTest {
 
         entetes.jjtAddChild(entete, 0);
         entetes.jjtAddChild(enil, 1);
-
+        
         ASTVnil var = new ASTVnil(0);
         ASTRetour retour = new ASTRetour(0);
         ASTNbre retourNbre = new ASTNbre(0);
@@ -665,7 +683,7 @@ public class TypeCheckerTest {
         ASTAppelI appelE = new ASTAppelI(0);
         ASTIdent ident = new ASTIdent(0);
         ident.jjtSetValue("zero");
-        //  listexp
+        //  listexp 
         ASTNbre nbre1 = new ASTNbre(0);
         nbre1.jjtSetValue(2);
         ASTNbre nbre2 = new ASTNbre(1);
@@ -676,8 +694,8 @@ public class TypeCheckerTest {
         exp.jjtAddChild(nbre1, 0);
         listexp.jjtAddChild(exp, 0);
         listexp.jjtAddChild(exnil, 1);
-
-
+       
+       
         appelE.jjtAddChild(ident, 0);
         appelE.jjtAddChild(listexp , 1);
         try {
@@ -692,13 +710,13 @@ public class TypeCheckerTest {
         // Déclarer une variable y de type entier
         ASTCst cst = new ASTCst(0);
         ASTEntier entier = new ASTEntier(0);
-        ASTIdent cstIdent = new ASTIdent(1);
-        ASTNbre nbre = new ASTNbre(2);
-        nbre.jjtSetValue(2);
+        ASTIdent cstIdent = new ASTIdent(0);
+        ASTNbre nbre = new ASTNbre(0);
+        nbre.jjtSetValue(2);    
         cstIdent.jjtSetValue("y");
         cst.jjtAddChild(entier, 0);
         cst.jjtAddChild(cstIdent, 1);
-        cst.jjtAddChild(nbre, 2);
+        cst.jjtAddChild(nbre, 2); 
         try {
             typeChecker.visit(cst, null);
         } catch (TypeCheckException e) {
@@ -716,21 +734,22 @@ public class TypeCheckerTest {
             fail("Expected exception for incrementing a integer variable");
         }
     }
-
+    
     @Test
     public void testIncrementOnNonInteger() {
-        // Déclarer une variable y de type BOOLEAN
+        // Déclarer une variable y de type BOOLEAN 
         ASTBooleen booleen = new ASTBooleen(0);
         ASTIdent varIdent = new ASTIdent(1);
         varIdent.jjtSetValue("y");
-        ASTOmega omega = new ASTOmega(2);
+        ASTFaux faux = new ASTFaux(0);
         ASTVar varNode = new ASTVar(0);
         varNode.jjtAddChild(booleen, 0);
         varNode.jjtAddChild(varIdent, 1);
-        varNode.jjtAddChild(omega, 2);
+        varNode.jjtAddChild(faux, 2);
         try {
             typeChecker.visit(varNode, null);
         } catch (TypeCheckException e) {
+            //fail("Type mismatch");
             fail("Exception thrown during variable declaration: " + e.getMessage());
         }
         // Tester l'incrémentation sur une variable non-entière
@@ -738,10 +757,10 @@ public class TypeCheckerTest {
         ASTIdent varIdent1 = new ASTIdent(1);
         varIdent1.jjtSetValue("y");
         incrementNode.jjtAddChild(varIdent1, 0);
-
+    
         try {
             typeChecker.visit(incrementNode, null);
-            fail("Expected exception for incrementing a non-integer variable");
+            fail("Type mismatch");
         } catch (TypeCheckException e) {
             assertTrue(e.getMessage().contains("Type mismatch"));
         }
@@ -753,11 +772,11 @@ public class TypeCheckerTest {
         ASTEntier entier = new ASTEntier(0);
         ASTIdent cstIdent = new ASTIdent(1);
         ASTNbre nbre = new ASTNbre(2);
-        nbre.jjtSetValue(valeur);
+        nbre.jjtSetValue(valeur);    
         cstIdent.jjtSetValue(nom);
         cst.jjtAddChild(entier, 0);
         cst.jjtAddChild(cstIdent, 1);
-        cst.jjtAddChild(nbre, 2);
+        cst.jjtAddChild(nbre, 2); 
         try {
             typeChecker.visit(cst, null);
         } catch (TypeCheckException e) {
@@ -773,9 +792,9 @@ public class TypeCheckerTest {
          incrementNode.jjtAddChild(varIdent1, 0);
          return incrementNode;
     }
-    @Test
+    @Test 
     public void testInstrs(){
-        ASTIncrement inc = increment("x", 0);
+        ASTIncrement inc = increment("x", 0); 
         ASTInstrs instrs = new ASTInstrs(0);
         ASTInil inil = new ASTInil(0);
         instrs.jjtAddChild(inc, 0);
@@ -789,26 +808,26 @@ public class TypeCheckerTest {
     }
     @Test
     public void testInstrs2(){
-        ASTIncrement inc = increment("x", 0);
-        ASTIncrement inc2 = increment("y", 0);
+        ASTIncrement inc = increment("x", 0); 
+        ASTIncrement inc2 = increment("y", 0); 
         ASTInstrs instrs1 = new ASTInstrs(0);
 
         ASTInstrs instrs2 = new ASTInstrs(0);
         ASTInil inil2 = new ASTInil(1);
-
+        
         instrs2.jjtAddChild(inc2, 0);
         instrs2.jjtAddChild(inil2, 1);
-
+        
         instrs1.jjtAddChild(inc, 0);
         instrs1.jjtAddChild(instrs2, 1);
         try {
             typeChecker.visit(instrs1, null);
         } catch (TypeCheckException e) {
             fail("Exception thrown during instrs check: " + e.getMessage());
-        }
+        }    
     }
 
-    @Test
+    @Test 
     public void testecrire(){
         ASTIdent ident = new ASTIdent(0);
         ident.jjtSetValue("x");
