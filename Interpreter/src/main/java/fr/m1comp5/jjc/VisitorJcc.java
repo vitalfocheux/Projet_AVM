@@ -6,6 +6,8 @@ import fr.m1comp5.MemoryObject;
 import fr.m1comp5.ObjectNature;
 import fr.m1comp5.ObjectType;
 
+import java.util.List;
+
 
 public class VisitorJcc implements JajaCodeVisitor {
     private String toDisplay;
@@ -57,8 +59,8 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTInit node, Object data) {
-        addr++;
         mem.getSymbolTable().newScope();
+        addr++;
         return null;
     }
 
@@ -140,15 +142,13 @@ public class VisitorJcc implements JajaCodeVisitor {
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
-            mem.declCst(null, addr + 1, ObjectType.INT);
+            mem.getStack().push(new MemoryObject(null, addr + 1, ObjectNature.CST, ObjectType.INT));
             addr = (int) mem.getVal(id);
         }
         catch (Exception e)
         {
             System.err.println(e.getMessage());
         }
-
-
         return null;
     }
 
