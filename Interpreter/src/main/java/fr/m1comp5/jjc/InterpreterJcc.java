@@ -22,8 +22,6 @@ public class InterpreterJcc {
     public String interpret() {
         int addr = 1;
         while (addr < instrs.size()) {
-            System.out.println(instrs.get(addr - 1));
-            System.out.println(addr);
             instrs.get(addr - 1).jjtAccept(visitorJcc, null);
             addr = visitorJcc.getAddr();
         }

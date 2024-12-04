@@ -48,12 +48,8 @@ public class Memory {
         }
     }
 
-    public void identVal(String ident, ObjectType type, int s) throws StackException, SymbolTableException, Exception {
+    public void identVal(String ident, ObjectType type, int s) throws StackException, SymbolTableException {
         MemoryObject mo = stack.getObjectFromTheTop(s);
-        if (mo.getType() != ObjectType.OMEGA)
-        {
-            throw new Exception("IdentVal must happen on an object with ");
-        }
         symbolTable.removeObjectFromCurrentScope(mo);
         mo.setId(ident);
         mo.setType(type);
