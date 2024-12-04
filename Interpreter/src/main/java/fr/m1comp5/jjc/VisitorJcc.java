@@ -24,10 +24,6 @@ public class VisitorJcc implements JajaCodeVisitor {
         return addr;
     }
 
-    public void setAddr(int addr) {
-        this.addr = addr;
-    }
-
     public String getToDisplay() {
         return toDisplay;
     }
@@ -142,6 +138,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
+            mem.getSymbolTable().newScope();
             mem.getStack().push(new MemoryObject(null, addr + 1, ObjectNature.CST, ObjectType.INT));
             addr = (int) mem.getVal(id);
         }
@@ -169,6 +166,7 @@ public class VisitorJcc implements JajaCodeVisitor {
     public Object visit(ASTReturn node, Object data) {
         try
         {
+            mem.getSymbolTable().popScope();
             MemoryObject mo = mem.getStack().pop();
             addr = (int) mo.getValue();
         }
