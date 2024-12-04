@@ -22,7 +22,7 @@ public class InterpreterJjcTest {
         Assertions.assertDoesNotThrow(() -> {
             JajaCode jjc = new JajaCode(new FileReader(filepath));
             Node root = jjc.start();
-            Memory mem = new Memory(new SymbolTable());
+            Memory mem = new Memory();
             List<Node> instrs = new ArrayList<>();
             for(int i = 0; i < root.jjtGetNumChildren(); i++) {
                 instrs.add(root.jjtGetChild(i));

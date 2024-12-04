@@ -3,6 +3,7 @@ package fr.m1comp5;
 import fr.m1comp5.mjj.generated.*;
 import fr.m1comp5.mjj.InterpreterMjj;
 
+import junit.framework.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -18,27 +19,13 @@ public class InterpreterMjjTest {
     @ParameterizedTest
     @MethodSource("fileProvider")
     void testInterpreterMiniJaja(String filepath) {
-        boolean exceptionCaught = false;
-        try {
-            // Assuming you already have a parser that creates the AST
-            //System.out.println(filepath);
+        Assertions.assertDoesNotThrow(() -> {
             MiniJaja parser = new MiniJaja(new FileReader(filepath));
-
-            SimpleNode rootNode = parser.start();// Parse and get the AST root
-
+            SimpleNode rootNode = parser.start();
             rootNode.dump("");
-
-            // Initialize the interpreter with the AST root
             InterpreterMjj interpreter = new InterpreterMjj(rootNode);
-
-            // Start interpreting the AST
-            interpreter.interpret();
-
-        } catch (Exception e) {
-            exceptionCaught = true;
-            System.err.println("Error during interpretation: " + e.getMessage());
-        }
-        Assertions.assertFalse(exceptionCaught);
+            System.out.println(interpreter.interpret());
+        });
     }
 
     static Stream<Arguments> fileProvider() throws IOException {
