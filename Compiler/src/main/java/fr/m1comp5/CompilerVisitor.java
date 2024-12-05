@@ -81,28 +81,84 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTDecls node, Object data) {
-        return 0;
+        return retraitDeclVar(node, data);
     }
 
     @Override
     public Object visit(ASTMethode node, Object data) {
-        return 0;
-    }
-
-    @Override
-    public Object visit(ASTVars node, Object data) {
         DataModel dm = (DataModel) data;
         int n = (Integer) dm.data[0];
         Mode m = (Mode) dm.data[1];
 
         if (m == Mode.DEFAULT) {
-            int ndv = (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
-            int ndvs = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+ndv, Mode.DEFAULT));
+            var methType = node.jjtGetChild(0);
+            ASTIdent methIdent = (ASTIdent) node.jjtGetChild(1);
+            ASTEntetes methHeaders = (ASTEntetes) node.jjtGetChild(2);
+            ASTVars methVars = (ASTVars) node.jjtGetChild(3);
+            ASTInstrs methInstrs = (ASTInstrs) node.jjtGetChild(4);
+            int addrIncr = methType instanceof ASTRien ? 6 : 5;
 
-            return ndv+ndvs;
+            ASTPush nPush = new ASTPush(JJTPUSH);
+            ASTNew nNew = new ASTNew(JJTNEW);
+            ASTGoTo nGoTo = new ASTGoTo(JJTGOTO);
+            ASTSwap nSwap = new ASTSwap(JJTSWAP);
+            ASTReturn nReturn = new ASTReturn(JJTRETURN);
+
+            ASTJcNbre pushNbre = new ASTJcNbre(JJTJCNBRE);
+            pushNbre.jjtSetValue(n+3);
+            nPush.jjtAddChild(nPush,0);
+            instrs.add(nPush);
+
+            ASTType methTypeJjc = new ASTType(JJTTYPE);
+            methTypeJjc.jjtSetValue(methType);
+            ASTJcIdent methIdentJjc = new ASTJcIdent(JJTJCIDENT);
+            methIdentJjc.jjtSetValue(methIdent);
+            ASTSorte methSorte = new ASTSorte(JJTSORTE);
+            methSorte.jjtSetValue(ObjectNature.METH);
+            ASTJcNbre methNbre = new ASTJcNbre(JJTJCNBRE);
+            methNbre.jjtSetValue(0);
+
+            nNew.jjtAddChild(methIdentJjc,0);
+            nNew.jjtAddChild(methTypeJjc,0);
+            nNew.jjtAddChild(methSorte,0);
+            nNew.jjtAddChild(methNbre,0);
+
+            instrs.add(nNew);
+
+            int nens = (int) node.jjtGetChild(2).jjtAccept(this, new DataModel(n+3, Mode.DEFAULT));
+            int ndvs = (int) node.jjtGetChild(3).jjtAccept(this, new DataModel(n+nens+3, Mode.DEFAULT));
+            int niss = (int) node.jjtGetChild(4).jjtAccept(this, new DataModel(n+nens+ndvs+3, Mode.DEFAULT));
+            int nrdvs;
+            ASTJcNbre addrGoTo = new ASTJcNbre(JJTJCNBRE);
+            if (methType instanceof ASTRien) {
+                nrdvs = (int) node.jjtGetChild(3).jjtAccept(this, new DataModel(n+nens+ndvs+niss+4, Mode.RETRAIT));
+                ASTPush nPushVoid = new ASTPush(JJTPUSH);
+                ASTJcNbre zero = new ASTJcNbre(JJTJCNBRE);
+                zero.jjtSetValue(0);
+                nPushVoid.jjtAddChild(zero,0);
+                instrs.add(nPushVoid);
+
+            }else {
+                nrdvs = (int) node.jjtGetChild(3).jjtAccept(this, new DataModel(n+nens+ndvs+niss+3, Mode.RETRAIT));
+            }
+
+            addrGoTo.jjtSetValue(n+nens+ndvs+niss+nrdvs+addrIncr);
+            nGoTo.jjtAddChild(addrGoTo,0);
+            instrs.add(nGoTo);
+            instrs.add(nSwap);
+            instrs.add(nReturn);
+            return n+nens+ndvs+niss+nrdvs+addrIncr;
+        }
+        if (m == Mode.RETRAIT) {
+            return retraitDss();
         }
 
         return 0;
+    }
+
+    @Override
+    public Object visit(ASTVars node, Object data) {
+        return retraitDeclVar(node, data);
     }
 
     @Override
@@ -623,5 +679,24 @@ public class CompilerVisitor implements MiniJajaVisitor {
         instrs.add(pop);
 
         return 2;
+    }
+
+    private int retraitDeclVar(Node node, Object data) {
+        DataModel dm = (DataModel) data;
+        int n = (Integer) dm.data[0];
+        Mode m = (Mode) dm.data[1];
+
+        if (m == Mode.DEFAULT) {
+            int nds = (int) node.jjtGetChild(0).jjtAccept(this, data);
+            int ndss = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+nds, Mode.DEFAULT));
+
+            return nds+ndss;
+        }
+        if (m == Mode.RETRAIT) {
+            int nrds = (int) node.jjtGetChild(1).jjtAccept(this, data);
+            int nrdss = (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n+nrds, Mode.RETRAIT));
+            return nrds+nrdss;
+        }
+        return 0;
     }
 }
