@@ -273,10 +273,14 @@ public class CompilerVisitor implements MiniJajaVisitor {
         DataModel dm = (DataModel) data;
         int n = (Integer) dm.data[0];
         Mode m = (Mode) dm.data[1];
+        int nh = -1;
+        if (dm.data.length == 3) {
+            nh = (int) dm.data[2];
+        }
 
         if (m == Mode.DEFAULT) {
-            int nens = (int) node.jjtGetChild(1).jjtAccept(this, data);
-            int nen = (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n+nens, Mode.DEFAULT));
+            int nens = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n, Mode.DEFAULT, nh-1));
+            int nen = (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n+nens, Mode.DEFAULT, nh));
 
             return nens+nen;
         }
@@ -286,6 +290,10 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTEntete node, Object data) {
+        DataModel dm = (DataModel) data;
+        int n = (Integer) dm.data[0];
+        Mode m = (Mode) dm.data[1];
+
         ASTNew nNew = new ASTNew(JJTNEW);
 
         ASTJcIdent varIdent = new ASTJcIdent(JJTJCIDENT);
@@ -298,7 +306,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         varNature.jjtSetValue("var");
 
         ASTJcNbre varValue = new ASTJcNbre(JJTJCNBRE);
-        varValue.jjtSetValue(());
+        varValue.jjtSetValue(dm.data[2]);
 
         nNew.jjtAddChild(varIdent,0);
         nNew.jjtAddChild(varType,1);
