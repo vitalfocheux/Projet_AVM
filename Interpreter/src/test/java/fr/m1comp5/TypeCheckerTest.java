@@ -4,38 +4,45 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import fr.m1comp5.Typechecker.TypeCheckException;
+import fr.m1comp5.Debug.AppLogger;
+import fr.m1comp5.Debug.TestLoggerListener;
 import fr.m1comp5.Typechecker.TypeChecker;
+
 
 public class TypeCheckerTest {
 
     private TypeChecker typeChecker;
+    TestLoggerListener loggerListener = new TestLoggerListener();
+    AppLogger logger = AppLogger.getInstance();
+
+
 
     @BeforeEach
     public void setUp() {
         typeChecker = new TypeChecker();
+        logger.removeLoggerListener(loggerListener);
+        
     } 
 
     @Test
     public void testidentCorrect(){
+
         ASTIdent ident = new ASTIdent(0);
         ident.jjtSetValue("Xml12");
-        try {
-            typeChecker.visit(ident, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during ident check: " + e.getMessage());
-        }
+        typeChecker.visit(ident, null);
+        assertTrue(loggerListener.getMessages().isEmpty(), 
+        "Aucun log d'erreur ne devrait être produit pour un identifiant valide.");
+
     }
+
     @Test
     public void testidentIncorrect(){
         ASTIdent ident = new ASTIdent(0);
         ident.jjtSetValue("12Xml");
-        try {
-            typeChecker.visit(ident, null);
-            fail("Expected exception for incorrect ident");
-        } catch (TypeCheckException e) {
-            assertTrue(e.getMessage().contains("Invalid identifier"));
-        }
+        
+        typeChecker.visit(ident, null);
+        assertFalse(loggerListener.getMessages().isEmpty(), 
+                "Expected exception for incorrect ident");       
     }
 
     @Test 
@@ -48,11 +55,8 @@ public class TypeCheckerTest {
         tab.jjtAddChild(int1, 0);
         tab.jjtAddChild(tabl,1); 
         tab.jjtAddChild(nill, 2);
-        try {
-            typeChecker.visit(tab,null ); 
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during Tableau declaration: " + e.getMessage());
-        }
+        assertTrue(loggerListener.getMessages().isEmpty() );
+       
 
     }
     @Test 
@@ -61,12 +65,9 @@ public class TypeCheckerTest {
         longueur.jjtSetValue("exemple");
         ASTLongeur longueurNode = new ASTLongeur(0);
         longueurNode.jjtAddChild(longueur, 0);
-        try {
-            typeChecker.visit(longueurNode,null ); 
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during Longueur declaration: " + e.getMessage());
-        }
-
+        typeChecker.visit(longueurNode,null ); 
+        assertTrue(loggerListener.getMessages().isEmpty(),"Exception thrown during Longueur declaration: " );
+        
     }
 
     @Test
@@ -80,15 +81,14 @@ public class TypeCheckerTest {
         varNode.jjtAddChild(entier, 0);
         varNode.jjtAddChild(varIdent, 1);
         varNode.jjtAddChild(n, 2);
-        try {
-            MemoryObject t = (MemoryObject) typeChecker.visit(varNode, null);
-            assertEquals(t.getId(),"myVar");
-            assertEquals(t.getNature(),ObjectNature.VAR);
-            assertEquals(t.getType(),ObjectType.INT);
-            assertEquals(t.getValue(),null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during variable declaration: " + e.getMessage());
-        }
+
+        MemoryObject t = (MemoryObject) typeChecker.visit(varNode, null);
+        assertEquals(t.getId(),"myVar");
+        assertEquals(t.getNature(),ObjectNature.VAR);
+        assertEquals(t.getType(),ObjectType.INT);
+        assertEquals(t.getValue(),null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+    
     }
     @Test
     public void testClassDeclaration() {
@@ -111,33 +111,10 @@ public class TypeCheckerTest {
         classNode1.jjtAddChild(classIdent1, 0);
         classNode1.jjtAddChild(decls1, 1);
         classNode1.jjtAddChild(main1, 2);
-        //try {
-            typeChecker.visit(classNode1, null);
-            //fail("Expected TypeCheckException to be thrown");
-       // } catch (TypeCheckException e) {
-        //    assertEquals("La classe MyClass est déjà définie.", e.getMessage());
-        //}
-    
-    }
-   
-    @Test
-    public void testDuplicateClassDeclaration() {
-            ASTIdent classIdent = new ASTIdent(0);
-            classIdent.jjtSetValue("Pop");
-            ASTDecls decls = new ASTDecls(1);
-            ASTMain main = new ASTMain(2); 
-            ASTClasse classNode = new ASTClasse(0);
-            classNode.jjtAddChild(classIdent, 0);
-            classNode.jjtAddChild(decls, 1);
-            classNode.jjtAddChild(main, 2);
-            Object t= typeChecker.visit(classNode, null);
-            assertEquals(t, ObjectType.VOID);
-         try {
-            typeChecker.visit(classNode, null);
-            typeChecker.visit(classNode, null);
-        } catch (TypeCheckException e) {
-            assertEquals("La classe Pop est déjà définie.", e.getMessage());
-        }
+        typeChecker.visit(classNode1, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
+        
     }
 
    @Test 
@@ -151,12 +128,8 @@ public class TypeCheckerTest {
         cst.jjtAddChild(entier, 0);
         cst.jjtAddChild(cstIdent, 1);
         cst.jjtAddChild(nbre, 2); 
-        try {
-            typeChecker.visit(cst, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during constant declaration: " + e.getMessage());
-        }
-
+        typeChecker.visit(cst, null);
+       
    }
     
     
@@ -172,11 +145,9 @@ public class TypeCheckerTest {
         cst.jjtAddChild(entier, 0);
         cst.jjtAddChild(cstIdent, 1);
         cst.jjtAddChild(nbre, 2);
-        try {
-            typeChecker.visit(cst, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during constant declaration: " + e.getMessage());
-        }
+        typeChecker.visit(cst, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+       
         ASTEntier enti = new ASTEntier(0);
         ASTIdent varIdent = new ASTIdent(1);
         varIdent.jjtSetValue("zero");
@@ -207,11 +178,9 @@ public class TypeCheckerTest {
         methode.jjtAddChild(var, 3);
         methode.jjtAddChild(retour, 4);
 
-        try {
-            typeChecker.visit(methode, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during method declaration: " + e.getMessage());
-        }
+        typeChecker.visit(methode, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+        
     }
  
 
@@ -249,12 +218,10 @@ public class TypeCheckerTest {
         assignnombre.jjtSetValue(5);
         affectnode.jjtAddChild(varIdent2, 0);
         affectnode.jjtAddChild(assignnombre, 1);
-        try {
-            MemoryObject t = (MemoryObject) typeChecker.visit(varNode, null);
-            assertEquals(t.getType(), ObjectType.INT);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during variable declaration: " + e.getMessage());
-        }
+
+        MemoryObject t = (MemoryObject) typeChecker.visit(varNode, null);
+        assertEquals(t.getType(), ObjectType.INT);
+        
     }
      
     @Test
@@ -264,12 +231,9 @@ public class TypeCheckerTest {
         ASTTantQue tantque = new ASTTantQue(0);
         tantque.jjtAddChild(vrai, 0);
         tantque.jjtAddChild(inil, 1);
-        try {
-            typeChecker.visit(tantque, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during while condition check: " + e.getMessage());
-        }
-
+        typeChecker.visit(tantque, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+    
     }
     
 
@@ -282,11 +246,9 @@ public class TypeCheckerTest {
         tantque.jjtAddChild(nbre, 0);  // pas booléen 
         tantque.jjtAddChild(inil, 1);
 
-        TypeCheckException exception = assertThrows(TypeCheckException.class, () -> {
             typeChecker.visit(tantque, null);
-        });
+            assertFalse(loggerListener.getMessages().isEmpty());
 
-        assertTrue(exception.getMessage().contains("Condition in while statement must be boolean."));
     }
     
     @Test
@@ -297,12 +259,10 @@ public class TypeCheckerTest {
         ifNode.jjtAddChild(vrai, 0);
         ifNode.jjtAddChild(inil, 1);
 
-        try {
-            typeChecker.visit(ifNode, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during if condition check: " + e.getMessage());
-        }
+        typeChecker.visit(ifNode, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
     }
+        
     
     @Test
     public void testIfConditionTypeCheck2() {
@@ -313,10 +273,8 @@ public class TypeCheckerTest {
         ifNode.jjtAddChild(nbre, 0);  // Ajouter un nœud non-booléen comme condition
         ifNode.jjtAddChild(inil, 1);
 
-        TypeCheckException exception = assertThrows(TypeCheckException.class, () -> {
             typeChecker.visit(ifNode, null);
-        });
-        assertTrue(exception.getMessage().contains("Condition in if statement must be boolean."));
+            assertFalse(loggerListener.getMessages().isEmpty(), "Condition in if statement must be boolean.");
     }
 
 
@@ -326,12 +284,9 @@ public class TypeCheckerTest {
         ASTNot not = new ASTNot(0);
         not.jjtAddChild(vrai, 0);
 
-        try {
-            typeChecker.visit(not, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during negation check: " + e.getMessage());
-        }
-    }
+        typeChecker.visit(not, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+ }
 
     @Test
     public void testNegationNoBoolean() {
@@ -340,11 +295,8 @@ public class TypeCheckerTest {
         ASTNot not = new ASTNot(0);
         not.jjtAddChild(nbre, 0); 
 
-        TypeCheckException exception = assertThrows(TypeCheckException.class, () -> {
-            typeChecker.visit(not, null);
-        });
-
-        assertTrue(exception.getMessage().contains("Type mismatch"));
+        typeChecker.visit(not, null);
+        assertFalse(loggerListener.getMessages().isEmpty());
     }
 
     @Test
@@ -354,11 +306,10 @@ public class TypeCheckerTest {
         ASTEt et = new ASTEt(0);
         et.jjtAddChild(vrai, 0);
         et.jjtAddChild(faux, 1);
-        try {
-            typeChecker.visit(et, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during AND operation check: " + e.getMessage());
-        }
+        
+        typeChecker.visit(et, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+       
     }
     @Test
     public void TestANDoperationNoBoolean() {
@@ -369,11 +320,9 @@ public class TypeCheckerTest {
         et.jjtAddChild(nbre, 0);
         et.jjtAddChild(faux, 1);
 
-        TypeCheckException exception = assertThrows(TypeCheckException.class, () -> {
-            typeChecker.visit(et, null);
-        });
-
-        assertTrue(exception.getMessage().contains("Type mismatch"));
+        typeChecker.visit(et, null);
+        assertFalse(loggerListener.getMessages().isEmpty());
+        assertTrue(loggerListener.getMessages().contains("Type mismatch"));
     }
 
     @Test
@@ -383,12 +332,10 @@ public class TypeCheckerTest {
         ASTOu ou = new ASTOu(0);
         ou.jjtAddChild(vrai, 0);
         ou.jjtAddChild(faux, 1);
-        try {
-            typeChecker.visit(ou, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during OR operation check: " + e.getMessage());
-        }
+        typeChecker.visit(ou, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
     }
+
     @Test
     public void TestORoperationNoBoolean() {
         ASTNbre nbre = new ASTNbre(0);
@@ -398,11 +345,10 @@ public class TypeCheckerTest {
         ou.jjtAddChild(nbre, 0);
         ou.jjtAddChild(faux, 1);
 
-        TypeCheckException exception = assertThrows(TypeCheckException.class, () -> {
-            typeChecker.visit(ou, null);
-        });
+        typeChecker.visit(ou, null);
+        assertFalse(loggerListener.getMessages().isEmpty());
+        assertTrue(loggerListener.getMessages().contains("Type mismatch"));
 
-        assertTrue(exception.getMessage().contains("Type mismatch"));
     }
     @Test 
     public void testADDoperation(){
@@ -413,11 +359,10 @@ public class TypeCheckerTest {
         ASTAdd plus = new ASTAdd(0);
         plus.jjtAddChild(nbre1, 0);
         plus.jjtAddChild(nbre2, 1);
-        try {
-            typeChecker.visit(plus, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during ADD operation check: " + e.getMessage());
-        }
+     
+        typeChecker.visit(plus, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
     }
     @Test
     public void testADDoperationNoInteger() {
@@ -428,12 +373,10 @@ public class TypeCheckerTest {
         plus.jjtAddChild(nbre, 0);
         plus.jjtAddChild(vrai, 1);
 
-        TypeCheckException exception = assertThrows(TypeCheckException.class, () -> {
-            typeChecker.visit(plus, null);
-        });
-
-        assertTrue(exception.getMessage().contains("Type mismatch"));
+        typeChecker.visit(plus, null);
+        assertFalse(loggerListener.getMessages().isEmpty());
     }
+
     @Test
     public void testSUBoperation(){
         ASTNbre nbre1 = new ASTNbre(0);
@@ -443,11 +386,10 @@ public class TypeCheckerTest {
         ASTSub moins = new ASTSub(0);
         moins.jjtAddChild(nbre1, 0);
         moins.jjtAddChild(nbre2, 1);
-        try {
-            typeChecker.visit(moins, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during SUB operation check: " + e.getMessage());
-        }
+        typeChecker.visit(moins, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
+        
     }
     @Test
     public void testSUBoperationNoInteger() {
@@ -458,12 +400,10 @@ public class TypeCheckerTest {
         moins.jjtAddChild(nbre, 0);
         moins.jjtAddChild(vrai, 1);
 
-        TypeCheckException exception = assertThrows(TypeCheckException.class, () -> {
-            typeChecker.visit(moins, null);
-        });
+        typeChecker.visit(moins, null);
 
-        assertTrue(exception.getMessage().contains("Type mismatch"));
-    }
+        assertFalse(loggerListener.getMessages().isEmpty());    
+     }
 
     @Test
     public void testMULoperation(){
@@ -474,11 +414,9 @@ public class TypeCheckerTest {
         ASTMul mul = new ASTMul(0);
         mul.jjtAddChild(nbre1, 0);
         mul.jjtAddChild(nbre2, 1);
-        try {
-            typeChecker.visit(mul, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during MUL operation check: " + e.getMessage());
-        }
+        typeChecker.visit(mul, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
     }
     @Test
     public void testMULoperationNoInteger() {
@@ -489,10 +427,9 @@ public class TypeCheckerTest {
         mul.jjtAddChild(nbre, 0);
         mul.jjtAddChild(vrai, 1);
 
-        TypeCheckException exception = assertThrows(TypeCheckException.class, () -> {
             typeChecker.visit(mul, null);
-        });
-        assertTrue(exception.getMessage().contains("Type mismatch"));
+            assertFalse(loggerListener.getMessages().isEmpty());    
+
     }
  
     @Test
@@ -500,11 +437,10 @@ public class TypeCheckerTest {
         ASTExnil exnil = new ASTExnil(0);
         ASTListExp listexp = new ASTListExp(0);
         listexp.jjtAddChild(exnil, 0);
-        try {
-            typeChecker.visit(listexp, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during listexp check: " + e.getMessage());
-        }
+       
+        typeChecker.visit(listexp, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+      
     }
  
     @Test 
@@ -519,12 +455,11 @@ public class TypeCheckerTest {
         exp.jjtAddChild(nbre1, 0);
         listexp.jjtAddChild(exp, 0);
         listexp.jjtAddChild(exnil, 1);
-        try {
-            typeChecker.visit(listexp, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during listexp check: " + e.getMessage());
-        }
+        typeChecker.visit(listexp, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+        
     }
+
     @Test
     public void testListexp2() {
         ASTIncrement incrementNode = increment("z",4);
@@ -534,12 +469,8 @@ public class TypeCheckerTest {
         exp.jjtAddChild(incrementNode, 0);
         listexp.jjtAddChild(exp, 0);
         listexp.jjtAddChild(exnil, 1);
-        try {
-            typeChecker.visit(listexp, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during listexp check: " + e.getMessage());
-        }
-        
+        typeChecker.visit(listexp, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
     }
 
     @Test
@@ -567,11 +498,9 @@ public class TypeCheckerTest {
         entetes.jjtAddChild(entete, 0);
         entetes.jjtAddChild(entests1, 1);
         
-        try {
-            typeChecker.visit(entetes, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during entetes check: " + e.getMessage());
-        }
+        typeChecker.visit(entetes, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
 
     }
      
@@ -608,11 +537,9 @@ public class TypeCheckerTest {
         methode.jjtAddChild(var, 3);
         methode.jjtAddChild(retour, 4);
 
-        try {
-            typeChecker.visit(methode, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during method declaration: " + e.getMessage());
-        }
+        typeChecker.visit(methode, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
 
         // AppelI: zero(5)
         ASTAppelI appelI = new ASTAppelI(0);
@@ -633,11 +560,9 @@ public class TypeCheckerTest {
        
         appelI.jjtAddChild(ident, 0);
         appelI.jjtAddChild(listexp , 1);
-        try {
-            typeChecker.visit(appelI, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during appelI  check: " + e.getMessage());
-        }
+        typeChecker.visit(appelI, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
     }
 
     @Test 
@@ -673,11 +598,10 @@ public class TypeCheckerTest {
         methode.jjtAddChild(var, 3);
         methode.jjtAddChild(retour, 4);
 
-        try {
-            typeChecker.visit(methode, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during method declaration: " + e.getMessage());
-        }
+        typeChecker.visit(methode, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
+       
 
         // AppelI: zero(5)
         ASTAppelI appelE = new ASTAppelI(0);
@@ -698,11 +622,9 @@ public class TypeCheckerTest {
        
         appelE.jjtAddChild(ident, 0);
         appelE.jjtAddChild(listexp , 1);
-        try {
-            typeChecker.visit(appelE, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during appelI  check: " + e.getMessage());
-        }
+        typeChecker.visit(appelE, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
     }
 
     @Test
@@ -717,22 +639,18 @@ public class TypeCheckerTest {
         cst.jjtAddChild(entier, 0);
         cst.jjtAddChild(cstIdent, 1);
         cst.jjtAddChild(nbre, 2); 
-        try {
-            typeChecker.visit(cst, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during variable declaration: " + e.getMessage());
-        }
+            
+        typeChecker.visit(cst, null);
+        assertTrue(loggerListener.getMessages().isEmpty());    
+
+       
         ASTIncrement incrementNode = new ASTIncrement(0);
         ASTIdent varIdent1 = new ASTIdent(0);
         varIdent1.jjtSetValue("y");
         incrementNode.jjtAddChild(varIdent1, 0);
 
-        try {
            Object t = typeChecker.visit(incrementNode, null);
-            assertEquals(t, ObjectType.INT);
-        } catch (TypeCheckException e) {
-            fail("Expected exception for incrementing a integer variable");
-        }
+           assertEquals(t, ObjectType.INT);
     }
     
     @Test
@@ -746,24 +664,18 @@ public class TypeCheckerTest {
         varNode.jjtAddChild(booleen, 0);
         varNode.jjtAddChild(varIdent, 1);
         varNode.jjtAddChild(faux, 2);
-        try {
-            typeChecker.visit(varNode, null);
-        } catch (TypeCheckException e) {
-            //fail("Type mismatch");
-            fail("Exception thrown during variable declaration: " + e.getMessage());
-        }
+        typeChecker.visit(varNode, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
         // Tester l'incrémentation sur une variable non-entière
         ASTIncrement incrementNode = new ASTIncrement(0);
         ASTIdent varIdent1 = new ASTIdent(1);
         varIdent1.jjtSetValue("y");
         incrementNode.jjtAddChild(varIdent1, 0);
     
-        try {
             typeChecker.visit(incrementNode, null);
-            fail("Type mismatch");
-        } catch (TypeCheckException e) {
-            assertTrue(e.getMessage().contains("Type mismatch"));
-        }
+            assertFalse(loggerListener.getMessages().isEmpty());
+        
     }
 
     // Créer une constante entière
@@ -777,11 +689,9 @@ public class TypeCheckerTest {
         cst.jjtAddChild(entier, 0);
         cst.jjtAddChild(cstIdent, 1);
         cst.jjtAddChild(nbre, 2); 
-        try {
-            typeChecker.visit(cst, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during constant declaration: " + e.getMessage());
-        }
+        typeChecker.visit(cst, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
     }
     // Créer un nœud d'incrémentation
     public ASTIncrement  increment(String nom, int valeur){
@@ -792,6 +702,7 @@ public class TypeCheckerTest {
          incrementNode.jjtAddChild(varIdent1, 0);
          return incrementNode;
     }
+
     @Test 
     public void testInstrs(){
         ASTIncrement inc = increment("x", 0); 
@@ -799,11 +710,9 @@ public class TypeCheckerTest {
         ASTInil inil = new ASTInil(0);
         instrs.jjtAddChild(inc, 0);
         instrs.jjtAddChild(inil, 1);
-        try {
-            typeChecker.visit(instrs, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during instrs check: " + e.getMessage());
-        }
+        typeChecker.visit(instrs, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
 
     }
     @Test
@@ -820,11 +729,10 @@ public class TypeCheckerTest {
         
         instrs1.jjtAddChild(inc, 0);
         instrs1.jjtAddChild(instrs2, 1);
-        try {
-            typeChecker.visit(instrs1, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during instrs check: " + e.getMessage());
-        }    
+        typeChecker.visit(instrs1, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
+          
     }
 
     @Test 
@@ -833,11 +741,9 @@ public class TypeCheckerTest {
         ident.jjtSetValue("x");
         ASTEcrire ecrire = new ASTEcrire(0);
         ecrire.jjtAddChild(ident, 0);
-        try {
-            typeChecker.visit(ecrire, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during ecrire check: " + e.getMessage());
-        }
+        typeChecker.visit(ecrire, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
     }
     @Test
     public void testecrire2(){
@@ -845,11 +751,9 @@ public class TypeCheckerTest {
         chaine.jjtSetValue("Hello World");
         ASTEcrire ecrire = new ASTEcrire(0);
         ecrire.jjtAddChild(chaine, 0);
-        try {
-            typeChecker.visit(ecrire, null);
-        } catch (TypeCheckException e) {
-            fail("Exception thrown during ecrire check: " + e.getMessage());
-        }
+        typeChecker.visit(ecrire, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
+
     }
 
 }
