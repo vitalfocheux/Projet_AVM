@@ -196,6 +196,34 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTTableau node, Object data) {
+        DataModel dm = (DataModel) data;
+        int n = (Integer) dm.data[0];
+        Mode m = (Mode) dm.data[1];
+
+        if (m == Mode.DEFAULT) {
+            ASTNewArray newTab = new ASTNewArray(JJTNEWARRAY);
+
+            ASTJcIdent tabIdent = new ASTJcIdent(JJTJCIDENT);
+            tabIdent.jjtSetValue(((ASTIdent) node.jjtGetChild(1)).jjtGetValue());
+
+            ASTType tabType = new ASTType(JJTTYPE);
+            if (node.jjtGetChild(0) instanceof ASTEntier) {
+                tabType.jjtSetValue("entier");
+            } else {
+                tabType.jjtSetValue("booleen");
+            }
+
+            newTab.jjtAddChild(tabIdent,0);
+            newTab.jjtAddChild(tabType,1);
+
+            int ne = (int) node.jjtGetChild(2).jjtAccept(this, data);
+            instrs.add(newTab);
+
+            return ne+1;
+        }
+        if (m == Mode.RETRAIT) {
+            return retraitDss();
+        }
         return 0;
     }
 
@@ -242,12 +270,45 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTEntetes node, Object data) {
+        DataModel dm = (DataModel) data;
+        int n = (Integer) dm.data[0];
+        Mode m = (Mode) dm.data[1];
+
+        if (m == Mode.DEFAULT) {
+            int nens = (int) node.jjtGetChild(1).jjtAccept(this, data);
+            int nen = (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n+nens, Mode.DEFAULT));
+
+            return nens+nen;
+        }
+
         return 0;
     }
 
     @Override
     public Object visit(ASTEntete node, Object data) {
-        return 0;
+        ASTNew nNew = new ASTNew(JJTNEW);
+
+        ASTJcIdent varIdent = new ASTJcIdent(JJTJCIDENT);
+        varIdent.jjtSetValue(((ASTIdent) node.jjtGetChild(1)).jjtGetValue());
+
+        ASTType varType = new ASTType(JJTTYPE);
+        varType.jjtSetValue(node.jjtGetChild(0));
+
+        ASTSorte varNature = new ASTSorte(JJTSORTE);
+        varNature.jjtSetValue("var");
+
+        ASTJcNbre varValue = new ASTJcNbre(JJTJCNBRE);
+        varValue.jjtSetValue(());
+
+        nNew.jjtAddChild(varIdent,0);
+        nNew.jjtAddChild(varType,1);
+        nNew.jjtAddChild(varNature,2);
+        nNew.jjtAddChild(varValue,3);
+
+        int ne = (int) node.jjtGetChild(2).jjtAccept(this, data);
+        instrs.add(nNew);
+
+        return 1;
     }
 
     @Override
