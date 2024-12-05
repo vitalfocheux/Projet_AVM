@@ -124,12 +124,13 @@ public class VisitorJcc implements JajaCodeVisitor {
         ObjectType arrayType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
         try
         {
-            mem.declTab(id, mem.getStack().getTop().getValue(), arrayType);
+            mem.declTab(id, mem.getStack().pop().getValue(), arrayType);
         }
         catch (Exception e)
         {
             throw new RuntimeException(e.getMessage());
         }
+        addr++;
         return null;
     }
 
@@ -677,6 +678,11 @@ public class VisitorJcc implements JajaCodeVisitor {
     @Override
     public Object visit(ASTJcChaine node, Object data) {
         return node.jjtGetValue();
+    }
+
+    public String toString()
+    {
+        return toDisplay;
     }
 
 }
