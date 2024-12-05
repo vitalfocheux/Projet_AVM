@@ -1,0 +1,9 @@
+class error {
+
+    main {
+
+        return 0
+
+    }
+
+}

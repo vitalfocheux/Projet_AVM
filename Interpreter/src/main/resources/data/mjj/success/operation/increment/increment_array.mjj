@@ -1,0 +1,11 @@
+/* TODO */
+/* Impossible d'avoir un commenaire simple en début de programme */
+/* Impossible d'avoir un programme vide sans que ça commence par class */
+
+class increment {
+
+    main {
+
+
+    }
+}

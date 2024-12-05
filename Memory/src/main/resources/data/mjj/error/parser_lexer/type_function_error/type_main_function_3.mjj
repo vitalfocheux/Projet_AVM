@@ -1,0 +1,9 @@
+class error {
+
+    void main {
+
+        return 0;
+
+    }
+
+}
