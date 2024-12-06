@@ -1,9 +1,0 @@
-code-area {
-    -fx-font-family: "JetBrains Mono", monospace;
-    -fx-font-size: 14px;
-}
-
-.console {
-    -fx-font-family: "Consolas", monospace;
-    -fx-font-size: 13px;
-}
