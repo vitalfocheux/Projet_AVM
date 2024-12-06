@@ -37,6 +37,10 @@ public class MiniJajaWindow extends Application {
     private File currentFile;
     private boolean isModified;
 
+    private TabPane tabPane;  // New: TabPane to hold multiple editors
+    private Tab currentTab;   // New: Currently selected tab
+    private Map<Tab, File> tabFiles;  // New: Map to track files associated with tabs
+
 
     private static final Pattern KEYWORDS = Pattern.compile("\\b(class|extends|void|int|boolean|if|else|while|return|true|false|main|writeln)\\b");
     private static final Pattern PARENTHESES = Pattern.compile("[()]");
@@ -100,21 +104,53 @@ public class MiniJajaWindow extends Application {
         }
     }
 
+    private class EditorTab extends Tab {
+        private final CodeArea codeArea;
+        private boolean isModified;
+
+        public EditorTab(String title) {
+            super(title);
+            this.codeArea = new CodeArea();
+            setupCodeArea(this.codeArea);
+            VirtualizedScrollPane<CodeArea> scrollPane = new VirtualizedScrollPane<>(codeArea);
+            setContent(scrollPane);
+
+            // Add close button handler
+            setOnCloseRequest(event -> {
+                if (!checkSaveBeforeClosing(this)) {
+                    event.consume();
+                }
+            });
+
+            // Add on closed handler to clean up resources
+            setOnClosed(event -> {
+                tabFiles.remove(this);  // Remove the tab from the map when it's closed
+            });
+
+            // Track modifications
+            codeArea.textProperty().addListener((obs, oldText, newText) -> {
+                isModified = true;
+                updateTitle();
+            });
+        }
+
+        public CodeArea getCodeArea() {
+            return codeArea;
+        }
+    }
+
     @Override
     public void start(Stage stage) {
         this.primaryStage = stage;
+        this.tabFiles = new HashMap<>();  // Initialize the map here
         initializeWindow();
     }
 
     private void initializeWindow() {
         primaryStage.setTitle("MiniJaja IDE");
 
-        // Création de la racine avec les classes de style appropriées
         VBox root = new VBox();
         root.getStyleClass().add("root");
-
-        // Chargement du CSS
-        //root.getStylesheets().add(getClass().getResource("/styles/theme.css").toExternalForm());
 
         root.getChildren().addAll(
                 createMenuBar(),
@@ -124,14 +160,12 @@ public class MiniJajaWindow extends Application {
 
         Scene scene = new Scene(root, 1024, 768);
 
-
         String cssUrl = getClass().getResource("/styles/light-theme.css").toExternalForm();
         scene.getStylesheets().add(cssUrl);
 
         primaryStage.setScene(scene);
         setupKeyboardShortcuts(scene);
         primaryStage.show();
-
     }
 
     private MenuBar createMenuBar() {
@@ -294,38 +328,57 @@ public class MiniJajaWindow extends Application {
     }
 
     private SplitPane createMainContent() {
-        setupCodeArea();
+        // Create TabPane
+        tabPane = new TabPane();
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
 
+        // Create initial tab
+        createNewTab();
+
+        // Handle tab selection changes
+        tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            if (newTab != null) {
+                currentTab = newTab;
+                updateTitle();
+            }
+        });
 
         consoleArea = new TextArea();
         consoleArea.setEditable(false);
         consoleArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13px;");
 
-
-        VBox editorWrapper = new VBox();
-        VirtualizedScrollPane<CodeArea> scrollPane = new VirtualizedScrollPane<>(codeArea);
-        editorWrapper.getChildren().add(scrollPane);
-        VBox.setVgrow(scrollPane, Priority.ALWAYS);
-
-
         VBox consoleWrapper = new VBox();
         consoleWrapper.getChildren().add(consoleArea);
         VBox.setVgrow(consoleArea, Priority.ALWAYS);
 
-
         SplitPane splitPane = new SplitPane();
         splitPane.setOrientation(Orientation.VERTICAL);
-        splitPane.getItems().addAll(editorWrapper, consoleWrapper);
+        splitPane.getItems().addAll(tabPane, consoleWrapper);
         splitPane.setDividerPositions(0.7);
 
-
         VBox.setVgrow(splitPane, Priority.ALWAYS);
-
         return splitPane;
     }
 
+    private void createNewTab() {
+        EditorTab tab = new EditorTab("Untitled");
+        tabFiles.put(tab, null);  // Add tab to the map with no associated file yet
+        tabPane.getTabs().add(tab);
+        tabPane.getSelectionModel().select(tab);
+        currentTab = tab;
+    }
+
+    private CodeArea getCurrentCodeArea() {
+        if (currentTab instanceof EditorTab) {
+            return ((EditorTab) currentTab).getCodeArea();
+        }
+        return null;
+    }
+
     private void executeCode() {
-        String code = codeArea.getText();
+        if (getCurrentCodeArea() == null) return;
+
+        String code = getCurrentCodeArea().getText();
         consoleArea.clear();
 
         try {
@@ -364,23 +417,13 @@ public class MiniJajaWindow extends Application {
             appendToConsole(sw.toString());
         }
     }
-    private void setupCodeArea() {
-        codeArea = new CodeArea();
+    private void setupCodeArea(CodeArea codeArea) {
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
-
-        // Style de base
         codeArea.setStyle("-fx-font-family: 'JetBrains Mono', Consolas, monospace; -fx-font-size: 14px;");
 
-        // Configuration de la coloration syntaxique
         codeArea.multiPlainChanges()
                 .successionEnds(Duration.ofMillis(100))
                 .subscribe(ignore -> codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText())));
-
-
-        codeArea.textProperty().addListener((obs, oldText, newText) -> {
-            isModified = true;
-            updateTitle();
-        });
     }
 
     private void appendToConsole(String text) {
@@ -388,56 +431,76 @@ public class MiniJajaWindow extends Application {
     }
 
     private void newFile() {
-        if (checkSaveBeforeClosing()) {
-            codeArea.clear();
-            currentFile = null;
-            isModified = false;
-            updateTitle();
-        }
+        createNewTab();
+        updateTitle();
     }
 
     private void openFile() {
-        if (checkSaveBeforeClosing()) {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Open MiniJaja File");
-            fileChooser.getExtensionFilters().add(
-                    new FileChooser.ExtensionFilter("MiniJaja Files", "*.mjj")
-            );
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open MiniJaja File");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("MiniJaja Files", "*.mjj")
+        );
 
-            File file = fileChooser.showOpenDialog(primaryStage);
-            if (file != null) {
-                try {
-                    String content = Files.readString(file.toPath());
-                    codeArea.replaceText(content);
-                    currentFile = file;
-                    isModified = false;
-                    updateTitle();
-                } catch (IOException e) {
-                    showError("Error opening file", e.getMessage());
+        File file = fileChooser.showOpenDialog(primaryStage);
+        if (file != null) {
+            // Check if file is already open
+            Tab existingTab = null;
+            for (Map.Entry<Tab, File> entry : tabFiles.entrySet()) {
+                if (entry.getValue() != null && entry.getValue().equals(file)) {
+                    existingTab = entry.getKey();
+                    break;
                 }
+            }
+
+            if (existingTab != null) {
+                tabPane.getSelectionModel().select(existingTab);
+                currentTab = existingTab;
+                updateTitle();
+                return;
+            }
+
+            try {
+                String content = Files.readString(file.toPath());
+                EditorTab tab = new EditorTab(file.getName());
+                tab.getCodeArea().replaceText(content);
+                tabFiles.put(tab, file);
+                tabPane.getTabs().add(tab);
+
+                tabPane.getSelectionModel().select(tab);
+                currentTab = tab;
+                ((EditorTab) currentTab).isModified = false;
+
+                updateTitle();
+            } catch (IOException e) {
+                showError("Error opening file", e.getMessage());
             }
         }
     }
 
     private void saveFile() {
-        if (currentFile == null) {
+        if (!(currentTab instanceof EditorTab)) return;
+
+        File file = tabFiles.get(currentTab);
+        if (file == null) {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save MiniJaja File");
             fileChooser.getExtensionFilters().add(
                     new FileChooser.ExtensionFilter("MiniJaja Files", "*.mjj")
             );
 
-            File file = fileChooser.showSaveDialog(primaryStage);
+            file = fileChooser.showSaveDialog(primaryStage);
             if (file != null) {
-                currentFile = file;
+                tabFiles.put(currentTab, file);
+                currentTab.setText(file.getName());
             } else {
                 return;
             }
         }
 
         try {
-            Files.writeString(currentFile.toPath(), codeArea.getText());
-            isModified = false;
+            Files.writeString(file.toPath(), getCurrentCodeArea().getText());
+            ((EditorTab) currentTab).isModified = false;
             updateTitle();
         } catch (IOException e) {
             showError("Error saving file", e.getMessage());
@@ -454,23 +517,35 @@ public class MiniJajaWindow extends Application {
 
     private void updateTitle() {
         String title = "MiniJaja IDE";
-        if (currentFile != null) {
-            title += " - " + currentFile.getName();
-        }
-        if (isModified) {
-            title += " *";
+        if (currentTab != null) {
+            File currentFile = tabFiles.get(currentTab);
+            if (currentFile != null) {
+                title += " - " + currentFile.getName();
+            } else {
+                title += " - " + currentTab.getText();
+            }
+            if (currentTab instanceof EditorTab && ((EditorTab) currentTab).isModified) {
+                title += " *";
+            }
         }
         primaryStage.setTitle(title);
     }
 
-    private boolean checkSaveBeforeClosing() {
-        if (!isModified) {
+    private boolean checkSaveBeforeClosing(Tab tab) {
+        if (!(tab instanceof EditorTab) || !((EditorTab) tab).isModified) {
             return true;
+        }
+
+        // Get the file name or tab title to display
+        String fileName = tab.getText();
+        File file = tabFiles.get(tab);
+        if (file != null) {
+            fileName = file.getName();
         }
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Save Changes");
-        alert.setHeaderText("Do you want to save changes?");
+        alert.setHeaderText("Do you want to save changes to " + fileName + "?");
         alert.setContentText("Your changes will be lost if you don't save them.");
 
         ButtonType saveButton = new ButtonType("Save");
@@ -482,15 +557,22 @@ public class MiniJajaWindow extends Application {
         ButtonType result = alert.showAndWait().orElse(ButtonType.CANCEL);
 
         if (result == saveButton) {
+            currentTab = tab;
             saveFile();
-            return !isModified;
+            return !((EditorTab) tab).isModified;
         }
         return result == dontSaveButton;
     }
 
+
     private void exit() {
-        if (checkSaveBeforeClosing()) {
-            primaryStage.close();
+        boolean allSaved = true;
+        for (Tab tab : new ArrayList<>(tabPane.getTabs())) {
+            if (!checkSaveBeforeClosing(tab)) {
+                allSaved=false;
+            }
+            if(allSaved)
+                primaryStage.close();
         }
     }
 
@@ -523,9 +605,12 @@ public class MiniJajaWindow extends Application {
 
 
     private void closeWindow() {
-        if (checkSaveBeforeClosing()) {
-            Platform.exit();
+        for (Tab tab : new ArrayList<>(tabPane.getTabs())) {
+            if (!checkSaveBeforeClosing(tab)) {
+                return;
+            }
         }
+        Platform.exit();
     }
     /*
     public static void main(String[] args) {
