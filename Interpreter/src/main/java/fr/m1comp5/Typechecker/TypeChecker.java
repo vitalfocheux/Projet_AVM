@@ -2,9 +2,6 @@ package fr.m1comp5.Typechecker;
 import fr.m1comp5.*;
 import fr.m1comp5.mjj.generated.*;
 import fr.m1comp5.Debug.AppLogger;
-import fr.m1comp5.Debug.TokenPositionDebug;
-import fr.m1comp5.Debug.TokenerrorPosition;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +55,6 @@ public class TypeChecker implements MiniJajaVisitor {
     
     @Override
     public Object visit(ASTIdent node, Object data) {
-
         Object value = node.jjtGetValue();
 
         if (value instanceof String) {
@@ -66,12 +62,10 @@ public class TypeChecker implements MiniJajaVisitor {
             if (ident.matches("[a-zA-Z][a-zA-Z0-9]*")) {
                 return ident;
             } else {
-                Token token = TokenerrorPosition.getToken(node);
-                logger.logError("Invalid identifier: " + ident + ". Identifiers must start with a letter and contain only letters and digits.", new TokenPositionDebug(token));
+                 logger.logError("Invalid identifier: " + ident + ". Identifiers must start with a letter and contain only letters and digits.");
             }
         } else {
-            Token token = TokenerrorPosition.getToken(node);
-            logger.logError("Expected a string identifier, but got: " + value , new TokenPositionDebug(token));
+                logger.logError("Expected a string identifier, but got: " + value );
         }
         return null;
     }
@@ -92,10 +86,9 @@ public class TypeChecker implements MiniJajaVisitor {
         ObjectType cstType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         String cstName = (String) node.jjtGetChild(1).jjtAccept(this, data);
         Object  cstValue =  node.jjtGetChild(2).jjtAccept(this, data);
-        Token token = TokenerrorPosition.getToken(node);
 
        if (isDefined(cstName, cstType, ObjectNature.CST)){
-        logger.logError("constant " + cstName +  " is already defined " , new TokenPositionDebug(token));
+        logger.logError("constant " + cstName +  " is already defined " );
    
         } else {
             MemoryObject mo = new MemoryObject(cstName, cstValue, ObjectNature.CST, cstType);
@@ -120,15 +113,14 @@ public class TypeChecker implements MiniJajaVisitor {
         ObjectType varType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         String varName = identNode.jjtGetValue().toString();
         ObjectType typeExp = getNodeType(node.jjtGetChild(2), data);
-        Token token = TokenerrorPosition.getToken(node);
 
         if (typeExp != varType){
-            logger.logError("Type mismatch: Cannot assign " + typeExp + " to " + identNode + " of type " +varType , new TokenPositionDebug(token));
+            logger.logError("Type mismatch: Cannot assign " + typeExp + " to " + identNode + " of type " +varType );
         }
         if (isDefined(varName, typeExp, ObjectNature.VAR)) {
              MemoryObject mp= lookupSymbol(varName); 
              if (mp.getType() == varType){
-                logger.logError(" Variable " + varName + " is already defined with the same Type " + varType , new TokenPositionDebug(token));
+                logger.logError(" Variable " + varName + " is already defined with the same Type " + varType );
              }
         } 
         else {
@@ -149,10 +141,9 @@ public class TypeChecker implements MiniJajaVisitor {
     public Object visit(ASTTableau node, Object data) {
         String arrayName = (String) node.jjtGetChild(1).jjtAccept(this, data);  // nom 
         ObjectType arrayType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data); // type 
-        Token token = TokenerrorPosition.getToken(node);
 
         if (isDefined(arrayName, arrayType, ObjectNature.TAB)){
-            logger.logError("Tableau " + arrayName + " is already defined !.", new TokenPositionDebug(token));
+            logger.logError("Tableau " + arrayName + " is already defined !.");
         }
         else {
             MemoryObject mo = new MemoryObject(arrayName, null, ObjectNature.TAB, arrayType);
@@ -175,12 +166,13 @@ public class TypeChecker implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTMethode node, Object data) {
-        Token token = TokenerrorPosition.getToken(node);
         Object returnTypeObject = node.jjtGetChild(0).jjtAccept(this, data);
         if (!(returnTypeObject instanceof ObjectType)) {
-            logger.logError("Expected ObjectType but found " + returnTypeObject.getClass().getSimpleName(), new TokenPositionDebug(token));
+            logger.logError("Expected ObjectType but found " + returnTypeObject.getClass().getSimpleName());
+            return null; 
         }
-        ObjectType returnType = (ObjectType) returnTypeObject;
+        ObjectType returnType = (ObjectType) returnTypeObject;  
+        System.out.println("returnType : " + returnType);
 
         String methodName = (String) node.jjtGetChild(1).jjtAccept(this, data);
         List<ObjectType> paramTypes = new ArrayList<>();
@@ -205,7 +197,7 @@ public class TypeChecker implements MiniJajaVisitor {
 
         // Vérifier si la méthode avec cette signature est déjà définie
         if (isDefined(methodName, returnType, ObjectNature.METH)) {
-            logger.logError("Method " + methodSignature + " is already defined ", new TokenPositionDebug(token));
+            logger.logError("Method " + methodSignature + " is already defined ");
         } else {
             MemoryObject mo = new MemoryObject(methodSignature, null, ObjectNature.METH, returnType, paramTypes);
             try {
@@ -241,9 +233,10 @@ public class TypeChecker implements MiniJajaVisitor {
             if (child instanceof ASTEntete) {
                 ObjectType paramType = (ObjectType) child.jjtGetChild(0).jjtAccept(this, data);
                 if (paramType == null) {
-                    logger.logError("Parameter type cannot be null.", null);
-                }
+                    logger.logError("Parameter type cannot be null.");
+                }else {
                 paramTypes.add(paramType);
+                }
             } else if (child instanceof ASTEntetes) {
                 collectParamTypes((ASTEntetes) child, paramTypes, data);
             }
@@ -251,39 +244,32 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTMain node, Object data) {
-
-        Token token = TokenerrorPosition.getToken(node);
-        if (isDefined("main",ObjectType.VOID, ObjectNature.METH)) {
-            logger.logError("Main method is already defined ", new TokenPositionDebug(token));
-        }
-        // Nouvelle portée pour le main
-        try {
-       // List<MemoryObject> methods = lookupMethode();
-        // Crée une nouvelle portée pour le main
-        MemoryObject mainMemoryObject = new MemoryObject("main","Methmain", ObjectNature.METH, ObjectType.VOID);
-        stack.push(mainMemoryObject);
-        currentMethod ="Methmain";
-
-        // Ajoute les méthodes existantes à la nouvelle table
-        /*HashTable currentTable = (HashTable) stack.getTop().getValue();
-        for (MemoryObject method : methods) {
-            currentTable.put(method);
-        }
-            } catch (StackException  | SymbolTableException e) {
-            e.printStackTrace();
-        }*/
-        // déclarations de variables, instructions
-        visitChildren(node, data);        
-        try {
-            stack.pop();
-            } catch (StackException e ) {
-            e.printStackTrace();
-        } } catch (StackException   e) {
-            e.printStackTrace();
-        }
+public Object visit(ASTMain node, Object data) {
+    if (isDefined("main", ObjectType.VOID, ObjectNature.METH)) {
+        logger.logError("Main method is already defined.");
         return null;
     }
+
+    try {
+        MemoryObject mainMemoryObject = new MemoryObject("main", "Methmain", ObjectNature.METH, ObjectType.VOID);
+        stack.push(mainMemoryObject);
+        currentMethod = "Methmain";
+        visitChildren(node, data);
+    } catch (StackException e) {
+        logger.logError("Error pushing main method scope: " + e.getMessage());
+        e.printStackTrace();
+    } finally {
+        try {
+            stack.pop();
+        } catch (StackException e) {
+            logger.logError("Error popping main method scope: " + e.getMessage());
+            e.printStackTrace();
+        }
+        currentMethod = null;
+    }
+
+    return null;
+}
 
     @Override
     public Object visit(ASTEnil node, Object data) {
@@ -309,18 +295,12 @@ public class TypeChecker implements MiniJajaVisitor {
     public Object visit(ASTInstrs node, Object data) {
         return visitChildren(node, data);
     }
-    
+
     @Override
     public Object visit(ASTRetour node, Object data) {
-        ObjectType returnType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
-        Token token = TokenerrorPosition.getToken(node);
-        if (! isDefined(currentMethod, returnType, ObjectNature.METH)) {
-            MemoryObject mo = lookupSymbol(currentMethod);
-            logger.logError("Return type mismatch: Expected " + mo.getType() + " but got " + returnType, new TokenPositionDebug(token));
-        }
-        currentMethod = null;
-        return null;
+        return visitChildren(node, data);
     }
+
 
     @Override
     public Object visit(ASTEcrire node, Object data) {
@@ -335,9 +315,8 @@ public class TypeChecker implements MiniJajaVisitor {
     @Override
     public Object visit(ASTSi node, Object data) {
         ObjectType conditionType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
-        Token token = TokenerrorPosition.getToken(node);
         if (conditionType != ObjectType.BOOLEAN) {
-            logger.logError("Condition in if statement must be boolean.", new TokenPositionDebug(token));
+            logger.logError("Condition in if statement must be boolean.");
         }
         return visitChildren(node, data);
     }
@@ -345,9 +324,8 @@ public class TypeChecker implements MiniJajaVisitor {
     @Override
     public Object visit(ASTTantQue node, Object data) {
         ObjectType conditionType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
-        Token token = TokenerrorPosition.getToken(node);
         if (conditionType != ObjectType.BOOLEAN) {
-            logger.logError("Condition in while statement must be boolean.", new TokenPositionDebug(token));
+            logger.logError("Condition in while statement must be boolean.");
         }
         return visitChildren(node, data);
     }
@@ -355,17 +333,16 @@ public class TypeChecker implements MiniJajaVisitor {
     @Override
     public Object visit(ASTAffectation node, Object data) {
         String identName = (String)  node.jjtGetChild(0).jjtAccept(this, data);
-        Token token = TokenerrorPosition.getToken(node);
         
         ObjectType assignedType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
 
         MemoryObject mo = lookupSymbol(identName);
         if (mo == null) {
-            logger.logError("Variable " + identName + " is not defined.", null);
+            logger.logError("Variable " + identName + " is not defined.");
         }
         // Vérifier que les types correspondent
         if (assignedType != mo.getType()) {
-            logger.logError("Type mismatch: Cannot assign " + assignedType + " to " + identName + " of type " + mo.getType(), null);
+            logger.logError("Type mismatch: Cannot assign " + assignedType + " to " + identName + " of type " + mo.getType());
         }
         Object value = node.jjtGetChild(1).jjtAccept(this, data);
         MemoryObject mo2 = new MemoryObject(identName,value, ObjectNature.VAR, assignedType);
@@ -377,14 +354,13 @@ public class TypeChecker implements MiniJajaVisitor {
     public Object visit(ASTIncrement node, Object data) {
         String varName = (String) node.jjtGetChild(0).jjtAccept(this, data); //  nom de la variable
         MemoryObject mo = lookupSymbol(varName); 
-        Token token = TokenerrorPosition.getToken(node);
 
         
         if (mo == null) {
-            logger.logError("Variable " + varName + " is not defined.", new TokenPositionDebug(token));
+            logger.logError("Variable " + varName + " is not defined.");
         }
         if ( mo.getType() != ObjectType.INT) {
-            logger.logError("Type mismatch: Cannot increment non-integer variable", new TokenPositionDebug(token));
+            logger.logError("Type mismatch: Cannot increment non-integer variable");
         }
         return ObjectType.INT;
     }
@@ -392,7 +368,6 @@ public class TypeChecker implements MiniJajaVisitor {
     @Override
     public Object visit(ASTAppelI node, Object data) {
         String methodName = (String) node.jjtGetChild(0).jjtAccept(this, data);
-        Token token = TokenerrorPosition.getToken(node);
         List<ObjectType> actualParamTypes = new ArrayList<>();
 
         // Construire la signature de la méthode à partir des paramètres
@@ -417,20 +392,21 @@ public class TypeChecker implements MiniJajaVisitor {
         // Rechercher la méthode avec la signature complète
         MemoryObject mo = lookupSymbol(methodSignature);
         if (mo == null) {
-            logger.logError("Method " + methodSignature + " is not defined.", new TokenPositionDebug(token));
+            logger.logError("Method " + methodSignature + " is not defined.");
+            return null;
         }
     
         // Vérifier les types des paramètres
         List<ObjectType> expectedParamTypes = mo.getParamTypes();
         if (expectedParamTypes.size() != actualParamTypes.size()) {
-            logger.logError("Parameter count mismatch in method " + methodSignature, new TokenPositionDebug(token));
-
+            logger.logError("Parameter count mismatch in method " + methodSignature);
+            return null;
         }
     
         for (int i = 0; i < expectedParamTypes.size(); i++) {
             if (expectedParamTypes.get(i) != actualParamTypes.get(i)) {
                 logger.logError("Parameter type mismatch in method "  + ": expected " + expectedParamTypes.get(i) + 
-                " but got " + actualParamTypes.get(i) + methodSignature, new TokenPositionDebug(token));
+                " but got " + actualParamTypes.get(i) + methodSignature);
             }
         }
     
@@ -440,22 +416,21 @@ public class TypeChecker implements MiniJajaVisitor {
     @Override
     public Object visit(ASTListExp node, Object data) {
 
-        Token token = TokenerrorPosition.getToken(node);
         if (node.jjtGetNumChildren() == 2) {
             SimpleNode firstChild = (SimpleNode) node.jjtGetChild(0);
             SimpleNode secondChild = (SimpleNode) node.jjtGetChild(1);
             if (firstChild instanceof ASTExp) {
                 ObjectType paramType = (ObjectType) firstChild.jjtAccept(this, data);
                 if (paramType == null) {
-                    logger.logError("Parameter type cannot be null.", new TokenPositionDebug(token));
+                    logger.logError("Parameter type cannot be null.");
                 }
             }else {
-                logger.logError("Unexpected node type in ASTListExp: " + firstChild.getClass().getSimpleName(), new TokenPositionDebug(token));
+                logger.logError("Unexpected node type in ASTListExp: " + firstChild.getClass().getSimpleName());
             }
             if (secondChild instanceof ASTListExp) {
                 return secondChild.jjtAccept(this, data);
             } else if (!(secondChild instanceof ASTExnil)) {
-                logger.logError("Unexpected node type in ASTListExp: " + firstChild.getClass().getSimpleName(), new TokenPositionDebug(token));
+                logger.logError("Unexpected node type in ASTListExp: " + firstChild.getClass().getSimpleName());
             }
         } else if (node.jjtGetNumChildren() == 1) {
             if (node.jjtGetChild(0) instanceof ASTExnil) {
@@ -483,15 +458,16 @@ public class TypeChecker implements MiniJajaVisitor {
             if (firstChild instanceof ASTExp) {
                 ObjectType paramType = (ObjectType) firstChild.jjtAccept(this, data);
                 if (paramType == null) {
-                    logger.logError("Parameter type cannot be null.", null);
-                }
+                    logger.logError("Parameter type cannot be null.");
+                }else {
                 paramTypes.add(paramType);
+                }
             }
     
             if (secondChild instanceof ASTListExp) {
                 collectParamTypesFromListexp((ASTListExp) secondChild, paramTypes, data);
             } else if (!(secondChild instanceof ASTExnil)) {
-                logger.logError("Unexpected node type in ASTListExp: " + secondChild.getClass().getSimpleName(), null);
+                logger.logError("Unexpected node type in ASTListExp: " + secondChild.getClass().getSimpleName());
             }
         } 
         else if (listexpNode.jjtGetNumChildren() == 1) {
@@ -504,15 +480,14 @@ public class TypeChecker implements MiniJajaVisitor {
     @Override
     public Object visit(ASTAppelE node, Object data) {
         String methodName = (String) node.jjtGetChild(0).jjtAccept(this, data);
-        Token token = TokenerrorPosition.getToken(node);
 
         // Construire la signature de la méthode à partir des paramètres
         Object paramsData = node.jjtGetChild(1);
         List<ObjectType> actualParamTypes = new ArrayList<>();
 
         if (paramsData instanceof ASTListExp){
-        ASTListExp paramsNode = (ASTListExp) paramsData;
-                collectParamTypesFromListexp(paramsNode, actualParamTypes, data);
+            ASTListExp paramsNode = (ASTListExp) paramsData;
+            collectParamTypesFromListexp(paramsNode, actualParamTypes, data);
         }
     
         // Construire la signature complète de la méthode
@@ -530,19 +505,22 @@ public class TypeChecker implements MiniJajaVisitor {
         // Rechercher la méthode avec la signature complète
         MemoryObject mo = lookupSymbol(methodSignature);
         if (mo == null) {
-            logger.logError("Method " + methodSignature + " is not defined.", new TokenPositionDebug(token));
+            logger.logError("Method " + methodSignature + " is not defined.");
+            return null;
         }
     
         // Vérifier les types des paramètres
         List<ObjectType> expectedParamTypes = mo.getParamTypes();
         if (expectedParamTypes.size() != actualParamTypes.size()) {
-            logger.logError("Parameter count mismatch in method " + methodSignature, new TokenPositionDebug(token));
+            logger.logError("Parameter count mismatch in method " + methodSignature);
+            return null;
         }
     
         for (int i = 0; i < expectedParamTypes.size(); i++) {
             if (expectedParamTypes.get(i) != actualParamTypes.get(i)) {
                 logger.logError("Parameter type mismatch in method "  + ": expected " + expectedParamTypes.get(i) + 
-                " but got " + actualParamTypes.get(i) + methodSignature, new TokenPositionDebug(token));
+                " but got " + actualParamTypes.get(i) + methodSignature);
+                return null;
             }
         }
     
@@ -578,12 +556,11 @@ public class TypeChecker implements MiniJajaVisitor {
     @Override
     public Object visit(ASTEq node, Object data) {
 
-        Token token = TokenerrorPosition.getToken(node);
         ObjectType leftType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         ObjectType rightType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
         
         if (leftType != rightType) {
-            logger.logError("Type mismatch: Expected same type (Boolean) for both operands for equivalence expression.", new TokenPositionDebug(token));
+            logger.logError("Type mismatch: Expected same type (Boolean) for both operands for equivalence expression.");
         }
         return ObjectType.BOOLEAN;
     }
@@ -591,12 +568,11 @@ public class TypeChecker implements MiniJajaVisitor {
     @Override
     public Object visit(ASTSup node, Object data) {
 
-        Token token = TokenerrorPosition.getToken(node);
         ObjectType leftType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         ObjectType rightType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
         
         if (leftType != rightType && leftType != ObjectType.BOOLEAN && rightType != ObjectType.BOOLEAN) {
-            logger.logError("Type mismatch: Expected  type Boolean for both operands.", new TokenPositionDebug(token));
+            logger.logError("Type mismatch: Expected  type Boolean for both operands.");
         }
         return ObjectType.BOOLEAN;
     }
@@ -624,17 +600,16 @@ public class TypeChecker implements MiniJajaVisitor {
     @Override
     public Object visit(ASTDiv node, Object data) {
 
-        Token token = TokenerrorPosition.getToken(node);
         Object value = node.jjtGetChild(1).jjtAccept(this, data);
 
         if (value instanceof Integer) {
             int rightValue = (Integer) value;
             if (rightValue == 0) {
-                logger.logError("Error : not allowed to divide by zero !", new TokenPositionDebug(token));
+                logger.logError("Error : not allowed to divide by zero !");
             }
         } 
         else {
-            logger.logError("Expected an integer value, but got: " + value, new TokenPositionDebug(token));
+            logger.logError("Expected an integer value, but got: " + value);
         }
         return visitBinaryOperation(node, data, ObjectType.INT);
     }
@@ -642,13 +617,12 @@ public class TypeChecker implements MiniJajaVisitor {
     @Override
     public Object visit(ASTLongeur node, Object data) {
 
-        Token token = TokenerrorPosition.getToken(node);
         ASTIdent identNode = (ASTIdent) node.jjtGetChild(0);
         Object value = identNode.jjtGetValue();
         if (value instanceof String) {
             return ObjectType.INT; //  le type INT pour la longueur d'une chaîne
         } else {
-            logger.logError("Expected a string identifier, but got: " + value, new TokenPositionDebug(token));
+            logger.logError("Expected a string identifier, but got: " + value);
         }
 
         return null;
@@ -688,25 +662,23 @@ public class TypeChecker implements MiniJajaVisitor {
     @Override
     public Object visit(ASTNbre node, Object data) { 
 
-        Token token = TokenerrorPosition.getToken(node);
         Object value = node.jjtGetValue();
         if (value instanceof Integer) {
             return ObjectType.INT;
         } else {
-            logger.logError("Expected an integer value, but got: " + value, new TokenPositionDebug(token));
+            logger.logError("Expected an integer value, but got: " + value);
         }
         return null; 
     }
 
     @Override
     public Object visit(ASTChaine node, Object data) {    
-        Token token = TokenerrorPosition.getToken(node);
         Object value = node.jjtGetValue();
         if (value instanceof String) {
             String chaine = (String) value;
             return chaine ; 
         } else {
-            logger.logError("Expected a string chaine, but got: " + value, new TokenPositionDebug(token));
+            logger.logError("Expected a string chaine, but got: " + value);
         }
         
         return null ; 
@@ -716,10 +688,9 @@ public class TypeChecker implements MiniJajaVisitor {
         
         ObjectType leftType = getNodeType(node.jjtGetChild(0), data);
         ObjectType rightType = getNodeType(node.jjtGetChild(1), data);
-        Token token = TokenerrorPosition.getToken(node);
     
         if (leftType != expectedType || rightType != expectedType) {
-            logger.logError("Type mismatch: Expected " + expectedType + " for both operands.", new TokenPositionDebug(token));
+            logger.logError("Type mismatch: Expected " + expectedType + " for both operands.");
         }
         return expectedType;
     }
@@ -731,7 +702,7 @@ public class TypeChecker implements MiniJajaVisitor {
             if (memoryObject != null) {
                 return memoryObject.getType();
             } else {
-                logger.logError("Variable " + varName + " is not defined.", new TokenPositionDebug(null));
+                logger.logError("Variable " + varName + " is not defined.");
             }
         } else if (node instanceof ASTNbre) {
             return ObjectType.INT;
@@ -755,10 +726,9 @@ public class TypeChecker implements MiniJajaVisitor {
     private ObjectType visitUnaryOperation(SimpleNode node, Object data, ObjectType expectedType) {
        
         ObjectType operandType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
-        Token token = TokenerrorPosition.getToken(node);
 
         if (operandType != expectedType) {
-            logger.logError("Type mismatch: Expected " + expectedType + " for operand.", new TokenPositionDebug(token));
+            logger.logError("Type mismatch: Expected " + expectedType + " for operand.");
         }
         return expectedType;
     }
