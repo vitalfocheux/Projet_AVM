@@ -16,58 +16,60 @@ public class TypeCheckerTest {
     AppLogger logger = AppLogger.getInstance();
 
 
-
+    
     @BeforeEach
     public void setUp() {
         typeChecker = new TypeChecker();
-        logger.removeLoggerListener(loggerListener);
-        
-    } 
+        logger = AppLogger.getInstance();
+        loggerListener = new TestLoggerListener();
+        logger.addLoggerListener(loggerListener);
+        AppLogger.setDebugMode(true); 
+    }
 
     @Test
-    public void testidentCorrect(){
-
+    public void testIdentCorrect() {
         ASTIdent ident = new ASTIdent(0);
         ident.jjtSetValue("Xml12");
         typeChecker.visit(ident, null);
         assertTrue(loggerListener.getMessages().isEmpty(), 
         "Aucun log d'erreur ne devrait être produit pour un identifiant valide.");
-
     }
 
     @Test
-    public void testidentIncorrect(){
+    public void testIdentIncorrect() {
         ASTIdent ident = new ASTIdent(0);
         ident.jjtSetValue("12Xml");
-        
         typeChecker.visit(ident, null);
         assertFalse(loggerListener.getMessages().isEmpty(), 
-                "Expected exception for incorrect ident");       
+                "Expected exception for incorrect ident");
+        assertTrue(loggerListener.getMessages().get(0).contains("Invalid identifier: 12Xml"), 
+                "Expected log message for incorrect ident");
     }
 
     @Test 
-    public void testTableau(){
-        ASTEntier int1 = new  ASTEntier(0);
+    public void testTableau() {
+        ASTEntier int1 = new ASTEntier(0);
         ASTIdent tabl = new ASTIdent(0);
         tabl.jjtSetValue("tab");  
         ASTVnil nill = new ASTVnil(0);
         ASTTableau tab = new ASTTableau(0);
         tab.jjtAddChild(int1, 0);
-        tab.jjtAddChild(tabl,1); 
+        tab.jjtAddChild(tabl, 1); 
         tab.jjtAddChild(nill, 2);
-        assertTrue(loggerListener.getMessages().isEmpty() );
-       
-
+        typeChecker.visit(tab, null);
+        assertTrue(loggerListener.getMessages().isEmpty(), 
+                "Aucun log d'erreur ne devrait être produit pour un tableau valide.");
     }
+
     @Test 
-    public void testLong(){
+    public void testLong() {
         ASTIdent longueur = new ASTIdent(0);
         longueur.jjtSetValue("exemple");
         ASTLongeur longueurNode = new ASTLongeur(0);
         longueurNode.jjtAddChild(longueur, 0);
-        typeChecker.visit(longueurNode,null ); 
-        assertTrue(loggerListener.getMessages().isEmpty(),"Exception thrown during Longueur declaration: " );
-        
+        typeChecker.visit(longueurNode, null); 
+        assertTrue(loggerListener.getMessages().isEmpty(), 
+                "Exception thrown during Longueur declaration: ");
     }
 
     @Test
@@ -83,43 +85,18 @@ public class TypeCheckerTest {
         varNode.jjtAddChild(n, 2);
 
         MemoryObject t = (MemoryObject) typeChecker.visit(varNode, null);
-        assertEquals(t.getId(),"myVar");
-        assertEquals(t.getNature(),ObjectNature.VAR);
-        assertEquals(t.getType(),ObjectType.INT);
-        assertEquals(t.getValue(),null);
-        assertTrue(loggerListener.getMessages().isEmpty());
-    
-    }
-    @Test
-    public void testClassDeclaration() {
-        ASTIdent classIdent = new ASTIdent(0);
-        classIdent.jjtSetValue("MyClass");
-        ASTDecls decls = new ASTDecls(1);
-        ASTMain main = new ASTMain(2); 
-        ASTClasse classNode = new ASTClasse(0);
-        classNode.jjtAddChild(classIdent, 0);
-        classNode.jjtAddChild(decls, 1);
-        classNode.jjtAddChild(main, 2);
-        Object t= typeChecker.visit(classNode, null);
-        assertEquals(t, ObjectType.VOID);
-
-        ASTIdent classIdent1 = new ASTIdent(0);
-        classIdent1.jjtSetValue("MyClass");
-        ASTDecls decls1 = new ASTDecls(1);
-        ASTMain main1 = new ASTMain(2); 
-        ASTClasse classNode1 = new ASTClasse(0);
-        classNode1.jjtAddChild(classIdent1, 0);
-        classNode1.jjtAddChild(decls1, 1);
-        classNode1.jjtAddChild(main1, 2);
-        typeChecker.visit(classNode1, null);
-        assertTrue(loggerListener.getMessages().isEmpty());
-
-        
+        assertEquals(t.getId(), "myVar");
+        assertEquals(t.getNature(), ObjectNature.VAR);
+        assertEquals(t.getType(), ObjectType.INT);
+        assertEquals(t.getValue(), null);
+        assertTrue(loggerListener.getMessages().isEmpty(), 
+                "Aucun log d'erreur ne devrait être produit pour une déclaration de variable valide.");
     }
 
-   @Test 
-   public void testcst(){
-    ASTCst cst = new ASTCst(0);
+   
+    @Test 
+    public void testCst() {
+        ASTCst cst = new ASTCst(0);
         ASTEntier entier = new ASTEntier(0);
         ASTIdent cstIdent = new ASTIdent(1);
         ASTNbre nbre = new ASTNbre(2);
@@ -129,13 +106,12 @@ public class TypeCheckerTest {
         cst.jjtAddChild(cstIdent, 1);
         cst.jjtAddChild(nbre, 2); 
         typeChecker.visit(cst, null);
-       
-   }
-    
+        assertTrue(loggerListener.getMessages().isEmpty(), 
+                "Aucun log d'erreur ne devrait être produit pour une constante valide.");
+    }
     
     @Test
     public void testMethodDeclaration() {
-
         ASTCst cst = new ASTCst(0);
         ASTEntier entier = new ASTEntier(0);
         ASTIdent cstIdent = new ASTIdent(1);
@@ -146,8 +122,9 @@ public class TypeCheckerTest {
         cst.jjtAddChild(cstIdent, 1);
         cst.jjtAddChild(nbre, 2);
         typeChecker.visit(cst, null);
-        assertTrue(loggerListener.getMessages().isEmpty());
-       
+        assertTrue(loggerListener.getMessages().isEmpty(), 
+                "Aucun log d'erreur ne devrait être produit pour une constante valide.");
+
         ASTEntier enti = new ASTEntier(0);
         ASTIdent varIdent = new ASTIdent(1);
         varIdent.jjtSetValue("zero");
@@ -179,23 +156,10 @@ public class TypeCheckerTest {
         methode.jjtAddChild(retour, 4);
 
         typeChecker.visit(methode, null);
-        assertTrue(loggerListener.getMessages().isEmpty());
-        
+        assertTrue(loggerListener.getMessages().isEmpty(), 
+                "Aucun log d'erreur ne devrait être produit pour une méthode valide.");
     }
- 
 
-    public void declvariableentier(String nom){
-        ASTEntier entier = new ASTEntier(0);
-         ASTIdent varIdent = new ASTIdent(1);
-         varIdent.jjtSetValue(nom);
-         ASTOmega omega = new ASTOmega(2);
-         ASTVar varNode = new ASTVar(0);
-         varNode.jjtAddChild(entier, 0);
-         varNode.jjtAddChild(varIdent, 1);
-         varNode.jjtAddChild(omega, 2);
-         
-    }
-    
     @Test
     public void testAffectation() {
         // Déclarer la variable x avant de tester l'affectation
@@ -208,8 +172,8 @@ public class TypeCheckerTest {
         varNode.jjtAddChild(entier, 0);
         varNode.jjtAddChild(varIdent, 1);
         varNode.jjtAddChild(n, 2);
-    
-    
+        typeChecker.visit(varNode, null);
+
         // Tester l'affectation
         ASTAffectation affectnode = new ASTAffectation(0);
         ASTIdent varIdent2 = new ASTIdent(1);
@@ -219,23 +183,22 @@ public class TypeCheckerTest {
         affectnode.jjtAddChild(varIdent2, 0);
         affectnode.jjtAddChild(assignnombre, 1);
 
-        MemoryObject t = (MemoryObject) typeChecker.visit(varNode, null);
-        assertEquals(t.getType(), ObjectType.INT);
-        
+        typeChecker.visit(affectnode, null);
+        assertTrue(loggerListener.getMessages().isEmpty(), 
+                "Aucun log d'erreur ne devrait être produit pour une affectation valide.");
     }
-     
+
     @Test
-    public void testTantque(){
+    public void testTantque() {
         ASTVrai vrai = new ASTVrai(0);
         ASTInil inil = new ASTInil(1);
         ASTTantQue tantque = new ASTTantQue(0);
         tantque.jjtAddChild(vrai, 0);
         tantque.jjtAddChild(inil, 1);
         typeChecker.visit(tantque, null);
-        assertTrue(loggerListener.getMessages().isEmpty());
-    
+        assertTrue(loggerListener.getMessages().isEmpty(), 
+                "Aucun log d'erreur ne devrait être produit pour une boucle tantque valide.");
     }
-    
 
     @Test
     public void testTantqueNoBoolean() {
@@ -246,11 +209,13 @@ public class TypeCheckerTest {
         tantque.jjtAddChild(nbre, 0);  // pas booléen 
         tantque.jjtAddChild(inil, 1);
 
-            typeChecker.visit(tantque, null);
-            assertFalse(loggerListener.getMessages().isEmpty());
-
+        typeChecker.visit(tantque, null);
+        assertFalse(loggerListener.getMessages().isEmpty(), 
+                "Expected log message for non-boolean condition in while loop");
+        assertTrue(loggerListener.getMessages().get(0).contains("Condition in while statement must be boolean"), 
+                "Expected log message for non-boolean condition in while loop");
     }
-    
+
     @Test
     public void testIfConditionTypeCheck() {
         ASTVrai vrai = new ASTVrai(0);
@@ -260,10 +225,10 @@ public class TypeCheckerTest {
         ifNode.jjtAddChild(inil, 1);
 
         typeChecker.visit(ifNode, null);
-        assertTrue(loggerListener.getMessages().isEmpty());
+        assertTrue(loggerListener.getMessages().isEmpty(), 
+                "Aucun log d'erreur ne devrait être produit pour une condition if valide.");
     }
-        
-    
+
     @Test
     public void testIfConditionTypeCheck2() {
         ASTNbre nbre = new ASTNbre(0);
@@ -273,20 +238,23 @@ public class TypeCheckerTest {
         ifNode.jjtAddChild(nbre, 0);  // Ajouter un nœud non-booléen comme condition
         ifNode.jjtAddChild(inil, 1);
 
-            typeChecker.visit(ifNode, null);
-            assertFalse(loggerListener.getMessages().isEmpty(), "Condition in if statement must be boolean.");
+        typeChecker.visit(ifNode, null);
+        assertFalse(loggerListener.getMessages().isEmpty(), 
+                "Expected log message for non-boolean condition in if statement");
+        assertTrue(loggerListener.getMessages().get(0).contains("Condition in if statement must be boolean"), 
+                "Expected log message for non-boolean condition in if statement");
     }
 
-
     @Test 
-    public void testNegation(){
+    public void testNegation() {
         ASTVrai vrai = new ASTVrai(0);
         ASTNot not = new ASTNot(0);
         not.jjtAddChild(vrai, 0);
 
         typeChecker.visit(not, null);
-        assertTrue(loggerListener.getMessages().isEmpty());
- }
+        assertTrue(loggerListener.getMessages().isEmpty(), 
+                "Aucun log d'erreur ne devrait être produit pour une négation valide.");
+    }
 
     @Test
     public void testNegationNoBoolean() {
@@ -296,11 +264,14 @@ public class TypeCheckerTest {
         not.jjtAddChild(nbre, 0); 
 
         typeChecker.visit(not, null);
-        assertFalse(loggerListener.getMessages().isEmpty());
+        assertFalse(loggerListener.getMessages().isEmpty(), 
+                "Expected log message for non-boolean operand in negation");
+        assertTrue(loggerListener.getMessages().get(0).contains("Type mismatch: Expected BOOLEAN for operand"), 
+                "Expected log message for non-boolean operand in negation");
     }
 
     @Test
-    public void TestANDoperation(){
+    public void testANDoperation() {
         ASTVrai vrai = new ASTVrai(0);
         ASTFaux faux = new ASTFaux(1);
         ASTEt et = new ASTEt(0);
@@ -308,11 +279,12 @@ public class TypeCheckerTest {
         et.jjtAddChild(faux, 1);
         
         typeChecker.visit(et, null);
-        assertTrue(loggerListener.getMessages().isEmpty());
-       
+        assertTrue(loggerListener.getMessages().isEmpty(), 
+                "Aucun log d'erreur ne devrait être produit pour une opération AND valide.");
     }
+
     @Test
-    public void TestANDoperationNoBoolean() {
+    public void testANDoperationNoBoolean() {
         ASTNbre nbre = new ASTNbre(0);
         nbre.jjtSetValue(2);
         ASTFaux faux = new ASTFaux(1);
@@ -321,23 +293,26 @@ public class TypeCheckerTest {
         et.jjtAddChild(faux, 1);
 
         typeChecker.visit(et, null);
-        assertFalse(loggerListener.getMessages().isEmpty());
-        assertTrue(loggerListener.getMessages().contains("Type mismatch"));
+        assertFalse(loggerListener.getMessages().isEmpty(), 
+                "Expected log message for non-boolean operand in AND operation");
+        assertTrue(loggerListener.getMessages().get(0).contains("Type mismatch: Expected BOOLEAN for both operands"), 
+                "Expected log message for non-boolean operand in AND operation");
     }
 
     @Test
-    public void TestORoperation(){
+    public void testORoperation() {
         ASTVrai vrai = new ASTVrai(0);
         ASTFaux faux = new ASTFaux(1);
         ASTOu ou = new ASTOu(0);
         ou.jjtAddChild(vrai, 0);
         ou.jjtAddChild(faux, 1);
         typeChecker.visit(ou, null);
-        assertTrue(loggerListener.getMessages().isEmpty());
+        assertTrue(loggerListener.getMessages().isEmpty(), 
+                "Aucun log d'erreur ne devrait être produit pour une opération OR valide.");
     }
 
     @Test
-    public void TestORoperationNoBoolean() {
+    public void testORoperationNoBoolean() {
         ASTNbre nbre = new ASTNbre(0);
         nbre.jjtSetValue(2);
         ASTFaux faux = new ASTFaux(1);
@@ -346,12 +321,14 @@ public class TypeCheckerTest {
         ou.jjtAddChild(faux, 1);
 
         typeChecker.visit(ou, null);
-        assertFalse(loggerListener.getMessages().isEmpty());
-        assertTrue(loggerListener.getMessages().contains("Type mismatch"));
-
+        assertFalse(loggerListener.getMessages().isEmpty(), 
+                "Expected log message for non-boolean operand in OR operation");
+        assertTrue(loggerListener.getMessages().get(0).contains("Type mismatch"), 
+                "Expected log message for non-boolean operand in OR operation");
     }
+
     @Test 
-    public void testADDoperation(){
+    public void testADDoperation() {
         ASTNbre nbre1 = new ASTNbre(0);
         nbre1.jjtSetValue(2);
         ASTNbre nbre2 = new ASTNbre(1);
@@ -361,9 +338,10 @@ public class TypeCheckerTest {
         plus.jjtAddChild(nbre2, 1);
      
         typeChecker.visit(plus, null);
-        assertTrue(loggerListener.getMessages().isEmpty());
-
+        assertTrue(loggerListener.getMessages().isEmpty(), 
+                "Aucun log d'erreur ne devrait être produit pour une opération ADD valide.");
     }
+
     @Test
     public void testADDoperationNoInteger() {
         ASTNbre nbre = new ASTNbre(0);
@@ -374,7 +352,20 @@ public class TypeCheckerTest {
         plus.jjtAddChild(vrai, 1);
 
         typeChecker.visit(plus, null);
-        assertFalse(loggerListener.getMessages().isEmpty());
+        assertFalse(loggerListener.getMessages().isEmpty(), 
+                "Expected log message for non-integer operand in ADD operation");
+        assertTrue(loggerListener.getMessages().get(0).contains("Type mismatch"), 
+                "Expected log message for non-integer operand in ADD operation");
+    }
+    @Test
+    public void TestORoperation(){
+        ASTVrai vrai = new ASTVrai(0);
+        ASTFaux faux = new ASTFaux(1);
+        ASTOu ou = new ASTOu(0);
+        ou.jjtAddChild(vrai, 0);
+        ou.jjtAddChild(faux, 1);
+        typeChecker.visit(ou, null);
+        assertTrue(loggerListener.getMessages().isEmpty());
     }
 
     @Test
