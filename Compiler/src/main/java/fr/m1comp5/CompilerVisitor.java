@@ -81,7 +81,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTDecls node, Object data) {
-        return retraitDeclVar(node, data);
+        return declVar(node, data);
     }
 
     @Override
@@ -158,7 +158,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTVars node, Object data) {
-        return retraitDeclVar(node, data);
+        return declVar(node, data);
     }
 
     @Override
@@ -428,26 +428,190 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTSi node, Object data) {
+        DataModel dm = (DataModel) data;
+        int n = (Integer) dm.data[0];
+        Mode m = (Mode) dm.data[1];
+
+        if (m == Mode.DEFAULT) {
+            ASTIf nIf = new ASTIf(JJTIF);
+            ASTGoTo nGoTo = new ASTGoTo(JJTGOTO);
+            ASTJcNbre ifNbre = new ASTJcNbre(JJTJCNBRE);
+            ASTJcNbre addrGoto = new ASTJcNbre(JJTJCNBRE);
+
+            int ne = (int) node.jjtGetChild(0).jjtAccept(this, data);
+            int niss1 = (int) node.jjtGetChild(2).jjtAccept(this, new DataModel(n+ne+1, Mode.DEFAULT));
+            int niss = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+ne+niss1+2, Mode.DEFAULT));
+
+            ifNbre.jjtSetValue(n+ne+niss1+2);
+            addrGoto.jjtSetValue(n+ne+niss1+niss+2);
+
+            nIf.jjtAddChild(ifNbre,0);
+            nGoTo.jjtAddChild(addrGoto,0);
+
+            instrs.add(nIf);
+            instrs.add(nGoTo);
+
+            return ne+niss1+niss+2;
+        }
+
         return 0;
     }
 
     @Override
     public Object visit(ASTTantQue node, Object data) {
+        DataModel dm = (DataModel) data;
+        int n = (Integer) dm.data[0];
+        Mode m = (Mode) dm.data[1];
+
+        if (m == Mode.DEFAULT) {
+            fr.m1comp5.jjc.generated.ASTNot nNot = new fr.m1comp5.jjc.generated.ASTNot(JJTNOT);
+            instrs.add(nNot);
+
+            ASTIf nIf = new ASTIf(JJTIF);
+            ASTGoTo nGoTo = new ASTGoTo(JJTGOTO);
+            ASTJcNbre ifNbre = new ASTJcNbre(JJTJCNBRE);
+            ASTJcNbre addrGoto = new ASTJcNbre(JJTJCNBRE);
+
+            int ne = (int) node.jjtGetChild(0).jjtAccept(this, data);
+            int niss = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+ne+2, Mode.DEFAULT));
+
+            ifNbre.jjtSetValue(n+ne+3);
+            addrGoto.jjtSetValue(n);
+
+            nIf.jjtAddChild(ifNbre,0);
+            nGoTo.jjtAddChild(addrGoto,0);
+
+            instrs.add(nIf);
+            instrs.add(nGoTo);
+
+            return ne+niss+3;
+        }
+
         return 0;
     }
 
     @Override
     public Object visit(ASTAffectation node, Object data) {
+        DataModel dm = (DataModel) data;
+        int n = (Integer) dm.data[0];
+        Mode m = (Mode) dm.data[1];
+
+        if (m == Mode.DEFAULT) {
+            if (node.jjtGetChild(0) instanceof ASTTab) {
+                var varIndex = node.jjtGetChild(0).jjtGetChild(1); // Get index of element in tab
+                ASTTab nTab = (ASTTab) node.jjtGetChild(0); // Get the array node
+                ASTIdent i = (ASTIdent) nTab.jjtGetChild(0);
+
+                ASTAStore nAStore = new ASTAStore(JJTASTORE);
+                ASTJcIdent nJcIdent = new ASTJcIdent(JJTJCIDENT);
+                nJcIdent.jjtSetValue(i.jjtGetValue());
+                nAStore.jjtAddChild(nJcIdent,0);
+
+                int ne1 = (int) varIndex.jjtAccept(this, data);
+                int ne = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+ne1, Mode.DEFAULT));
+
+                instrs.add(nAStore);
+
+                return ne1+ne+1;
+            }
+
+            ASTStore nStore = new ASTStore(JJTSTORE);
+            ASTJcIdent nIdentStore = new ASTJcIdent(JJTJCIDENT);
+            nIdentStore.jjtSetValue(((ASTIdent) node.jjtGetChild(0)).jjtGetValue());
+            nStore.jjtAddChild(nIdentStore,0);
+
+            int ne = (int) node.jjtGetChild(1).jjtAccept(this, data);
+
+            instrs.add(nStore);
+
+            return ne+1;
+        }
+
         return 0;
     }
 
     @Override
     public Object visit(ASTSomme node, Object data) {
+        DataModel dm = (DataModel) data;
+        int n = (Integer) dm.data[0];
+        Mode m = (Mode) dm.data[1];
+
+        if (m == Mode.DEFAULT) {
+            if (node.jjtGetChild(0) instanceof ASTTab) {
+                var varIndex = node.jjtGetChild(0).jjtGetChild(1);
+                ASTTab nodeTab = (ASTTab) node.jjtGetChild(0);
+                ASTIdent i = (ASTIdent) nodeTab.jjtGetChild(0);
+
+                ASTAInc nAInc = new ASTAInc(JJTAINC);
+                ASTJcIdent nJcIdent = new ASTJcIdent(JJTJCIDENT);
+                nJcIdent.jjtSetValue(i.jjtGetValue());
+                nAInc.jjtAddChild(nJcIdent,0);
+
+                int ne = (int) varIndex.jjtAccept(this, data);
+                int ne1 = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+ne, Mode.DEFAULT));
+
+                instrs.add(nAInc);
+
+                return ne+ne1+1;
+            }
+
+            ASTInc nInc = new ASTInc(JJTINC);
+            ASTJcIdent nJcIdent = new ASTJcIdent(JJTJCIDENT);
+            nJcIdent.jjtSetValue(((ASTIdent) node.jjtGetChild(0)).jjtGetValue());
+            nInc.jjtAddChild(nJcIdent,0);
+
+            int ne = (int) node.jjtGetChild(1).jjtAccept(this, data);
+
+            instrs.add(nInc);
+
+            return ne+1;
+        }
+
         return 0;
     }
 
     @Override
     public Object visit(ASTIncrement node, Object data) {
+        DataModel dm = (DataModel) data;
+        int n = (Integer) dm.data[0];
+        Mode m = (Mode) dm.data[1];
+
+        if (m == Mode.DEFAULT) {
+            ASTPush nPush = new ASTPush(JJTPUSH);
+            ASTJcNbre nJcNbre = new ASTJcNbre(JJTJCNBRE);
+            nJcNbre.jjtSetValue(1);
+            nPush.jjtAddChild(nJcNbre,0);
+
+            instrs.add(nPush);
+
+            if (node.jjtGetChild(0) instanceof ASTTab) {
+                var varIndex = node.jjtGetChild(0).jjtGetChild(1);
+                ASTTab nodeTab = (ASTTab) node.jjtGetChild(0);
+                ASTIdent i = (ASTIdent) nodeTab.jjtGetChild(0);
+
+                ASTAInc nAInc = new ASTAInc(JJTAINC);
+                ASTJcIdent nJcIdent = new ASTJcIdent(JJTJCIDENT);
+                nJcIdent.jjtSetValue(i.jjtGetValue());
+                nAInc.jjtAddChild(nJcIdent,0);
+
+                int ne = (int) varIndex.jjtAccept(this, data);
+
+                instrs.add(nAInc);
+
+                return ne+2;
+            }
+
+
+            ASTInc nInc = new ASTInc(JJTINC);
+            ASTJcIdent nJcIdent = new ASTJcIdent(JJTJCIDENT);
+            nJcIdent.jjtSetValue(((ASTIdent) node.jjtGetChild(0)).jjtGetValue());
+            nInc.jjtAddChild(nJcIdent,0);
+
+            instrs.add(nInc);
+
+            return 2;
+        }
+
         return 0;
     }
 
@@ -530,10 +694,10 @@ public class CompilerVisitor implements MiniJajaVisitor {
     @Override
     public Object visit(ASTLongeur node, Object data) {
         ASTLength lengthNode = new ASTLength(JJTLENGTH);
-        ASTJcIdent ident = new ASTJcIdent(JJTJCIDENT);
+        ASTJcIdent nJcIdent = new ASTJcIdent(JJTJCIDENT);
 
-        ident.jjtSetValue(((ASTIdent) node.jjtGetChild(0)).jjtGetValue());
-        lengthNode.jjtAddChild(ident,0);
+        nJcIdent.jjtSetValue(((ASTIdent) node.jjtGetChild(0)).jjtGetValue());
+        lengthNode.jjtAddChild(nJcIdent,0);
 
         instrs.add(lengthNode);
 
@@ -578,6 +742,22 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTTab node, Object data) {
+        DataModel dm = (DataModel) data;
+        int n = (Integer) dm.data[0];
+        Mode m = (Mode) dm.data[1];
+
+        if (m == Mode.DEFAULT) {
+            ASTALoad nALoad = new ASTALoad(JJTALOAD);
+            ASTJcIdent nJcIdent = new ASTJcIdent(JJTJCIDENT);
+
+            nJcIdent.jjtSetValue(((ASTIdent) node.jjtGetChild(0)).jjtGetValue());
+            nALoad.jjtAddChild(nJcIdent,0);
+
+            int ne = (int) node.jjtGetChild(1).jjtAccept(this, data);
+
+            return ne+1;
+        }
+
         return 0;
     }
 
@@ -681,7 +861,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         return 2;
     }
 
-    private int retraitDeclVar(Node node, Object data) {
+    private int declVar(Node node, Object data) {
         DataModel dm = (DataModel) data;
         int n = (Integer) dm.data[0];
         Mode m = (Mode) dm.data[1];
