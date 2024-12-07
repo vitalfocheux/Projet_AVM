@@ -1,10 +1,7 @@
 package fr.m1comp5.jjc;
 
 import fr.m1comp5.jjc.generated.ASTJajaCode;
-<<<<<<< Interpreter/src/main/java/fr/m1comp5/jjc/InterpreterJcc.java
-=======
 import fr.m1comp5.jjc.generated.ASTJcnil;
->>>>>>> Interpreter/src/main/java/fr/m1comp5/jjc/InterpreterJcc.java
 import fr.m1comp5.jjc.generated.Node;
 import fr.m1comp5.mjj.VisitorMjj;
 import fr.m1comp5.Memory;
@@ -28,7 +25,7 @@ public class InterpreterJcc {
 
     public String interpret() {
         System.out.println("Activating debugger...");
-        VisitorJcc.ActiverDebugger(true);
+        visitorJcc.ActiverDebugger(true);
         int addr = 1;
         while (addr < instrs.size()) {
             instrs.get(addr - 1).jjtAccept(visitorJcc, null);
@@ -56,7 +53,7 @@ public class InterpreterJcc {
 
     public void setDebugger(InterpreterDebugger debugger ) {
         this.debugger = debugger;
-        VisitorJcc.setDebugger(debugger);
+        visitorJcc.setDebugger(debugger);
     }
 
 
