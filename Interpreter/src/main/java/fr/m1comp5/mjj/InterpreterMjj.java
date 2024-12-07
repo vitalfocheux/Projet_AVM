@@ -1,6 +1,6 @@
 package fr.m1comp5.mjj;
 
-import fr.m1comp5.MjjDebug.InterpreterDebugger;
+import fr.m1comp5.Debug.InterpreterDebugger;
 import fr.m1comp5.mjj.generated.Node;
 
 public class InterpreterMjj {
