@@ -116,4 +116,8 @@ public class SymbolTable
         }
     }
 
+    public List<HashTable> getScopes() {
+        return scopes;
+    }
+
 }
