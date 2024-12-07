@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Abstract class for debugging the interpreter.
+ *  class for debugging the interpreter.
  * Manages breakpoints, event handling, and interpreter control.
  */
-public abstract class InterpreterDebugger {
+public class InterpreterDebugger {
     protected Debugger interpreter;
     protected List<fr.m1comp5.mjj.generated.Node> breakpointNodesM;
     protected List<fr.m1comp5.jjc.generated.Node> breakpointNodesC;
