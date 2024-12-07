@@ -1,11 +1,13 @@
 package fr.m1comp5.mjj;
-
 import fr.m1comp5.*;
+import fr.m1comp5.MjjDebug.InterpreterDebugger;
 import fr.m1comp5.mjj.generated.*;
 
 public class VisitorMjj implements MiniJajaVisitor {
     private String toDisplay;
     private Memory memory;
+    private InterpreterDebugger debugger;   
+    private boolean activerDebugger;
 
     public VisitorMjj() {
         try
@@ -23,6 +25,25 @@ public class VisitorMjj implements MiniJajaVisitor {
         return this.toDisplay;
     }
 
+    public void setDebugger(InterpreterDebugger debug) {
+        this.debugger = debug;
+    }
+
+    public void ActiverDebugger(boolean flag) {
+        this.activerDebugger = flag;
+    }
+
+    public void checkDebugNode(Node node)  {
+        if (activerDebugger && debugger != null) {
+            try {
+                debugger.onNodeVisit(node);
+            } catch (Exception e) {
+                // If an exception is thrown, we deactivate the debugger
+                activerDebugger = false;
+            }
+        }
+    }
+
     @Override
     public Object visit(SimpleNode node, Object data) {
         return null;
@@ -37,6 +58,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTClasse node, Object data) {
         String id = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
+        checkDebugNode(node);
         try {
             memory.getSymbolTable().newScope();
             memory.declVar(id, null, ObjectType.OMEGA);
@@ -54,6 +76,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTIdent node, Object data) {
+        checkDebugNode(node);
         try {
             if (memory.getSymbolTable().get((String) node.jjtGetValue()).getType() == ObjectType.OMEGA) {
                 throw new Exception();
@@ -69,6 +92,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTDecls node, Object data) {
+        checkDebugNode(node);
         RDeclsAndVars(node, data);
         return null;
     }
@@ -77,6 +101,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTMethode node, Object data) {
         ObjectType type = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         String id = (String) ((ASTIdent) node.jjtGetChild(1)).jjtGetValue();
+        checkDebugNode(node);
         try
         {
             if (data == MjjInterpreterMode.DEFAULT)
@@ -118,7 +143,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         if (node.jjtGetNumChildren() > 2) {
             value = node.jjtGetChild(2).jjtAccept(this, data); // Retrieve the initialized value
         }
-
+        checkDebugNode(node);
         try
         {
             if (data == MjjInterpreterMode.DEFAULT)
@@ -150,6 +175,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         if (node.jjtGetNumChildren() > 2 && data == MjjInterpreterMode.DEFAULT) {
             value = node.jjtGetChild(2).jjtAccept(this, data); // Retrieve the initialized value
         }
+        checkDebugNode(node);
         try
         {
             if (data == MjjInterpreterMode.DEFAULT)
@@ -173,6 +199,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         ObjectType type = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         String id = (String) ((ASTIdent) node.jjtGetChild(1)).jjtGetValue();
         int arraySize = (int) node.jjtGetChild(2).jjtAccept(this, data);
+        checkDebugNode(node);
         try
         {
             if (data == MjjInterpreterMode.DEFAULT)
@@ -197,6 +224,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTMain node, Object data) {
+        checkDebugNode(node);
         memory.getSymbolTable().newScope();
         node.jjtGetChild(0).jjtAccept(this, MjjInterpreterMode.DEFAULT);
         node.jjtGetChild(1).jjtAccept(this, MjjInterpreterMode.DEFAULT);
@@ -244,6 +272,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTRetour node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
+        checkDebugNode(node);
         try
         {
             memory.assignValue(memory.classVariable(), val);
@@ -259,6 +288,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTEcrire node, Object data) {
         Object value = node.jjtGetChild(0).jjtAccept(this, data);
+        checkDebugNode(node);
         try {
             if (value instanceof String) {
                 toDisplay += ((String) value).replace("\"","");
@@ -275,6 +305,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTEcrireLn node, Object data) {
         Object value = node.jjtGetChild(0).jjtAccept(this, data);
+        checkDebugNode(node);
         try {
             if (value instanceof String) {
                 toDisplay += (String) ((String) value).replace("\"","");
@@ -292,6 +323,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTSi node, Object data) {
         Object value = node.jjtGetChild(0).jjtAccept(this, data);
+        checkDebugNode(node);
         try {
             if ((boolean) value) {
                 node.jjtGetChild(1).jjtAccept(this, data);
@@ -307,6 +339,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTTantQue node, Object data) {
+        checkDebugNode(node);
         try {
             while ((boolean) node.jjtGetChild(0).jjtAccept(this, data))
             {
@@ -321,6 +354,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTAffectation node, Object data) {
+        checkDebugNode(node);
         try {
             Object val = node.jjtGetChild(1).jjtAccept(this, data);
             if (node.jjtGetChild(0) instanceof ASTTab tab)
@@ -347,6 +381,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTSomme node, Object data) {
+        checkDebugNode(node);
         try {
             int val = (int) node.jjtGetChild(1).jjtAccept(this, data);
             if (node.jjtGetChild(0) instanceof ASTTab tab)
@@ -370,6 +405,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTIncrement node, Object data) {
+        checkDebugNode(node);
         try
         {
             if (node.jjtGetChild(0) instanceof ASTTab tab)
@@ -395,6 +431,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTAppelI node, Object data) {
+        checkDebugNode(node);
         String funcID = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
         Node lexp = node.jjtGetChild(1);
         try
@@ -503,6 +540,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTLongeur node, Object data) {
+        checkDebugNode(node);
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -536,6 +574,7 @@ public class VisitorMjj implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTAppelE node, Object data) {
+        checkDebugNode(node);
         try
         {
             ASTAppelI appelI = new ASTAppelI(MiniJajaTreeConstants.JJTAPPELI);

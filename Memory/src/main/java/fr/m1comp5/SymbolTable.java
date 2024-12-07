@@ -84,4 +84,8 @@ public class SymbolTable
         scopes.get(scopes.size() - 1).update(id, val);
     }
 
+    public List<HashTable> getScopes() {
+        return scopes;
+    }
+
 }
