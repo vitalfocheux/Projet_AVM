@@ -3,6 +3,8 @@ options {
     NODE_DEFAULT_VOID = true;
     MULTI = true;
     VISITOR = true;
+    NODE_CLASS = "fr.m1comp5.custom.node.PositionableJjcSimpleNode";
+    TRACK_TOKENS = true;
 }
 
 PARSER_BEGIN(JajaCode)

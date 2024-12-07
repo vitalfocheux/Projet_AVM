@@ -21,8 +21,6 @@ public class Compiler {
         try {
             root.jjtAccept(visitor, new DataModel(1,Mode.DEFAULT));
             instrs = visitor.getInstrs();
-            System.out.println("Compiling to jajacode...");
-            writeJjcFile();
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
@@ -34,17 +32,11 @@ public class Compiler {
             sb.append(instr.toString());
             sb.append("\n");
         }
-        return null;
+        return sb.toString();
     }
 
-    public void writeJjcFile() {
-        File dir = new File("CompilerCode");
-        int filecount = 0;
-        if (dir.isDirectory()) {
-            filecount = dir.listFiles().length;
-        }
-        filecount++;
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("./CompiledCode/temp"+filecount+".jjc"))) {
+    public void writeJjcFile(String filename) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("./bin/"+filename+".jjc"))) {
             bw.write(jjcToString());
         } catch (Exception e) {
             System.err.println(e.getMessage());

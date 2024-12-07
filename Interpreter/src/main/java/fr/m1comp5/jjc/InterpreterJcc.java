@@ -1,6 +1,10 @@
 package fr.m1comp5.jjc;
 
 import fr.m1comp5.jjc.generated.ASTJajaCode;
+<<<<<<< Interpreter/src/main/java/fr/m1comp5/jjc/InterpreterJcc.java
+=======
+import fr.m1comp5.jjc.generated.ASTJcnil;
+>>>>>>> Interpreter/src/main/java/fr/m1comp5/jjc/InterpreterJcc.java
 import fr.m1comp5.jjc.generated.Node;
 import fr.m1comp5.mjj.VisitorMjj;
 import fr.m1comp5.Memory;
@@ -11,14 +15,14 @@ import java.util.List;
 
 public class InterpreterJcc {
     private Node root;
-    private VisitorJcc VisitorJcc;
+    private VisitorJcc visitorJcc;
     private List<Node> instrs;
     private InterpreterDebugger debugger;
 
 
     public InterpreterJcc(Node root, Memory mem, List<Node> instrs) {
         this.root = root;
-        VisitorJcc = new VisitorJcc(mem);
+        visitorJcc = new VisitorJcc(mem);
         this.instrs = instrs;
     }
 
@@ -27,16 +31,17 @@ public class InterpreterJcc {
         VisitorJcc.ActiverDebugger(true);
         int addr = 1;
         while (addr < instrs.size()) {
-            instrs.get(addr-1).jjtAccept(VisitorJcc, null);
-            addr++;
+            instrs.get(addr - 1).jjtAccept(visitorJcc, null);
+            addr = visitorJcc.getAddr();
         }
-        instrs.get(instrs.size()-1).jjtAccept(VisitorJcc, null);
+        instrs.get(instrs.size()-1).jjtAccept(visitorJcc, null);
+        
         if (debugger != null) {
             debugger.triggerEventHandler(true, root);}
         
-        return VisitorJcc.toString();
+        return visitorJcc.toString();
     }
-
+    
     public static List<Node> getInstrsFromRoot(Node r)
     {
         List<Node> instructions = new ArrayList<>();
