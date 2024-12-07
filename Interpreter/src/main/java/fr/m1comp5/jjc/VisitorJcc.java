@@ -5,12 +5,16 @@ import fr.m1comp5.Memory;
 import fr.m1comp5.MemoryObject;
 import fr.m1comp5.ObjectNature;
 import fr.m1comp5.ObjectType;
+import fr.m1comp5.Debug.InterpreterDebugger;
 
 
 public class VisitorJcc implements JajaCodeVisitor {
     private String toDisplay;
     private Memory mem;
     private int addr;
+     private InterpreterDebugger debugger;   
+    private boolean activerDebugger;
+
 
     public VisitorJcc(Memory mem) {
         this.toDisplay = "";
@@ -30,6 +34,24 @@ public class VisitorJcc implements JajaCodeVisitor {
         return toDisplay;
     }
 
+    public void setDebugger(InterpreterDebugger debug) {
+        this.debugger = debug;
+    }
+
+    public void ActiverDebugger(boolean flag) {
+        this.activerDebugger = flag;
+    }
+    public void checkDebugNode(Node node)  {
+        if (activerDebugger && debugger != null) {
+            try {
+                debugger.onNodeVisitJJC(node);
+            } catch (Exception e) {
+                // If an exception is thrown, we deactivate the debugger
+                activerDebugger = false;
+            }
+        }
+    }
+  
     @Override
     public Object visit(SimpleNode node, Object data) {
         return null;
@@ -64,6 +86,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTSwap node, Object data) {
+        checkDebugNode(node);
         try
         {
             mem.getStack().swap();
@@ -82,7 +105,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         ObjectType type = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
         ObjectNature nature = (ObjectNature) node.jjtGetChild(2).jjtAccept(this, data);
         int pos = (int) node.jjtGetChild(3).jjtAccept(this, data);
-
+        checkDebugNode(node);
         switch (nature) {
             case VAR :
                 try
@@ -124,6 +147,7 @@ public class VisitorJcc implements JajaCodeVisitor {
     {
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         ObjectType arrayType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
+        checkDebugNode(node);
         try
         {
             mem.declTab(id, mem.getStack().getTop().getValue(), arrayType);
@@ -138,6 +162,7 @@ public class VisitorJcc implements JajaCodeVisitor {
     @Override
     public Object visit(ASTInvoke node, Object data) {
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        checkDebugNode(node);
         try
         {
             mem.declCst(null, addr + 1, ObjectType.INT);
@@ -155,6 +180,7 @@ public class VisitorJcc implements JajaCodeVisitor {
     @Override
     public Object visit(ASTLength node, Object data) {
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        checkDebugNode(node);
         try
         {
             return mem.getHeap().getArraySize((int) mem.getSymbolTable().get(id).getValue());
@@ -167,6 +193,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTReturn node, Object data) {
+        checkDebugNode(node);
         try
         {
             MemoryObject mo = mem.getStack().pop();
@@ -182,6 +209,7 @@ public class VisitorJcc implements JajaCodeVisitor {
     @Override
     public Object visit(ASTWrite node, Object data) {
         StringBuilder sb = new StringBuilder();
+        checkDebugNode(node);
         try
         {
             Object msg = mem.getStack().pop().getValue();
@@ -206,6 +234,7 @@ public class VisitorJcc implements JajaCodeVisitor {
     @Override
     public Object visit(ASTWriteLn node, Object data) {
         StringBuilder sb = new StringBuilder();
+        checkDebugNode(node);
         try
         {
             Object msg = mem.getStack().pop().getValue();
@@ -230,6 +259,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTPush node, Object data) {
+        checkDebugNode(node);
         Object value = node.jjtGetChild(0).jjtAccept(this, data);
         ObjectType valType = null;
         if (value instanceof  Integer)
@@ -258,6 +288,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTPop node, Object data) {
+        checkDebugNode(node);
         try
         {
             MemoryObject mo = mem.getStack().pop();
@@ -277,6 +308,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTLoad node, Object data) {
+        checkDebugNode(node);
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -293,6 +325,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTALoad node, Object data) {
+        checkDebugNode(node);
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -310,6 +343,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTStore node, Object data) {
+        checkDebugNode(node);
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -330,6 +364,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTAStore node, Object data) {
+        checkDebugNode(node);
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -351,6 +386,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTIf node, Object data) {
+        checkDebugNode(node);
         int address = (int) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -376,12 +412,14 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTGoTo node, Object data) {
+        checkDebugNode(node);
         addr = (int) node.jjtGetChild(0).jjtAccept(this, data);
         return null;
     }
 
     @Override
     public Object visit(ASTInc node, Object data) {
+        checkDebugNode(node);
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -398,6 +436,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTAInc node, Object data) {
+        checkDebugNode(node);
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -415,12 +454,14 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTNop node, Object data) {
+        checkDebugNode(node);
         ++addr;
         return null;
     }
 
     @Override
     public Object visit(ASTJcStop node, Object data) {
+        checkDebugNode(node);
         return null;
     }
 
@@ -432,6 +473,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTNeg node, Object data) {
+        checkDebugNode(node);
         try
         {
             MemoryObject last = mem.getStack().pop();
@@ -450,6 +492,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTNot node, Object data) {
+        checkDebugNode(node);
         try
         {
             MemoryObject last = mem.getStack().pop();
@@ -468,6 +511,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTAdd node, Object data) {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -487,6 +531,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTSub node, Object data) {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -506,6 +551,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTMul node, Object data) {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -525,6 +571,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTDiv node, Object data) {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -548,6 +595,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTCmp node, Object data) {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -567,6 +615,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTSup node, Object data) {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -586,6 +635,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTOr node, Object data) {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -605,6 +655,7 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTAnd node, Object data) {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
