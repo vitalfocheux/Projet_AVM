@@ -8,6 +8,7 @@ import fr.m1comp5.Logger.AppLogger;
 
 public class TypeChecker implements MiniJajaVisitor {
 
+    private SymbolTable symbolTable;
     private Stack stack = new Stack(); // Pile pour gérer les portées
     private String currentMethod = null; // Méthode courante
     private AppLogger logger = AppLogger.getInstance();

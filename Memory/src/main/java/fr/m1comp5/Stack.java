@@ -97,7 +97,7 @@ public class Stack {
         for (int i = top; i >= 0; --i)
         {
             MemoryObject mo = stackList.get(i);
-            if (mo.getId().equals(id))
+            if (mo.getId() != null && mo.getId().equals(id))
             {
                 return mo;
             }
