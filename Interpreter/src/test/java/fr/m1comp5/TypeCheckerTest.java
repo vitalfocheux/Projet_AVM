@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import fr.m1comp5.Debug.AppLogger;
-import fr.m1comp5.Debug.TestLoggerListener;
+import fr.m1comp5.Logger.AppLogger;
+import fr.m1comp5.Logger.TestLoggerListener;
 import fr.m1comp5.Typechecker.TypeChecker;
 
 

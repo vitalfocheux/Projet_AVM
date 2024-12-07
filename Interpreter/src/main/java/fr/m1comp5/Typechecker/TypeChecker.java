@@ -1,9 +1,9 @@
 package fr.m1comp5.Typechecker;
 import fr.m1comp5.*;
 import fr.m1comp5.mjj.generated.*;
-import fr.m1comp5.Debug.AppLogger;
 import java.util.ArrayList;
 import java.util.List;
+import fr.m1comp5.Logger.AppLogger;
 
 
 public class TypeChecker implements MiniJajaVisitor {
