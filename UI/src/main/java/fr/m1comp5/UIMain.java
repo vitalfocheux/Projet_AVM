@@ -1,22 +1,9 @@
 package fr.m1comp5;
 
 import javafx.application.Application;
-import javafx.stage.Stage;
 
-/**
- * JavaFX App
- */
-public class UIMain extends Application {
-
-    @Override
-    public void start(Stage stage) {
-        IDE testJavaFx = new IDE();
-        testJavaFx.mainScreen(stage);
-    }
-
+public class UIMain {
     public static void main(String[] args) {
-//      MiniJajaWindow mjjwindow = new MiniJajaWindow();
-//      mjjwindow.showWindow();
-        launch();
+        Application.launch(MiniJajaWindow.class, args);
     }
 }
