@@ -37,10 +37,13 @@ public class HashTable
     {
         final int FNV_PRIME = 0x01000193;
         int hashCode = 0x811c9dc5;
-        for (char c : key.toCharArray())
+        if (key != null)
         {
-            hashCode ^= c;
-            hashCode *= FNV_PRIME;
+            for (char c : key.toCharArray())
+            {
+                hashCode ^= c;
+                hashCode *= FNV_PRIME;
+            }
         }
         return Math.abs(hashCode % size);
     }

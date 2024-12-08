@@ -3,12 +3,14 @@ options {
     NODE_DEFAULT_VOID = true;
     MULTI = true;
     VISITOR = true;
+    NODE_CLASS = "fr.m1comp5.custom.node.PositionableMjjSimpleNode";
+    TRACK_TOKENS = true;
 }
 
 PARSER_BEGIN(MiniJaja)
 package fr.m1comp5.mjj.generated;
 
-import org.javacc.jjtree.JJTreeParserConstants;public class MiniJaja
+public class MiniJaja
 {
 }
 PARSER_END(MiniJaja)
