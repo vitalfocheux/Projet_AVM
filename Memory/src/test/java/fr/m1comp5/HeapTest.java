@@ -88,6 +88,38 @@ public class HeapTest {
     }
 
     @Test
+    public void allocateINT() throws HeapException {
+        int address = heap.allocateInHeap(1, ObjectType.INT);
+        Assertions.assertEquals(0, heap.accessValue(address, 0));
+        Assertions.assertEquals(1, heap.getSizeOfElement(address));
+        Assertions.assertEquals(ObjectType.INT, heap.getTypeOfElement(address));
+    }
+
+    @Test
+    public void allocateBOOL() throws HeapException {
+        int address = heap.allocateInHeap(1, ObjectType.BOOLEAN);
+        Assertions.assertEquals(false, heap.accessValue(address, 0));
+        Assertions.assertEquals(1, heap.getSizeOfElement(address));
+        Assertions.assertEquals(ObjectType.BOOLEAN, heap.getTypeOfElement(address));
+    }
+
+    @Test
+    public void allocateVOID() throws HeapException {
+        int address = heap.allocateInHeap(1, ObjectType.VOID);
+        Assertions.assertEquals(null, heap.accessValue(address, 0));
+        Assertions.assertEquals(1, heap.getSizeOfElement(address));
+        Assertions.assertEquals(ObjectType.VOID, heap.getTypeOfElement(address));
+    }
+
+    @Test
+    public void allocateOMEGA() throws HeapException {
+        int address = heap.allocateInHeap(1, ObjectType.OMEGA);
+        Assertions.assertEquals(null, heap.accessValue(address, 0));
+        Assertions.assertEquals(1, heap.getSizeOfElement(address));
+        Assertions.assertEquals(ObjectType.OMEGA, heap.getTypeOfElement(address));
+    }
+
+    @Test
     public void decrementReference() throws HeapException {
         int address = heap.allocateInHeap(2, ObjectType.INT, 1);
         heap.decrementReference(address);
@@ -195,5 +227,18 @@ public class HeapTest {
         expected += "\nIsFree : true], "+size+"=[]}";
         Map<Integer, List<HeapBlock>> blocks = heap.getBlocks();
         Assertions.assertEquals(expected, blocks.toString());
+    }
+
+    @Test
+    public void getArraySizeHeapEmpty(){
+        Assertions.assertThrows(HeapException.class, () -> {
+            heap.getSizeOfElement(0);
+        });
+    }
+
+    @Test
+    public void getArraySize() throws HeapException {
+        int address = heap.allocateInHeap(1, ObjectType.INT, 42);
+        Assertions.assertEquals(1, heap.getArraySize(address));
     }
 }
