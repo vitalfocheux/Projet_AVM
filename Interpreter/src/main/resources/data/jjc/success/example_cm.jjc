@@ -1,24 +1,25 @@
-init
-push(0)
-new(x,entier,var,0)
-push(7)
-new(f,entier,meth,0)
-goto(11)
-new(p,entier,var,1)
-load(p)
-swap
-return
-push(3)
-store(x)
-load(x)
-invoke(f)
-swap
-pop
-inc(x)
-push(0)
-swap
-pop
-swap
-pop
-pop
-jcstop
+1 init;
+2 push(0);
+3 new(x,entier,var,0);
+4 push(7);
+5 new(f,entier,meth,0);
+6 goto(11);
+7 new(p,entier,var,1);
+8 load(p);
+9 swap;
+10 return;
+11 push(3);
+12 store(x);
+13 load(x);
+14 invoke(f);
+15 swap;
+16 pop;
+17 inc(x);
+18 write;
+19 push(0);
+20 swap;
+21 pop;
+22 swap;
+23 pop;
+24 pop;
+25 jcstop;
