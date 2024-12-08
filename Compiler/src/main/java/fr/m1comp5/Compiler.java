@@ -5,6 +5,7 @@ import fr.m1comp5.mjj.generated.Node;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Compiler {
@@ -15,6 +16,7 @@ public class Compiler {
     public Compiler(Node root) {
         this.root = root;
         this.visitor = new CompilerVisitor();
+        instrs = new ArrayList<>();
     }
 
     public void compile() {
