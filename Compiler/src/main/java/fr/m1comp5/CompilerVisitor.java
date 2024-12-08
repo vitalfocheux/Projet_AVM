@@ -790,14 +790,14 @@ public class CompilerVisitor implements MiniJajaVisitor {
     private fr.m1comp5.jjc.generated.Node getNodeOp(Node node) {
         fr.m1comp5.jjc.generated.Node opNode = null;
 
-        if (node instanceof ASTAdd) opNode = (fr.m1comp5.jjc.generated.Node) new ASTAdd(JJTADD);
-        else if (node instanceof ASTSub) opNode = (fr.m1comp5.jjc.generated.Node) new ASTSub(JJTSUB);
-        else if (node instanceof ASTMul) opNode = (fr.m1comp5.jjc.generated.Node) new ASTMul(JJTMUL);
-        else if (node instanceof ASTDiv) opNode = (fr.m1comp5.jjc.generated.Node) new ASTDiv(JJTDIV);
-        else if (node instanceof ASTSup) opNode = (fr.m1comp5.jjc.generated.Node) new ASTSup(JJTSUP);
-        else if (node instanceof ASTEq) opNode = new ASTCmp(JJTCMP);
-        else if (node instanceof ASTOu) opNode = new ASTOr(JJTOR);
-        else if (node instanceof ASTEt) opNode = new ASTAnd(JJTAND);
+        if (node instanceof ASTAdd) opNode = new fr.m1comp5.jjc.generated.ASTAdd(JJTADD);
+        else if (node instanceof ASTSub) opNode =  new fr.m1comp5.jjc.generated.ASTSub(JJTSUB);
+        else if (node instanceof ASTMul) opNode =  new fr.m1comp5.jjc.generated.ASTMul(JJTMUL);
+        else if (node instanceof ASTDiv) opNode =  new fr.m1comp5.jjc.generated.ASTDiv(JJTDIV);
+        else if (node instanceof ASTSup) opNode =  new fr.m1comp5.jjc.generated.ASTSup(JJTSUP);
+        else if (node instanceof ASTEq) opNode = new fr.m1comp5.jjc.generated.ASTCmp(JJTCMP);
+        else if (node instanceof ASTOu) opNode = new fr.m1comp5.jjc.generated.ASTOr(JJTOR);
+        else if (node instanceof ASTEt) opNode = new fr.m1comp5.jjc.generated.ASTAnd(JJTAND);
 
         return opNode;
     }
