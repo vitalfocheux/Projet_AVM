@@ -6,6 +6,8 @@ import fr.m1comp5.MemoryObject;
 import fr.m1comp5.ObjectNature;
 import fr.m1comp5.ObjectType;
 
+import java.util.List;
+
 
 public class VisitorJcc implements JajaCodeVisitor {
     private String toDisplay;
@@ -20,10 +22,6 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     public int getAddr() {
         return addr;
-    }
-
-    public void setAddr(int addr) {
-        this.addr = addr;
     }
 
     public String getToDisplay() {
@@ -57,8 +55,8 @@ public class VisitorJcc implements JajaCodeVisitor {
 
     @Override
     public Object visit(ASTInit node, Object data) {
-        addr++;
         mem.getSymbolTable().newScope();
+        addr++;
         return null;
     }
 
@@ -126,12 +124,13 @@ public class VisitorJcc implements JajaCodeVisitor {
         ObjectType arrayType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
         try
         {
-            mem.declTab(id, mem.getStack().getTop().getValue(), arrayType);
+            mem.declTab(id, mem.getStack().pop().getValue(), arrayType);
         }
         catch (Exception e)
         {
             throw new RuntimeException(e.getMessage());
         }
+        addr++;
         return null;
     }
 
@@ -140,15 +139,14 @@ public class VisitorJcc implements JajaCodeVisitor {
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
-            mem.declCst(null, addr + 1, ObjectType.INT);
+            mem.getSymbolTable().newScope();
+            mem.getStack().push(new MemoryObject(null, addr + 1, ObjectNature.CST, ObjectType.INT));
             addr = (int) mem.getVal(id);
         }
         catch (Exception e)
         {
             System.err.println(e.getMessage());
         }
-
-
         return null;
     }
 
@@ -169,6 +167,7 @@ public class VisitorJcc implements JajaCodeVisitor {
     public Object visit(ASTReturn node, Object data) {
         try
         {
+            mem.getSymbolTable().popScope();
             MemoryObject mo = mem.getStack().pop();
             addr = (int) mo.getValue();
         }
@@ -679,6 +678,11 @@ public class VisitorJcc implements JajaCodeVisitor {
     @Override
     public Object visit(ASTJcChaine node, Object data) {
         return node.jjtGetValue();
+    }
+
+    public String toString()
+    {
+        return toDisplay;
     }
 
 }

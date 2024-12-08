@@ -2,6 +2,8 @@ package fr.m1comp5;
 
 import fr.m1comp5.mjj.generated.*;
 
+import java.util.List;
+
 public class Memory {
     private SymbolTable symbolTable;
     private Stack stack;
@@ -33,12 +35,21 @@ public class Memory {
         stack.push(mo);
     }
 
-    public void identVal(String ident, ObjectType type, int s) throws StackException, SymbolTableException, Exception {
-        MemoryObject mo = stack.getObjectFromTheTop(s);
-        if (mo.getType() != ObjectType.OMEGA)
+    public void declVarsFromListOfParams(List<MemoryObject> fctParams) throws StackException, SymbolTableException
+    {
+        if (fctParams == null)
         {
-            throw new Exception("IdentVal must happen on an object with ");
+            return;
         }
+        for (MemoryObject mo : fctParams)
+        {
+            symbolTable.putObjectInCurrentScope(mo);
+            stack.push(mo);
+        }
+    }
+
+    public void identVal(String ident, ObjectType type, int s) throws StackException, SymbolTableException {
+        MemoryObject mo = stack.getObjectFromTheTop(s);
         symbolTable.removeObjectFromCurrentScope(mo);
         mo.setId(ident);
         mo.setType(type);
