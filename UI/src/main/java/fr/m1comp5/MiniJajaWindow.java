@@ -3,368 +3,1024 @@ package fr.m1comp5;
 import fr.m1comp5.mjj.generated.MiniJaja;
 import fr.m1comp5.mjj.generated.ParseException;
 import fr.m1comp5.mjj.generated.SimpleNode;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import fr.m1comp5.mjj.InterpreterMjj;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import java.io.*;
-import java.util.HashMap;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import java.nio.file.Files;
+import java.time.Duration;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
+import javafx.util.Pair;
+;
 
 
-public class MiniJajaWindow
-{
-    private static JFrame mainFrame;
-    static JMenu fileMenu,editMenu, viewMenu, helpMenu;
-    private static JTabbedPane tabbedPane;
-    private static JTextArea editorArea, consoleArea;
 
-    private static HashMap<JTextArea, Boolean> unsavedChanges = new HashMap<>(); // Track unsaved changes
-    private static HashMap<JTextArea, File> openFiles = new HashMap<>(); // Map each tab's JTextArea to the open file
-
-    public MiniJajaWindow()
-    {
-        // Créer la fenêtre principale
-        mainFrame = new JFrame("Minijaja Compiler");
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setSize(800, 600);
-
-        // Création de la barre de menu
-        JMenuBar menuBar = new JMenuBar();
-
-        // Créer les menus
-        fileMenu = new JMenu("File");
-        editMenu = new JMenu("Edit");
-        viewMenu = new JMenu("View");
-        helpMenu = new JMenu("Help");
-
-        // Ajouter des éléments dans le menu "File" avec des icônes redimensionnées
-        JMenuItem newFileItem = new JMenuItem("New File", resizeIcon("/icon/new-file.png", 22, 22));
-        JMenuItem openFileItem = new JMenuItem("Open File", resizeIcon("/icon/open.png", 22, 22));
-        JMenuItem saveFileItem = new JMenuItem("Save File", resizeIcon("/icon/save.png", 22, 22));
-        fileMenu.add(newFileItem);
-        fileMenu.add(openFileItem);
-        fileMenu.add(saveFileItem);
-
-        // Ajouter des éléments dans le menu "Edit" avec des icônes
-        JMenuItem undoItem = new JMenuItem("Undo", resizeIcon("/icon/undo.png", 22, 22));
-        JMenuItem redoItem = new JMenuItem("Redo", resizeIcon("/icon/redo.png", 22, 22));
-        editMenu.add(undoItem);
-        editMenu.add(redoItem);
-
-        // Ajouter les menus à la barre de menu
-        menuBar.add(fileMenu);
-        menuBar.add(editMenu);
-        menuBar.add(viewMenu);
-        menuBar.add(helpMenu);
-
-        // Créer un panneau principal avec BorderLayout
-        JPanel mainPanel = new JPanel(new BorderLayout());
-
-        tabbedPane = new JTabbedPane();
-        // Créer une zone de texte
-        editorArea = new JTextArea();
-        editorArea.setFont(new Font("Consolas", Font.PLAIN, 14));
-        JScrollPane editorScrollPane = new JScrollPane(editorArea);
-
-        // Créer une console en bas de la fenêtre
-        consoleArea = new JTextArea(8, 40);  // Console avec 8 lignes visibles
-        consoleArea.setEditable(false);  // La console ne doit pas être modifiable
-        JScrollPane consoleScrollPane = new JScrollPane(consoleArea);
-
-        // Bouton pour exécuter le code avec une icône
-        ImageIcon runIcon = resizeIcon("", 32, 32);
-        JButton executeButton = new JButton("Run Code", runIcon);
+public class MiniJajaWindow extends Application {
+    private Stage primaryStage;
+    private CodeArea codeArea;
+    private TextArea consoleArea;
+    private File currentFile;
+    private boolean isModified;
+    private CodeArea jajaCodeArea;
+    private SplitPane mainSplitPane;
+    private VBox jajaCodeWrapper;
+    private SplitPane mainContentSplitPane;
+    private TreeView<File> fileExplorer;
+    private HBox mainContainer;
+    private TabPane editorTabPane;
+    private Map<Tab, File> tabFileMap = new HashMap<>();
+    private Scene scene;
 
 
-        // Créer une barre d'icônes (JToolBar)
-        JToolBar toolBar = new JToolBar();
-        JButton newFileButton = new JButton(resizeIcon("/icon/new-file.png", 22, 22));
-        newFileButton.setToolTipText("New File");
-        JButton openFileButton = new JButton(resizeIcon("/icon/open.png", 22, 22));
-        openFileButton.setToolTipText("Open File");
-        JButton saveFileButton = new JButton(resizeIcon("/icon/save.png", 22, 22));
-        saveFileButton.setToolTipText("Save File");
-        JButton runButton = new JButton(resizeIcon("/icon/code.png", 22, 22));
-        runButton.setToolTipText("Run Code");
 
-        //Action Listener pour ouverture fichier
-        ActionListener openFileAction = e -> openFile();
-        openFileButton.addActionListener(openFileAction);
-        openFileItem.addActionListener(openFileAction);
+    private static final Pattern KEYWORDS = Pattern.compile("\\b(class|extends|void|int|boolean|if|else|while|return|true|false|main|writeln)\\b");
+    private static final Pattern PARENTHESES = Pattern.compile("[()]");
+    private static final Pattern BRACES = Pattern.compile("[{}]");
+    private static final Pattern BRACKETS = Pattern.compile("[\\[\\]]");
+    private static final Pattern SEMICOLON = Pattern.compile(";");
+    private static final Pattern STRING_PATTERN = Pattern.compile("\"([^\"\\\\]|\\\\.)*\"");
+    private static final Pattern COMMENT_PATTERN = Pattern.compile("//[^\n]*|/\\*(.|\\R)*?\\*/");
+    private static final Pattern NUMBERS = Pattern.compile("\\b\\d+\\b");
+    private static final Pattern OPERATORS = Pattern.compile("[+\\-*/<>=!&|^~]");
+    private static final Pattern JAJACODE_INSTRUCTIONS = Pattern.compile("\\b(push|pop|load|store|add|sub|mul|div|not|and|or|neg|cmp|sup|jmp|jcmp)\\b");
 
-        //Action Listener pour nouveau fichier
-        ActionListener newFileAction = e -> newFile();
-        newFileButton.addActionListener((newFileAction));
-        newFileItem.addActionListener(newFileAction);
+    private StyleSpans<Collection<String>> computeHighlighting(String text) {
+        StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+        int lastKwEnd = 0;
 
-        //Action Listener pour sauvegarder fichier
-        ActionListener saveFileAction = e -> saveFile();
-        saveFileButton.addActionListener(saveFileAction);
-        saveFileItem.addActionListener(saveFileAction);
+        List<Pair<String, Pattern>> patterns = Arrays.asList(
+                new Pair<>("keyword", KEYWORDS),
+                new Pair<>("string", STRING_PATTERN),
+                new Pair<>("comment", COMMENT_PATTERN),
+                new Pair<>("number", NUMBERS),
+                new Pair<>("operator", OPERATORS),
+                new Pair<>("parenthesis", PARENTHESES),
+                new Pair<>("brace", BRACES),
+                new Pair<>("bracket", BRACKETS),
+                new Pair<>("semicolon", SEMICOLON),
+                new Pair<>("jajacode-instruction", JAJACODE_INSTRUCTIONS)
+        );
 
-        //Action Listener pour lancer l'execution
-        ActionListener runCodeAction = e -> runCode();
-        executeButton.addActionListener(runCodeAction);
-        runButton.addActionListener(runCodeAction);
-        //runButton.addActionListener(e -> executeButton.doClick());  // Exécuter le code via le bouton "Run Code"
 
-        // Ajouter les boutons à la barre d'outils
-        toolBar.add(newFileButton);
-        toolBar.add(openFileButton);
-        toolBar.add(saveFileButton);
-        toolBar.add(runButton);
-
-        // Créer un panneau pour la console et le bouton "Run Code"
-        JPanel consolePanel = new JPanel(new BorderLayout());
-        consolePanel.add(executeButton, BorderLayout.NORTH);  // Ajouter le bouton "Run Code" au-dessus de la console
-        consolePanel.add(consoleScrollPane, BorderLayout.CENTER);  // Ajouter la console en dessous
-
-        // Ajouter l'éditeur de texte à la partie centrale
-        mainPanel.add(editorScrollPane, BorderLayout.CENTER);
-
-        // Ajouter le panneau de la console en bas
-        mainFrame.add(consolePanel, BorderLayout.SOUTH);
-
-        // Ajouter la barre d'icônes en haut
-        mainFrame.add(toolBar, BorderLayout.NORTH);
-
-        // Ajouter le panneau principal à la fenêtre
-        //mainFrame.add(mainPanel);
-        tabbedPane.add(mainPanel);
-        tabbedPane.setTabComponentAt(0, new JLabel("Sans titre"));
-        mainFrame.add(tabbedPane, BorderLayout.CENTER);
-
-        // Ajouter la barre de menu
-        mainFrame.setJMenuBar(menuBar);
-
-    }
-
-    public void showWindow()
-    {
-        mainFrame.setVisible(true);
-    }
-
-    public void hideWindow()
-    {
-        mainFrame.setVisible(false);
-    }
-
-    private ImageIcon resizeIcon(String iconPath, int width, int height) {
-        ImageIcon icon = new ImageIcon(getClass().getResource(iconPath).getPath());
-        Image image = icon.getImage();
-        Image resizedImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        return new ImageIcon(resizedImage);
-    }
-
-    //open file function
-    private static void openFile() {
-    JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setMultiSelectionEnabled(true); // Enable selecting multiple files
-    int option = fileChooser.showOpenDialog(null);
-
-    if (option == JFileChooser.APPROVE_OPTION) {
-        File[] files = fileChooser.getSelectedFiles(); // Get all selected files
-        for (File file : files) {
-            try (FileReader reader = new FileReader(file)) {
-                JTextArea textArea = new JTextArea();
-                textArea.read(reader, null);
-                JScrollPane scrollPane = new JScrollPane(textArea);
-                tabbedPane.addTab(file.getName(), scrollPane);
-                int tabIndex = tabbedPane.getTabCount() - 1;
-
-                // Set custom tab with close button
-                tabbedPane.setTabComponentAt(tabIndex, createTabHeader(file.getName(), textArea));
-
-                // Track open files and changes
-                openFiles.put(textArea, file);
-                unsavedChanges.put(textArea, false);
-
-                // Add document listener to track changes in the JTextArea
-                textArea.getDocument().addDocumentListener(new DocumentListener() {
-                    @Override
-                    public void insertUpdate(DocumentEvent e) {
-                        unsavedChanges.put(textArea, true);
-                    }
-
-                    @Override
-                    public void removeUpdate(DocumentEvent e) {
-                        unsavedChanges.put(textArea, true);
-                    }
-
-                    @Override
-                    public void changedUpdate(DocumentEvent e) {
-                        unsavedChanges.put(textArea, true);
-                    }
-                });
-
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(mainFrame, "Error opening file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        List<IndexRange> ranges = new ArrayList<>();
+        for (Pair<String, Pattern> patternPair : patterns) {
+            Matcher matcher = patternPair.getValue().matcher(text);
+            while (matcher.find()) {
+                ranges.add(new IndexRange(matcher.start(), matcher.end(), patternPair.getKey()));
             }
         }
+
+
+        ranges.sort(Comparator.comparing(r -> r.start));
+
+        // Construire les spans
+        int lastEnd = 0;
+        for (IndexRange range : ranges) {
+            spansBuilder.add(Collections.emptyList(), range.start - lastEnd);
+            spansBuilder.add(Collections.singleton(range.style), range.end - range.start);
+            lastEnd = range.end;
+        }
+        spansBuilder.add(Collections.emptyList(), text.length() - lastEnd);
+
+        return spansBuilder.create();
     }
-}
 
-    // Create custom tab header with close button
-    private static JPanel createTabHeader(String title, JTextArea textArea) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false);
+    private static class IndexRange {
+        final int start;
+        final int end;
+        final String style;
 
-        JLabel label = new JLabel(title);
-        panel.add(label, BorderLayout.CENTER);
+        IndexRange(int start, int end, String style) {
+            this.start = start;
+            this.end = end;
+            this.style = style;
+        }
+    }
 
-        JButton closeButton = new JButton("X");
-        closeButton.setMargin(new Insets(0, 0, 0, 0)); // Remove extra padding
-        closeButton.setPreferredSize(new Dimension(15,15));
-        closeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int tabIndex = tabbedPane.indexOfComponent(textArea.getParent().getParent());
+    @Override
+    public void start(Stage stage) {
+        this.primaryStage = stage;
+        tabFileMap = new HashMap<>();
+        initializeWindow();
+    }
 
-                if (unsavedChanges.get(textArea)) {
-                    int option = JOptionPane.showConfirmDialog(mainFrame, "Do you want to save changes?", "Unsaved Changes", JOptionPane.YES_NO_CANCEL_OPTION);
-                    if (option == JOptionPane.YES_OPTION) {
-                        saveFile();
-                    } else if (option == JOptionPane.CANCEL_OPTION) {
-                        return; // Don't close the tab
-                    }
-                }
+    private void initializeWindow() {
+        primaryStage.setTitle("MiniJaja IDE");
 
-                // Remove the tab and clean up
-                tabbedPane.remove(tabIndex);
-                unsavedChanges.remove(textArea);
-                openFiles.remove(textArea);
+        VBox root = new VBox();
+        root.setStyle("-fx-background-color: white;");
+        VBox.setVgrow(root, Priority.ALWAYS);
+
+        root.getChildren().addAll(
+                createMenuBar(),
+                createToolBar(),
+                createMainContent()
+        );
+
+
+        scene = new Scene(root, 1024, 768);
+        String cssUrl = getClass().getResource("/styles/light-theme.css").toExternalForm();
+        scene.getStylesheets().add(cssUrl);
+
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+
+    private MenuBar createMenuBar() {
+        MenuBar menuBar = new MenuBar();
+
+
+        Menu fileMenu = new Menu("File");
+        MenuItem newItem = new MenuItem("New");
+        newItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
+        newItem.setOnAction(e -> newFile());
+
+        MenuItem openItem = new MenuItem("Open File");
+        openItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
+        openItem.setOnAction(e -> openFile());
+
+        MenuItem saveItem = new MenuItem("Save");
+        saveItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
+        saveItem.setOnAction(e -> saveFile());
+
+        MenuItem exitItem = new MenuItem("Exit");
+        exitItem.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
+        exitItem.setOnAction(e -> closeWindow());
+
+        fileMenu.getItems().addAll(newItem, openItem, saveItem, new SeparatorMenuItem(), exitItem);
+
+
+        Menu editMenu = new Menu("Edit");
+        MenuItem undoItem = new MenuItem("Undo");
+        undoItem.setAccelerator(new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN));
+        undoItem.setOnAction(e -> {
+            CodeArea currentCodeArea = getCurrentCodeArea();
+            if (currentCodeArea != null && currentCodeArea.isUndoAvailable()) {
+                currentCodeArea.undo();
             }
         });
 
-        panel.add(closeButton, BorderLayout.EAST);
-        return panel;
-    }
-
-    public static void newFile() {
-        // Use JFileChooser to allow the user to create a new file
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Create a New File");
-        int userSelection = fileChooser.showSaveDialog(mainFrame);
-
-        if (userSelection == JFileChooser.APPROVE_OPTION) {
-            File newFile = fileChooser.getSelectedFile();
-
-            try {
-                if (newFile.createNewFile()) {
-                    JOptionPane.showMessageDialog(mainFrame, "New file created: " + newFile.getName());
-
-                    // Open the new file in a new tab after it's created
-                    openFileNamed(newFile); // Call the overloaded openFile method
-
-                } else {
-                    JOptionPane.showMessageDialog(mainFrame, "File already exists.");
-                }
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(mainFrame, "Error creating file.");
+        MenuItem redoItem = new MenuItem("Redo");
+        redoItem.setAccelerator(new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN));
+        redoItem.setOnAction(e -> {
+            CodeArea currentCodeArea = getCurrentCodeArea();
+            if (currentCodeArea != null && currentCodeArea.isRedoAvailable()) {
+                currentCodeArea.redo();
             }
+        });
+
+        MenuItem cutItem = new MenuItem("Cut");
+        cutItem.setAccelerator(new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN));
+        cutItem.setOnAction(e -> {
+            CodeArea currentCodeArea = getCurrentCodeArea();
+            if (currentCodeArea != null) currentCodeArea.cut();
+        });
+
+        MenuItem copyItem = new MenuItem("Copy");
+        copyItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN));
+        copyItem.setOnAction(e -> {
+            CodeArea currentCodeArea = getCurrentCodeArea();
+            if (currentCodeArea != null) currentCodeArea.copy();
+        });
+
+        MenuItem pasteItem = new MenuItem("Paste");
+        pasteItem.setAccelerator(new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN));
+        pasteItem.setOnAction(e -> {
+            CodeArea currentCodeArea = getCurrentCodeArea();
+            if (currentCodeArea != null) currentCodeArea.paste();
+        });
+
+        editMenu.getItems().addAll(undoItem, redoItem, new SeparatorMenuItem(),
+                cutItem, copyItem, pasteItem);
+
+
+        Menu viewMenu = new Menu("View");
+
+
+        Menu themesMenu = new Menu("Themes");
+        ToggleGroup themeGroup = new ToggleGroup();
+
+        RadioMenuItem lightTheme = new RadioMenuItem("Light Theme");
+        lightTheme.setToggleGroup(themeGroup);
+        lightTheme.setSelected(true);
+        lightTheme.setOnAction(e -> applyTheme("light"));
+
+        RadioMenuItem darkTheme = new RadioMenuItem("Dark Theme");
+        darkTheme.setToggleGroup(themeGroup);
+        darkTheme.setOnAction(e -> applyTheme("dark"));
+
+        themesMenu.getItems().addAll(lightTheme, darkTheme);
+
+
+        CheckMenuItem showExplorer = new CheckMenuItem("Show Explorer");
+        showExplorer.setSelected(true);
+        showExplorer.setOnAction(e -> toggleExplorer(showExplorer.isSelected()));
+
+        viewMenu.getItems().addAll(themesMenu, new SeparatorMenuItem(), showExplorer);
+
+        menuBar.getMenus().addAll(fileMenu, editMenu, viewMenu);
+
+        return menuBar;
+    }
+    private void toggleExplorer(boolean show) {
+        if (show) {
+            if (!mainSplitPane.getItems().contains(fileExplorer)) {
+                mainSplitPane.getItems().add(0, fileExplorer);
+                mainSplitPane.setDividerPositions(0.2);
+            }
+        } else {
+            mainSplitPane.getItems().remove(fileExplorer);
         }
     }
 
-    // Overload the openFile() method to accept a File argument
-    public static void openFileNamed(File file) {
-        try (FileReader reader = new FileReader(file)) {
-            JTextArea textArea = new JTextArea();
-            textArea.read(reader, null);
-            JScrollPane scrollPane = new JScrollPane(textArea);
+    private void applyTheme(String themeName) {
+        if (scene == null) return;
 
-            tabbedPane.addTab(file.getName(), scrollPane);
-            int tabIndex = tabbedPane.getTabCount() - 1;
-            tabbedPane.setTabComponentAt(tabIndex, createTabHeader(file.getName(), textArea));
+        scene.getStylesheets().clear();
 
-            // Track the file and unsaved changes
-            openFiles.put(textArea, file);
-            unsavedChanges.put(textArea, false);
+        if (themeName.equals("dark")) {
+            String darkThemeCSS =
+                    ".root { -fx-background-color: #2B2B2B; } " +
+                            ".tab-pane { -fx-background-color: #2B2B2B; } " +
+                            ".tab-header-area { -fx-background-color: #2B2B2B; } " +
+                            ".tab { -fx-background-color: #3C3F41; } " +
+                            ".tab-label { -fx-text-fill: #BBBBBB; } " +
+                            ".split-pane { -fx-background-color: #2B2B2B; } " +
+                            ".split-pane-divider { -fx-background-color: #3C3F41; } " +
+                            ".tree-view { -fx-background-color: #2B2B2B; } " +
+                            ".tree-cell { -fx-background-color: #2B2B2B; -fx-text-fill: #BBBBBB; } " +
+                            ".code-area { -fx-background-color: #2B2B2B; } " +
+                            ".code-area .text { -fx-fill: #A9B7C6 !important; } " +
+                            ".code-area .caret { -fx-stroke: #BBBBBB; } " +
+                            ".code-area .lineno { -fx-background-color: #313335; -fx-text-fill: #606366; } " +
 
-            // Track changes to detect unsaved changes
-            textArea.getDocument().addDocumentListener(new DocumentListener() {
-                @Override
-                public void insertUpdate(DocumentEvent e) {
-                    unsavedChanges.put(textArea, true);
+
+                            ".code-area .keyword { -fx-fill: #CC7832 !important; } " +
+                            ".code-area .string { -fx-fill: #6A8759 !important; } " +
+                            ".code-area .comment { -fx-fill: #808080 !important; -fx-font-style: italic; } " +
+                            ".code-area .number { -fx-fill: #6897BB !important; } " +
+                            ".code-area .operator { -fx-fill: #A9B7C6 !important; } " +
+                            ".code-area .parenthesis { -fx-fill: #A9B7C6 !important; } " +
+                            ".code-area .brace { -fx-fill: #A9B7C6 !important; } " +
+                            ".code-area .bracket { -fx-fill: #A9B7C6 !important; } " +
+                            ".code-area .semicolon { -fx-fill: #CC7832 !important; }";
+
+            scene.getStylesheets().clear();
+            scene.getStylesheets().add("data:text/css," + darkThemeCSS.replace(" ", "%20"));
+
+
+            for (Tab tab : editorTabPane.getTabs()) {
+                if (tab.getContent() instanceof VirtualizedScrollPane<?>) {
+                    VirtualizedScrollPane<?> scrollPane = (VirtualizedScrollPane<?>) tab.getContent();
+                    CodeArea codeArea = (CodeArea) scrollPane.getContent();
+                    codeArea.setStyle("-fx-background-color: #2B2B2B; -fx-text-fill: #A9B7C6; " +
+                            "-fx-font-size: 16px; -fx-font-family: 'JetBrains Mono', Consolas, monospace;");
+
+
+                    codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
                 }
+            }
+
+
+
+            consoleArea.setStyle("-fx-background-color: #323232; -fx-text-fill: #f8f8f2; " +
+                    "-fx-control-inner-background: #323232; -fx-font-size: 14px;");
+
+
+            fileExplorer.setStyle("-fx-background-color: #1e1e1e;");
+            fileExplorer.setCellFactory(tv -> new TreeCell<>() {
                 @Override
-                public void removeUpdate(DocumentEvent e) {
-                    unsavedChanges.put(textArea, true);
+                protected void updateItem(File file, boolean empty) {
+                    super.updateItem(file, empty);
+                    setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: #d4d4d4;");
+
+                    if (empty || file == null) {
+                        setText(null);
+                        setGraphic(null);
+                    } else {
+                        String icon = file.isDirectory() ? "📁 " : "📄 ";
+                        setText(icon + file.getName());
+                    }
+
+
+                    setOnMouseEntered(e -> {
+                        if (!isSelected()) {
+                            setStyle("-fx-background-color: #2d2d2d; -fx-text-fill: #d4d4d4;");
+                        }
+                    });
+                    setOnMouseExited(e -> {
+                        if (!isSelected()) {
+                            setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: #d4d4d4;");
+                        }
+                    });
                 }
+
                 @Override
-                public void changedUpdate(DocumentEvent e) {
-                    unsavedChanges.put(textArea, true);
+                public void updateSelected(boolean selected) {
+                    super.updateSelected(selected);
+                    if (!isEmpty()) {
+                        if (selected) {
+                            setStyle("-fx-background-color: #404040; -fx-text-fill: #ffffff;");
+                        } else {
+                            setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: #d4d4d4;");
+                        }
+                    }
                 }
             });
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(mainFrame, "Error opening file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            String lightThemeCSS =
+                    ".root { -fx-background-color: white; } " +
+                            ".tab-pane { -fx-background-color: white; } " +
+                            ".tab-header-area { -fx-background-color: white; } " +
+                            ".split-pane { -fx-background-color: white; } " +
+                            ".tree-view { -fx-background-color: white; } " +
+                            ".code-area { -fx-background-color: white; -fx-text-fill: black; -fx-font-size: 16px; -fx-font-family: 'JetBrains Mono', Consolas, monospace; }" + // Ajout de la taille et famille de police
+                            // Styles pour la coloration syntaxique
+                            ".keyword { -fx-fill: #000080; -fx-font-weight: bold; }" +
+                            ".string { -fx-fill: #008000; }" +
+                            ".comment { -fx-fill: #808080; -fx-font-style: italic; }" +
+                            ".number { -fx-fill: #0000FF; }" +
+                            ".operator { -fx-fill: #000000; -fx-font-weight: bold; }" +
+                            ".parenthesis { -fx-fill: #000000; }" +
+                            ".brace { -fx-fill: #000000; }" +
+                            ".bracket { -fx-fill: #000000; }" +
+                            ".semicolon { -fx-fill: #000000; }";
+
+            scene.getStylesheets().add("data:text/css," + lightThemeCSS.replace(" ", "%20"));
+
+
+            for (Tab tab : editorTabPane.getTabs()) {
+                if (tab.getContent() instanceof VirtualizedScrollPane<?>) {
+                    VirtualizedScrollPane<?> scrollPane = (VirtualizedScrollPane<?>) tab.getContent();
+                    CodeArea codeArea = (CodeArea) scrollPane.getContent();
+                    codeArea.setStyle("-fx-background-color: white; -fx-text-fill: black; " +
+                            "-fx-font-size: 16px; -fx-font-family: 'JetBrains Mono', Consolas, monospace;");
+                    codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
+                }
+            }
+
+
+
+            consoleArea.setStyle("-fx-background-color: white; -fx-text-fill: black; " +
+                    "-fx-control-inner-background: white;");
+
+
+            fileExplorer.setStyle("-fx-background-color: white;");
+            fileExplorer.setCellFactory(tv -> new TreeCell<>() {
+                @Override
+                protected void updateItem(File file, boolean empty) {
+                    super.updateItem(file, empty);
+                    setStyle("-fx-background-color: transparent; -fx-text-fill: black;");
+
+                    if (empty || file == null) {
+                        setText(null);
+                        setGraphic(null);
+                    } else {
+                        String icon = file.isDirectory() ? "📁 " : "📄 ";
+                        setText(icon + file.getName());
+                    }
+                }
+            });
+
+
+            if (jajaCodeArea != null) {
+                jajaCodeArea.setStyle("-fx-background-color: white; -fx-text-fill: black;");
+            }
+        }
+    }
+    private CodeArea getCurrentCodeArea() {
+        Tab currentTab = editorTabPane.getSelectionModel().getSelectedItem();
+        if (currentTab != null && currentTab.getContent() instanceof VirtualizedScrollPane) {
+            VirtualizedScrollPane<?> scrollPane = (VirtualizedScrollPane<?>) currentTab.getContent();
+            return (CodeArea) scrollPane.getContent();
+        }
+        return null;
+    }
+
+    private ToolBar createToolBar() {
+        ToolBar toolBar = new ToolBar();
+
+        toolBar.getItems().addAll(
+                createToolBarButton("New", "/icon/new-file.png", this::newFile),
+                createToolBarButton("Open File", "/icon/open-file.png", this::openFile),
+                createToolBarButton("Open Folder", "/icon/open.png", this::openDirectory), // Nouveau bouton
+                createToolBarButton("Save", "/icon/save.png", this::saveFile),
+                new Separator(),
+                createToolBarButton("Build", "/icon/build.png", this::buildCode),
+                createToolBarButton("Run", "/icon/run.png", this::executeCode)
+        );
+
+        return toolBar;
+    }
+
+
+    private Button createToolBarButton(String tooltip, String iconPath, Runnable action) {
+        Button button = new Button();
+        button.setTooltip(new Tooltip(tooltip));
+
+        try (InputStream is = getClass().getResourceAsStream(iconPath)) {
+            if (is != null) {
+                Image icon = new Image(is);
+                ImageView imageView = new ImageView(icon);
+                imageView.setFitWidth(24);
+                imageView.setFitHeight(24);
+                button.setGraphic(imageView);
+            }
+        } catch (IOException e) {
+            button.setText(tooltip);
+        }
+
+        button.setOnAction(event -> action.run());
+        return button;
+    }
+
+    private SplitPane createMainContent() {
+        // Créer le SplitPane principal
+        mainSplitPane = new SplitPane();
+
+        // initialisation des tout les composant
+        if (fileExplorer == null) setupFileExplorer();
+        if (editorTabPane == null) setupTabPane();
+        if (consoleArea == null) {
+            consoleArea = new TextArea();
+            consoleArea.setEditable(false);
+            consoleArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 14px;");
+        }
+
+        // Panel de gauche (explorateur)
+        VBox fileExplorerWrapper = new VBox();
+        fileExplorerWrapper.getChildren().add(fileExplorer);
+        VBox.setVgrow(fileExplorer, Priority.ALWAYS);
+
+
+        SplitPane centerSplitPane = new SplitPane();
+        centerSplitPane.setOrientation(Orientation.VERTICAL);
+        centerSplitPane.getItems().addAll(editorTabPane, consoleArea);
+        centerSplitPane.setDividerPositions(0.7);
+
+
+        if (fileExplorerWrapper != null && centerSplitPane != null) {
+            mainSplitPane.getItems().addAll(fileExplorerWrapper, centerSplitPane);
+            mainSplitPane.setDividerPositions(0.2);
+        }
+
+        VBox.setVgrow(mainSplitPane, Priority.ALWAYS);
+        return mainSplitPane;
+    }
+
+    private void setupTabPane() {
+        editorTabPane = new TabPane();
+        newFileTab();
+    }
+
+    private void newFileTab() {
+        CodeArea newCodeArea = createNewCodeArea();
+        Tab tab = new Tab("Untitled", new VirtualizedScrollPane<>(newCodeArea));
+        tab.setOnCloseRequest(event -> {
+            if (!checkSaveBeforeClosing(tab)) {
+                event.consume();
+            }
+        });
+        editorTabPane.getTabs().add(tab);
+        editorTabPane.getSelectionModel().select(tab);
+        tabFileMap.put(tab, null);
+    }
+
+    private CodeArea createNewCodeArea() {
+        CodeArea newCodeArea = new CodeArea();
+        newCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(newCodeArea));
+        newCodeArea.setStyle("-fx-font-family: 'JetBrains Mono', Consolas, monospace; -fx-font-size: 16px;");
+
+        // Initialiser la coloration syntaxique
+        newCodeArea.textProperty().addListener((obs, oldText, newText) -> {
+            Platform.runLater(() -> {
+                newCodeArea.setStyleSpans(0, computeHighlighting(newText));
+            });
+        });
+
+
+        Platform.runLater(() -> {
+            newCodeArea.setStyleSpans(0, computeHighlighting(newCodeArea.getText()));
+        });
+
+        return newCodeArea;
+    }
+
+    private void setupFileExplorer() {
+        fileExplorer = new TreeView<>();
+        fileExplorer.setShowRoot(true); // Changé à true pour voir le dossier racine
+        fileExplorer.setPrefWidth(200);
+
+
+        fileExplorer.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                TreeItem<File> selectedItem = fileExplorer.getSelectionModel().getSelectedItem();
+                if (selectedItem != null && !selectedItem.getValue().isDirectory()) {
+                    openFileInNewTab(selectedItem.getValue());
+                }
+            }
+        });
+
+        fileExplorer.setStyle("-fx-background-color: white;");
+
+        fileExplorer.setCellFactory(tv -> new TreeCell<File>() {
+            @Override
+            public void updateItem(File file, boolean empty) {
+                super.updateItem(file, empty);
+
+
+                setStyle("-fx-background-color: transparent; -fx-text-fill: black;");
+
+                if (empty || file == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    String icon = file.isDirectory() ? "📁 " : "📄 ";
+                    setText(icon + file.getName());
+
+
+                    setOnMouseEntered(e -> {
+                        if (!isSelected()) {
+                            setStyle("-fx-background-color: #e8e8e8; -fx-text-fill: black;");
+                        }
+                    });
+
+                    setOnMouseExited(e -> {
+                        if (!isSelected()) {
+                            setStyle("-fx-background-color: transparent; -fx-text-fill: black;");
+                        }
+                    });
+
+
+                    if (isSelected()) {
+                        setStyle("-fx-background-color: #0096C9; -fx-text-fill: white;");
+                    }
+                }
+            }
+
+            @Override
+            public void updateSelected(boolean selected) {
+                super.updateSelected(selected);
+                if (!isEmpty()) {
+                    if (selected) {
+                        setStyle("-fx-background-color: #0096C9; -fx-text-fill: white;");
+                    } else {
+                        setStyle("-fx-background-color: transparent; -fx-text-fill: black;");
+                    }
+                }
+            }
+        });
+    }
+
+    private void openFileFromExplorer(File file) {
+        try {
+            String content = Files.readString(file.toPath());
+            codeArea.replaceText(content);
+            currentFile = file;
+            isModified = false;
+            updateTitle();
+        } catch (IOException e) {
+            showError("Error opening file", e.getMessage());
         }
     }
 
-    // Method to save the current active tab content
-    private static void saveFile() {
-        if (tabbedPane.getTabCount() == 0) {
-            JOptionPane.showMessageDialog(mainFrame, "No open files to save!", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+    private TreeItem<File> buildFileTreeItem(File file) {
+        TreeItem<File> item = new TreeItem<>(file);
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            if (files != null) {
+                Arrays.sort(files, (f1, f2) -> {
+                    if (f1.isDirectory() && f2.isDirectory()) {
+                        return f1.getName().compareToIgnoreCase(f2.getName());
+                    } else if (f1.isDirectory()) {
+                        return -1;
+                    } else if (f2.isDirectory()) {
+                        return 1;
+                    } else {
+                        return f1.getName().compareToIgnoreCase(f2.getName());
+                    }
+                });
+
+                for (File childFile : files) {
+                    item.getChildren().add(buildFileTreeItem(childFile));
+                }
+            }
         }
 
-        int selectedTab = tabbedPane.getSelectedIndex(); // Get the current active tab
-        JScrollPane scrollPane = (JScrollPane) tabbedPane.getComponentAt(selectedTab);
-        JTextArea textArea = (JTextArea) scrollPane.getViewport().getView();
+        fileExplorer.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                TreeItem<File> selectedItem = fileExplorer.getSelectionModel().getSelectedItem();
+                if (selectedItem != null && !selectedItem.getValue().isDirectory()) {
+                    openFileInNewTab(selectedItem.getValue());
+                }
+            }
+        });
+        return item;
+    }
+    private void openDirectory() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Open Project Folder");
+        File directory = directoryChooser.showDialog(primaryStage);
 
-        File file = openFiles.get(textArea);
+        if (directory != null) {
+            TreeItem<File> root = buildFileTreeItem(directory);
+            fileExplorer.setRoot(root);
+            root.setExpanded(true);
+        }
+    }
+
+    private VBox createJajaCodePanel() {
+
+        if (jajaCodeArea == null) {
+            setupJajaCodeArea();
+        }
+
+        VBox wrapper = new VBox();
+
+
+        HBox header = new HBox();
+        header.setAlignment(Pos.CENTER_RIGHT);
+        header.setPadding(new Insets(5));
+        header.setStyle("-fx-background-color: #f0f0f0;");
+
+        Label titleLabel = new Label("JajaCode");
+        HBox.setHgrow(titleLabel, Priority.ALWAYS);
+        titleLabel.setPadding(new Insets(0, 0, 0, 5));
+
+        Button closeButton = new Button("×");
+        closeButton.setStyle("-fx-font-size: 14px; -fx-padding: 0 5 0 5; -fx-min-width: 20px; -fx-min-height: 20px;");
+        closeButton.setOnAction(e -> mainSplitPane.getItems().remove(wrapper));
+
+        header.getChildren().addAll(titleLabel, closeButton);
+
+
+        VirtualizedScrollPane<CodeArea> scrollPane = new VirtualizedScrollPane<>(jajaCodeArea);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+        wrapper.getChildren().addAll(header, scrollPane);
+
+        return wrapper;
+    }
+
+    private void setupCodeAreaListeners(CodeArea codeArea) {
+        codeArea.textProperty().addListener((obs, oldText, newText) -> {
+
+            if (mainSplitPane.getItems().contains(jajaCodeWrapper)) {
+                buildCode();
+            }
+
+
+            Tab currentTab = editorTabPane.getSelectionModel().getSelectedItem();
+            if (currentTab != null && !currentTab.getText().endsWith("*")) {
+                currentTab.setText(currentTab.getText() + "*");
+            }
+        });
+    }
+
+    private void setupJajaCodeArea() {
+        jajaCodeArea = new CodeArea();
+        jajaCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(jajaCodeArea));
+        jajaCodeArea.setEditable(false);
+        jajaCodeArea.setStyle("-fx-font-family: 'JetBrains Mono', Consolas, monospace; -fx-font-size: 14px;");
+    }
+
+    private void buildCode() {
+        CodeArea currentCodeArea = getCurrentCodeArea();
+        if (currentCodeArea == null) return;
+
+        String sourceCode = currentCodeArea.getText();
+
+        try {
+
+            MiniJaja mjj = new MiniJaja(new ByteArrayInputStream(sourceCode.getBytes()));
+            SimpleNode root = mjj.start();
+
+
+            Compiler compiler = new Compiler(root);
+            compiler.compile();
+            String javaCode = compiler.jjcToString();
+
+            // Afficher le JajaCode dans le panneau
+            if (!mainSplitPane.getItems().contains(jajaCodeWrapper)) {
+                if (jajaCodeWrapper == null) {
+                    jajaCodeWrapper = createJajaCodePanel();
+                }
+                mainSplitPane.getItems().add(jajaCodeWrapper);
+                mainSplitPane.setDividerPositions(0.2, 0.6);
+            }
+
+            if (jajaCodeArea != null) {
+                jajaCodeArea.clear();
+                if (javaCode != null && !javaCode.isEmpty()) {
+                    jajaCodeArea.appendText(javaCode);
+                } else {
+                    jajaCodeArea.appendText("// No JajaCode generated");
+                }
+            }
+
+
+            consoleArea.clear();
+            consoleArea.appendText("Compilation successful\n");
+
+        } catch (ParseException pe) {
+            consoleArea.clear();
+            consoleArea.appendText("Syntax error at line " + pe.currentToken.beginLine +
+                    ", column " + pe.currentToken.beginColumn + "\n" +
+                    pe.getMessage() + "\n");
+            try {
+                highlightError(pe);
+            } catch (Exception e) {
+                System.err.println("Error highlighting: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            consoleArea.clear();
+            consoleArea.appendText("Compilation error: " + e.getMessage() + "\n");
+        }
+    }
+
+    private void executeCode() {
+        CodeArea currentCodeArea = getCurrentCodeArea();
+        if (currentCodeArea == null) return;
+
+        String code = currentCodeArea.getText();
+        consoleArea.clear();
+
+        try {
+            MiniJaja mjj = new MiniJaja(new ByteArrayInputStream(code.getBytes()));
+            SimpleNode node = mjj.start();
+            InterpreterMjj interpreter = new InterpreterMjj(node);
+
+            Object result = interpreter.interpret();
+            appendToConsole("Compilation successful\n");
+            appendToConsole("Result: " + result + "\n");
+
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            PrintStream originalOut = System.out;
+            System.setOut(new PrintStream(new OutputStream() {
+                @Override
+                public void write(int b) {
+                    pw.write(b);
+                }
+            }));
+
+            node.dump("");
+            System.setOut(originalOut);
+            appendToConsole(sw.toString());
+
+        } catch (ParseException pe) {
+            highlightError(pe);
+            appendToConsole("Syntax error at line " + pe.currentToken.beginLine +
+                    ", column " + pe.currentToken.beginColumn + "\n" +
+                    pe.getMessage() + "\n");
+        } catch (Exception e) {
+            appendToConsole("Error: " + e.getMessage() + "\n");
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            appendToConsole(sw.toString());
+        }
+    }
+
+    private void appendToConsole(String text) {
+        consoleArea.appendText(text);
+    }
+
+    private void newFile() {
+        Tab currentTab = editorTabPane.getSelectionModel().getSelectedItem();
+
+        if (currentTab != null && checkSaveBeforeClosing(currentTab)) {
+            CodeArea newCodeArea = createNewCodeArea();
+            Tab newTab = new Tab("Untitled", new VirtualizedScrollPane<>(newCodeArea));
+            editorTabPane.getTabs().add(newTab);
+            editorTabPane.getSelectionModel().select(newTab);
+            tabFileMap.put(newTab, null);
+            isModified = false;
+            updateTitle();
+        }
+    }
+
+    private void openFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open File");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("MiniJaja Files", "*.mjj"));
+
+        File file = fileChooser.showOpenDialog(primaryStage);
         if (file != null) {
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write(textArea.getText());
-                unsavedChanges.put(textArea, false); // Reset the unsaved changes flag
-                JOptionPane.showMessageDialog(mainFrame, "File saved successfully!");
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(mainFrame, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            openFileInNewTab(file);
+        }
+    }
+    private void openFileInNewTab(File file) {
+        try {
+            String content = Files.readString(file.toPath());
+
+
+            for (Tab tab : editorTabPane.getTabs()) {
+                if (tab.getUserData() != null && tab.getUserData().equals(file)) {
+                    editorTabPane.getSelectionModel().select(tab);
+                    return;
+                }
             }
-        } else {
-            JFileChooser fileChooser = new JFileChooser();
-            int option = fileChooser.showSaveDialog(null);
-            if (option == JFileChooser.APPROVE_OPTION) {
-                file = fileChooser.getSelectedFile();
-                openFiles.put(textArea, file);
-                saveFile(); // Recursive call to save to the chosen file
+
+
+            CodeArea newCodeArea = createNewCodeArea();
+
+
+            Tab tab = new Tab(file.getName());
+            tab.setContent(new VirtualizedScrollPane<>(newCodeArea));
+            tab.setUserData(file);
+
+            tab.setOnCloseRequest(event -> {
+                if (!checkSaveBeforeClosing(tab)) {
+                    event.consume();
+                }
+            });
+
+            editorTabPane.getTabs().add(tab);
+            editorTabPane.getSelectionModel().select(tab);
+            tabFileMap.put(tab, file);
+
+
+            Platform.runLater(() -> {
+                newCodeArea.replaceText(content);
+                // Attendre que le texte soit chargé avant d'appliquer la coloration
+                Platform.runLater(() -> {
+                    newCodeArea.setStyleSpans(0, computeHighlighting(newCodeArea.getText()));
+                });
+            });
+
+        } catch (IOException e) {
+            showError("Error opening file", e.getMessage());
+        }
+    }
+
+    private void saveFile() {
+        Tab currentTab = editorTabPane.getSelectionModel().getSelectedItem();
+        if (currentTab == null) return;
+
+        File file = tabFileMap.get(currentTab);
+        VirtualizedScrollPane<?> scrollPane = (VirtualizedScrollPane<?>) currentTab.getContent();
+        CodeArea codeArea = (CodeArea) scrollPane.getContent();
+
+        if (file == null) {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save File");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("MiniJaja Files", "*.mjj"));
+            file = fileChooser.showSaveDialog(primaryStage);
+            if (file != null) {
+                tabFileMap.put(currentTab, file);
+                currentTab.setText(file.getName());
+            }
+        }
+
+        if (file != null) {
+            try {
+                Files.writeString(file.toPath(), codeArea.getText());
+                currentTab.setText(file.getName());
+            } catch (IOException e) {
+                showError("Error saving file", e.getMessage());
             }
         }
     }
 
-    public void runCode() {
-        consoleArea.setText("");
-        int selectedIndex= tabbedPane.getSelectedIndex();
-        Component tabContent =  tabbedPane.getComponentAt(selectedIndex);
-        String code;
-        if (tabContent instanceof JScrollPane) {
-            JScrollPane scrollPane = (JScrollPane) tabContent;
-            JTextArea textArea = (JTextArea) scrollPane.getViewport().getView();
-
-            code = textArea.getText();
-        } else {
-            code = editorArea.getText();
-        }
-
-        MiniJaja mjj = new MiniJaja(new ByteArrayInputStream(code.getBytes()));
-        consoleArea.setText("");  // Vider la console avant d'exécuter
-        try
-        {
-            SimpleNode n = mjj.start();
-            consoleArea.append("Compilation successfull");
-            n.dump("");
-        }
-        catch (ParseException pe)
-        {
-            consoleArea.append("Syntax error in code");
-        }
-        catch (Exception exp)
-        {
-            consoleArea.append(exp.getMessage());
-        }
-
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
+
+    private void updateTitle() {
+        String title = "MiniJaja IDE";
+        if (currentFile != null) {
+            title += " - " + currentFile.getName();
+        }
+        if (isModified) {
+            title += " *";
+        }
+        primaryStage.setTitle(title);
+    }
+
+    private boolean checkSaveBeforeClosing(Tab tab) {
+        if (!tab.getText().endsWith("*")) {
+            return true;
+        }
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Save Changes");
+        alert.setHeaderText("Do you want to save changes to " + tab.getText().replace("*", "") + "?");
+        alert.setContentText("Your changes will be lost if you don't save them.");
+
+        ButtonType saveButton = new ButtonType("Save");
+        ButtonType dontSaveButton = new ButtonType("Don't Save");
+        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(saveButton, dontSaveButton, cancelButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent()) {
+            if (result.get() == saveButton) {
+                saveFile();
+                return !tab.getText().endsWith("*");
+            }
+            return result.get() == dontSaveButton;
+        }
+        return false;
+    }
+
+    private boolean saveAllTabsBeforeClosing() {
+        for (Tab tab : editorTabPane.getTabs()) {
+            if (tab.getText().endsWith("*")) {
+                editorTabPane.getSelectionModel().select(tab);
+                if (!checkSaveBeforeClosing(tab)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void exit() {
+        if (saveAllTabsBeforeClosing()) {
+            primaryStage.close();
+        }
+    }
+
+
+    private void setupKeyboardShortcuts(Scene scene) {
+        scene.setOnKeyPressed(event -> {
+            if (event.isControlDown()) {
+                switch (event.getCode()) {
+                    case S -> saveFile();
+                    case O -> openFile();
+                    case N -> newFile();
+                    case Q -> exit();
+                }
+            } else if (event.getCode() == KeyCode.F5) {
+                executeCode();
+            }
+        });
+    }
+
+    private void highlightError(ParseException pe) {
+        CodeArea currentCodeArea = getCurrentCodeArea();
+        if (currentCodeArea == null) return;
+
+        try {
+            int line = Math.max(0, pe.currentToken.beginLine - 1);
+            int column = Math.max(0, pe.currentToken.beginColumn - 1);
+
+
+            if (line < currentCodeArea.getParagraphs().size()) {
+
+                int lineLength = currentCodeArea.getParagraph(line).length();
+                column = Math.min(column, lineLength);
+
+                currentCodeArea.moveTo(line, column);
+                currentCodeArea.requestFocus();
+
+
+                int lineStart = currentCodeArea.position(line, 0).toOffset();
+                int lineEnd = lineStart + currentCodeArea.getParagraph(line).length();
+                currentCodeArea.selectRange(lineStart, lineEnd);
+            }
+        } catch (Exception e) {
+            // En cas d'erreur, on évite de planter l'application
+            System.err.println("Error while highlighting: " + e.getMessage());
+        }
+    }
+
+    private void closeWindow() {
+        if (saveAllTabsBeforeClosing()) {
+            Platform.exit();
+        }
+    }
+    /*
+    public static void main(String[] args) {
+        launch(args);
+    }  */
 }
-
