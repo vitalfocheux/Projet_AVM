@@ -1,4 +1,4 @@
-package fr.m1comp5.UI;
+package fr.m1comp5;
 
 import fr.m1comp5.mjj.generated.MiniJaja;
 import fr.m1comp5.mjj.generated.ParseException;
@@ -63,6 +63,7 @@ public class MiniJajaWindow extends Application {
     private static final Pattern COMMENT_PATTERN = Pattern.compile("//[^\n]*|/\\*(.|\\R)*?\\*/");
     private static final Pattern NUMBERS = Pattern.compile("\\b\\d+\\b");
     private static final Pattern OPERATORS = Pattern.compile("[+\\-*/<>=!&|^~]");
+    private static final Pattern JAJACODE_INSTRUCTIONS = Pattern.compile("\\b(push|pop|load|store|add|sub|mul|div|not|and|or|neg|cmp|sup|jmp|jcmp)\\b");
 
     private StyleSpans<Collection<String>> computeHighlighting(String text) {
         StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
@@ -77,7 +78,8 @@ public class MiniJajaWindow extends Application {
                 new Pair<>("parenthesis", PARENTHESES),
                 new Pair<>("brace", BRACES),
                 new Pair<>("bracket", BRACKETS),
-                new Pair<>("semicolon", SEMICOLON)
+                new Pair<>("semicolon", SEMICOLON),
+                new Pair<>("jajacode-instruction", JAJACODE_INSTRUCTIONS)
         );
 
 
@@ -259,28 +261,33 @@ public class MiniJajaWindow extends Application {
         scene.getStylesheets().clear();
 
         if (themeName.equals("dark")) {
-
             String darkThemeCSS =
-                    ".root { -fx-background-color: #2b2b2b; } " +
-                            ".tab-pane { -fx-background-color: #2b2b2b; } " +
-                            ".tab-header-area { -fx-background-color: #2b2b2b; } " +
-                            ".tab { -fx-background-color: #3e3e42; } " +
-                            ".tab-label { -fx-text-fill: white; } " +
-                            ".split-pane { -fx-background-color: #2b2b2b; } " +
-                            ".split-pane-divider { -fx-background-color: #3e3e42; } " +
-                            ".tree-view { -fx-background-color: #2b2b2b; } " +
-                            ".code-area { -fx-background-color: #2b2b2b; -fx-text-fill: white; }" +
-                            // Styles pour la coloration syntaxique en mode sombre
-                            ".keyword { -fx-fill: #CC7832; -fx-font-weight: bold; }" +
-                            ".string { -fx-fill: #6A8759; }" +
-                            ".comment { -fx-fill: #808080; -fx-font-style: italic; }" +
-                            ".number { -fx-fill: #6897BB; }" +
-                            ".operator { -fx-fill: #CC7832; }" +
-                            ".parenthesis { -fx-fill: #A9B7C6; }" +
-                            ".brace { -fx-fill: #A9B7C6; }" +
-                            ".bracket { -fx-fill: #A9B7C6; }" +
-                            ".semicolon { -fx-fill: #CC7832; }";
+                    ".root { -fx-background-color: #2B2B2B; } " +
+                            ".tab-pane { -fx-background-color: #2B2B2B; } " +
+                            ".tab-header-area { -fx-background-color: #2B2B2B; } " +
+                            ".tab { -fx-background-color: #3C3F41; } " +
+                            ".tab-label { -fx-text-fill: #BBBBBB; } " +
+                            ".split-pane { -fx-background-color: #2B2B2B; } " +
+                            ".split-pane-divider { -fx-background-color: #3C3F41; } " +
+                            ".tree-view { -fx-background-color: #2B2B2B; } " +
+                            ".tree-cell { -fx-background-color: #2B2B2B; -fx-text-fill: #BBBBBB; } " +
+                            ".code-area { -fx-background-color: #2B2B2B; } " +
+                            ".code-area .text { -fx-fill: #A9B7C6 !important; } " +
+                            ".code-area .caret { -fx-stroke: #BBBBBB; } " +
+                            ".code-area .lineno { -fx-background-color: #313335; -fx-text-fill: #606366; } " +
 
+
+                            ".code-area .keyword { -fx-fill: #CC7832 !important; } " +
+                            ".code-area .string { -fx-fill: #6A8759 !important; } " +
+                            ".code-area .comment { -fx-fill: #808080 !important; -fx-font-style: italic; } " +
+                            ".code-area .number { -fx-fill: #6897BB !important; } " +
+                            ".code-area .operator { -fx-fill: #A9B7C6 !important; } " +
+                            ".code-area .parenthesis { -fx-fill: #A9B7C6 !important; } " +
+                            ".code-area .brace { -fx-fill: #A9B7C6 !important; } " +
+                            ".code-area .bracket { -fx-fill: #A9B7C6 !important; } " +
+                            ".code-area .semicolon { -fx-fill: #CC7832 !important; }";
+
+            scene.getStylesheets().clear();
             scene.getStylesheets().add("data:text/css," + darkThemeCSS.replace(" ", "%20"));
 
 
@@ -288,22 +295,26 @@ public class MiniJajaWindow extends Application {
                 if (tab.getContent() instanceof VirtualizedScrollPane<?>) {
                     VirtualizedScrollPane<?> scrollPane = (VirtualizedScrollPane<?>) tab.getContent();
                     CodeArea codeArea = (CodeArea) scrollPane.getContent();
-                    codeArea.setStyle("-fx-background-color: #2b2b2b; -fx-text-fill: #a9b7c6;");
+                    codeArea.setStyle("-fx-background-color: #2B2B2B; -fx-text-fill: #A9B7C6; " +
+                            "-fx-font-size: 16px; -fx-font-family: 'JetBrains Mono', Consolas, monospace;");
+
+
                     codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
                 }
             }
 
 
-            consoleArea.setStyle("-fx-background-color: #2b2b2b; -fx-text-fill: #a9b7c6; " +
-                    "-fx-control-inner-background: #2b2b2b;");
+
+            consoleArea.setStyle("-fx-background-color: #323232; -fx-text-fill: #f8f8f2; " +
+                    "-fx-control-inner-background: #323232; -fx-font-size: 14px;");
 
 
-            fileExplorer.setStyle("-fx-background-color: #2b2b2b;");
+            fileExplorer.setStyle("-fx-background-color: #1e1e1e;");
             fileExplorer.setCellFactory(tv -> new TreeCell<>() {
                 @Override
                 protected void updateItem(File file, boolean empty) {
                     super.updateItem(file, empty);
-                    setStyle("-fx-background-color: transparent; -fx-text-fill: white;");
+                    setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: #d4d4d4;");
 
                     if (empty || file == null) {
                         setText(null);
@@ -312,24 +323,41 @@ public class MiniJajaWindow extends Application {
                         String icon = file.isDirectory() ? "📁 " : "📄 ";
                         setText(icon + file.getName());
                     }
+
+
+                    setOnMouseEntered(e -> {
+                        if (!isSelected()) {
+                            setStyle("-fx-background-color: #2d2d2d; -fx-text-fill: #d4d4d4;");
+                        }
+                    });
+                    setOnMouseExited(e -> {
+                        if (!isSelected()) {
+                            setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: #d4d4d4;");
+                        }
+                    });
+                }
+
+                @Override
+                public void updateSelected(boolean selected) {
+                    super.updateSelected(selected);
+                    if (!isEmpty()) {
+                        if (selected) {
+                            setStyle("-fx-background-color: #404040; -fx-text-fill: #ffffff;");
+                        } else {
+                            setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: #d4d4d4;");
+                        }
+                    }
                 }
             });
-
-
-            if (jajaCodeArea != null) {
-                jajaCodeArea.setStyle("-fx-background-color: #2b2b2b; -fx-text-fill: #a9b7c6;");
-            }
-
         } else {
-
             String lightThemeCSS =
                     ".root { -fx-background-color: white; } " +
                             ".tab-pane { -fx-background-color: white; } " +
                             ".tab-header-area { -fx-background-color: white; } " +
                             ".split-pane { -fx-background-color: white; } " +
                             ".tree-view { -fx-background-color: white; } " +
-                            ".code-area { -fx-background-color: white; -fx-text-fill: black; }" +
-                            // Styles pour la coloration syntaxique en mode clair
+                            ".code-area { -fx-background-color: white; -fx-text-fill: black; -fx-font-size: 16px; -fx-font-family: 'JetBrains Mono', Consolas, monospace; }" + // Ajout de la taille et famille de police
+                            // Styles pour la coloration syntaxique
                             ".keyword { -fx-fill: #000080; -fx-font-weight: bold; }" +
                             ".string { -fx-fill: #008000; }" +
                             ".comment { -fx-fill: #808080; -fx-font-style: italic; }" +
@@ -347,10 +375,12 @@ public class MiniJajaWindow extends Application {
                 if (tab.getContent() instanceof VirtualizedScrollPane<?>) {
                     VirtualizedScrollPane<?> scrollPane = (VirtualizedScrollPane<?>) tab.getContent();
                     CodeArea codeArea = (CodeArea) scrollPane.getContent();
-                    codeArea.setStyle("-fx-background-color: white; -fx-text-fill: black;");
+                    codeArea.setStyle("-fx-background-color: white; -fx-text-fill: black; " +
+                            "-fx-font-size: 16px; -fx-font-family: 'JetBrains Mono', Consolas, monospace;");
                     codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText()));
                 }
             }
+
 
 
             consoleArea.setStyle("-fx-background-color: white; -fx-text-fill: black; " +
@@ -394,8 +424,8 @@ public class MiniJajaWindow extends Application {
 
         toolBar.getItems().addAll(
                 createToolBarButton("New", "/icon/new-file.png", this::newFile),
-                createToolBarButton("Open", "/icon/open.png", this::openFile),
-                createToolBarButton("Open Folder", "/icon/folder.png", this::openDirectory), // Nouveau bouton
+                createToolBarButton("Open File", "/icon/open-file.png", this::openFile),
+                createToolBarButton("Open Folder", "/icon/open.png", this::openDirectory), // Nouveau bouton
                 createToolBarButton("Save", "/icon/save.png", this::saveFile),
                 new Separator(),
                 createToolBarButton("Build", "/icon/build.png", this::buildCode),
@@ -436,7 +466,7 @@ public class MiniJajaWindow extends Application {
         if (consoleArea == null) {
             consoleArea = new TextArea();
             consoleArea.setEditable(false);
-            consoleArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13px;");
+            consoleArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 14px;");
         }
 
         // Panel de gauche (explorateur)
@@ -450,7 +480,7 @@ public class MiniJajaWindow extends Application {
         centerSplitPane.getItems().addAll(editorTabPane, consoleArea);
         centerSplitPane.setDividerPositions(0.7);
 
-        // Ajouter les composants seulement s'ils sont non-null
+
         if (fileExplorerWrapper != null && centerSplitPane != null) {
             mainSplitPane.getItems().addAll(fileExplorerWrapper, centerSplitPane);
             mainSplitPane.setDividerPositions(0.2);
@@ -481,18 +511,18 @@ public class MiniJajaWindow extends Application {
     private CodeArea createNewCodeArea() {
         CodeArea newCodeArea = new CodeArea();
         newCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(newCodeArea));
-        newCodeArea.setStyle("-fx-font-family: 'JetBrains Mono', Consolas, monospace; -fx-font-size: 14px;");
+        newCodeArea.setStyle("-fx-font-family: 'JetBrains Mono', Consolas, monospace; -fx-font-size: 16px;");
 
-
-        newCodeArea.multiPlainChanges()
-                .successionEnds(Duration.ofMillis(100))
-                .subscribe(ignore -> newCodeArea.setStyleSpans(0, computeHighlighting(newCodeArea.getText())));
-
+        // Initialiser la coloration syntaxique
         newCodeArea.textProperty().addListener((obs, oldText, newText) -> {
-            Tab currentTab = editorTabPane.getSelectionModel().getSelectedItem();
-            if (currentTab != null && !currentTab.getText().endsWith("*")) {
-                currentTab.setText(currentTab.getText() + "*");
-            }
+            Platform.runLater(() -> {
+                newCodeArea.setStyleSpans(0, computeHighlighting(newText));
+            });
+        });
+
+
+        Platform.runLater(() -> {
+            newCodeArea.setStyleSpans(0, computeHighlighting(newCodeArea.getText()));
         });
 
         return newCodeArea;
@@ -500,10 +530,19 @@ public class MiniJajaWindow extends Application {
 
     private void setupFileExplorer() {
         fileExplorer = new TreeView<>();
-        fileExplorer.setShowRoot(false);
+        fileExplorer.setShowRoot(true); // Changé à true pour voir le dossier racine
         fileExplorer.setPrefWidth(200);
 
-        // Configuration par défaut en mode clair
+
+        fileExplorer.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                TreeItem<File> selectedItem = fileExplorer.getSelectionModel().getSelectedItem();
+                if (selectedItem != null && !selectedItem.getValue().isDirectory()) {
+                    openFileInNewTab(selectedItem.getValue());
+                }
+            }
+        });
+
         fileExplorer.setStyle("-fx-background-color: white;");
 
         fileExplorer.setCellFactory(tv -> new TreeCell<File>() {
@@ -511,7 +550,7 @@ public class MiniJajaWindow extends Application {
             public void updateItem(File file, boolean empty) {
                 super.updateItem(file, empty);
 
-                // Style par défaut pour le mode clair
+
                 setStyle("-fx-background-color: transparent; -fx-text-fill: black;");
 
                 if (empty || file == null) {
@@ -521,7 +560,7 @@ public class MiniJajaWindow extends Application {
                     String icon = file.isDirectory() ? "📁 " : "📄 ";
                     setText(icon + file.getName());
 
-                    // Style de survol
+
                     setOnMouseEntered(e -> {
                         if (!isSelected()) {
                             setStyle("-fx-background-color: #e8e8e8; -fx-text-fill: black;");
@@ -534,7 +573,7 @@ public class MiniJajaWindow extends Application {
                         }
                     });
 
-                    // Style de sélection
+
                     if (isSelected()) {
                         setStyle("-fx-background-color: #0096C9; -fx-text-fill: white;");
                     }
@@ -585,12 +624,19 @@ public class MiniJajaWindow extends Application {
                 });
 
                 for (File childFile : files) {
-                    if (!childFile.isHidden()) {
-                        item.getChildren().add(buildFileTreeItem(childFile));
-                    }
+                    item.getChildren().add(buildFileTreeItem(childFile));
                 }
             }
         }
+
+        fileExplorer.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                TreeItem<File> selectedItem = fileExplorer.getSelectionModel().getSelectedItem();
+                if (selectedItem != null && !selectedItem.getValue().isDirectory()) {
+                    openFileInNewTab(selectedItem.getValue());
+                }
+            }
+        });
         return item;
     }
     private void openDirectory() {
@@ -613,7 +659,7 @@ public class MiniJajaWindow extends Application {
 
         VBox wrapper = new VBox();
 
-        // Créer l'en-tête
+
         HBox header = new HBox();
         header.setAlignment(Pos.CENTER_RIGHT);
         header.setPadding(new Insets(5));
@@ -638,6 +684,21 @@ public class MiniJajaWindow extends Application {
         return wrapper;
     }
 
+    private void setupCodeAreaListeners(CodeArea codeArea) {
+        codeArea.textProperty().addListener((obs, oldText, newText) -> {
+
+            if (mainSplitPane.getItems().contains(jajaCodeWrapper)) {
+                buildCode();
+            }
+
+
+            Tab currentTab = editorTabPane.getSelectionModel().getSelectedItem();
+            if (currentTab != null && !currentTab.getText().endsWith("*")) {
+                currentTab.setText(currentTab.getText() + "*");
+            }
+        });
+    }
+
     private void setupJajaCodeArea() {
         jajaCodeArea = new CodeArea();
         jajaCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(jajaCodeArea));
@@ -646,17 +707,56 @@ public class MiniJajaWindow extends Application {
     }
 
     private void buildCode() {
-        if (!mainSplitPane.getItems().contains(jajaCodeWrapper)) {
-            if (jajaCodeWrapper == null) {
-                jajaCodeWrapper = createJajaCodePanel();
-            }
-            mainSplitPane.getItems().add(jajaCodeWrapper);
-            mainSplitPane.setDividerPositions(0.2, 0.6);  // 20% explorateur, 40% éditeur, 40% jajacode
-        }
+        CodeArea currentCodeArea = getCurrentCodeArea();
+        if (currentCodeArea == null) return;
 
-        if (jajaCodeArea != null) {
-            jajaCodeArea.clear();
-            jajaCodeArea.appendText("// JajaCode généré\n// À implémenter");
+        String sourceCode = currentCodeArea.getText();
+
+        try {
+
+            MiniJaja mjj = new MiniJaja(new ByteArrayInputStream(sourceCode.getBytes()));
+            SimpleNode root = mjj.start();
+
+
+            Compiler compiler = new Compiler(root);
+            compiler.compile();
+            String javaCode = compiler.jjcToString();
+
+            // Afficher le JajaCode dans le panneau
+            if (!mainSplitPane.getItems().contains(jajaCodeWrapper)) {
+                if (jajaCodeWrapper == null) {
+                    jajaCodeWrapper = createJajaCodePanel();
+                }
+                mainSplitPane.getItems().add(jajaCodeWrapper);
+                mainSplitPane.setDividerPositions(0.2, 0.6);
+            }
+
+            if (jajaCodeArea != null) {
+                jajaCodeArea.clear();
+                if (javaCode != null && !javaCode.isEmpty()) {
+                    jajaCodeArea.appendText(javaCode);
+                } else {
+                    jajaCodeArea.appendText("// No JajaCode generated");
+                }
+            }
+
+
+            consoleArea.clear();
+            consoleArea.appendText("Compilation successful\n");
+
+        } catch (ParseException pe) {
+            consoleArea.clear();
+            consoleArea.appendText("Syntax error at line " + pe.currentToken.beginLine +
+                    ", column " + pe.currentToken.beginColumn + "\n" +
+                    pe.getMessage() + "\n");
+            try {
+                highlightError(pe);
+            } catch (Exception e) {
+                System.err.println("Error highlighting: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            consoleArea.clear();
+            consoleArea.appendText("Compilation error: " + e.getMessage() + "\n");
         }
     }
 
@@ -735,10 +835,23 @@ public class MiniJajaWindow extends Application {
     private void openFileInNewTab(File file) {
         try {
             String content = Files.readString(file.toPath());
-            CodeArea newCodeArea = createNewCodeArea();
-            newCodeArea.replaceText(content);
 
-            Tab tab = new Tab(file.getName(), new VirtualizedScrollPane<>(newCodeArea));
+
+            for (Tab tab : editorTabPane.getTabs()) {
+                if (tab.getUserData() != null && tab.getUserData().equals(file)) {
+                    editorTabPane.getSelectionModel().select(tab);
+                    return;
+                }
+            }
+
+
+            CodeArea newCodeArea = createNewCodeArea();
+
+
+            Tab tab = new Tab(file.getName());
+            tab.setContent(new VirtualizedScrollPane<>(newCodeArea));
+            tab.setUserData(file);
+
             tab.setOnCloseRequest(event -> {
                 if (!checkSaveBeforeClosing(tab)) {
                     event.consume();
@@ -748,6 +861,16 @@ public class MiniJajaWindow extends Application {
             editorTabPane.getTabs().add(tab);
             editorTabPane.getSelectionModel().select(tab);
             tabFileMap.put(tab, file);
+
+
+            Platform.runLater(() -> {
+                newCodeArea.replaceText(content);
+                // Attendre que le texte soit chargé avant d'appliquer la coloration
+                Platform.runLater(() -> {
+                    newCodeArea.setStyleSpans(0, computeHighlighting(newCodeArea.getText()));
+                });
+            });
+
         } catch (IOException e) {
             showError("Error opening file", e.getMessage());
         }
@@ -867,14 +990,28 @@ public class MiniJajaWindow extends Application {
         CodeArea currentCodeArea = getCurrentCodeArea();
         if (currentCodeArea == null) return;
 
-        int line = pe.currentToken.beginLine - 1;
-        int column = pe.currentToken.beginColumn - 1;
-        currentCodeArea.moveTo(line, column);
-        currentCodeArea.requestFocus();
+        try {
+            int line = Math.max(0, pe.currentToken.beginLine - 1);
+            int column = Math.max(0, pe.currentToken.beginColumn - 1);
 
-        int lineStart = currentCodeArea.position(line, 0).toOffset();
-        int lineEnd = lineStart + currentCodeArea.getParagraph(line).length();
-        currentCodeArea.selectRange(lineStart, lineEnd);
+
+            if (line < currentCodeArea.getParagraphs().size()) {
+
+                int lineLength = currentCodeArea.getParagraph(line).length();
+                column = Math.min(column, lineLength);
+
+                currentCodeArea.moveTo(line, column);
+                currentCodeArea.requestFocus();
+
+
+                int lineStart = currentCodeArea.position(line, 0).toOffset();
+                int lineEnd = lineStart + currentCodeArea.getParagraph(line).length();
+                currentCodeArea.selectRange(lineStart, lineEnd);
+            }
+        } catch (Exception e) {
+            // En cas d'erreur, on évite de planter l'application
+            System.err.println("Error while highlighting: " + e.getMessage());
+        }
     }
 
     private void closeWindow() {

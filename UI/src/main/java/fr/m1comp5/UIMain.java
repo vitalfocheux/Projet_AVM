@@ -1,6 +1,5 @@
 package fr.m1comp5;
 
-import fr.m1comp5.UI.MiniJajaWindow;
 import javafx.application.Application;
 
 public class UIMain {
