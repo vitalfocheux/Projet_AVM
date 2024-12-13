@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -303,12 +304,98 @@ public class MemoryTest {
         });
     }
 
-    //TODO: revoir ce test
     @Test
     public void assignValueArray() throws SymbolTableException, HeapException, StackException {
         mem.getSymbolTable().newScope();
+        int size = 5;
         mem.declTab("x", 5, ObjectType.INT);
-        mem.assignValueArray("x", 0, 1);
+        for(int i = 0; i < size; ++i){
+            mem.assignValueArray("x", i, i);
+            Assertions.assertEquals(mem.getHeap().accessValue(0, i), i);
+        }
     }
 
+    @Test
+    public void assignTypeWithIDDoesntExistAndScopeEmpty(){
+        mem.getSymbolTable().newScope();
+        Assertions.assertThrows(StackException.class, () -> {
+            mem.assignType("x", ObjectType.INT);
+        });
+    }
+
+    @Test
+    public void assignTypeWithIDDoesntExist() throws SymbolTableException, StackException {
+        mem.getSymbolTable().newScope();
+        mem.declVar("x", 1, ObjectType.INT);
+        mem.assignType("y", ObjectType.INT);
+        Assertions.assertThrows(SymbolTableException.class, () -> {
+            Assertions.assertEquals(mem.getType("y"), ObjectType.INT);
+        });
+        Assertions.assertEquals(mem.getStack().size(), 1);
+    }
+
+    @Test
+    public void assignType() throws SymbolTableException, StackException {
+        mem.getSymbolTable().newScope();
+        mem.declVar("x", 1, ObjectType.INT);
+        mem.assignType("x", ObjectType.BOOLEAN);
+        Assertions.assertEquals(mem.getType("x"), ObjectType.BOOLEAN);
+    }
+
+    @Test
+    public void classVariable() throws StackException, SymbolTableException {
+        mem.getSymbolTable().newScope();
+        mem.declVar("x", 1, ObjectType.INT);
+        Assertions.assertEquals(mem.classVariable(), "x");
+    }
+
+    @Test
+    public void classVariableEmpty() {
+        mem.getSymbolTable().newScope();
+        Assertions.assertThrows(StackException.class, () -> {
+            mem.classVariable();
+        });
+    }
+
+    @Test
+    public void getParamsVar() throws SymbolTableException, StackException {
+        mem.getSymbolTable().newScope();
+        mem.declVar("x", 1, ObjectType.INT);
+        Assertions.assertNull(mem.getParams("x"));
+    }
+
+    //TODO: A revoir pour insérer des entetes de fonctions
+    @Test
+    public void getParams() throws SymbolTableException, StackException {
+        mem.getSymbolTable().newScope();
+
+    }
+
+    @Test
+    public void declVarsFromListOfParamsEmpty() throws SymbolTableException, StackException {
+        mem.getSymbolTable().newScope();
+        mem.declVarsFromListOfParams(new ArrayList<>());
+        Assertions.assertEquals(mem.getStack().size(), 0);
+    }
+
+    @Test
+    public void declVarsFromListOfParamsNull() throws SymbolTableException, StackException {
+        mem.getSymbolTable().newScope();
+        mem.declVarsFromListOfParams(null);
+        Assertions.assertEquals(mem.getStack().size(), 0);
+    }
+
+    @Test
+    public void declVarsFromListOfParams() throws SymbolTableException, StackException {
+        mem.getSymbolTable().newScope();
+        List<MemoryObject> fctParams = new ArrayList<>();
+        MemoryObject mo = new MemoryObject("x", 1, ObjectNature.VAR, ObjectType.INT);
+        MemoryObject mo2 = new MemoryObject("y", 2, ObjectNature.VAR, ObjectType.INT);
+        fctParams.add(mo);
+        fctParams.add(mo2);
+        mem.declVarsFromListOfParams(fctParams);
+        Assertions.assertEquals(mem.getStack().size(), 2);
+        Assertions.assertEquals(mem.getStack().get(0), mo);
+        Assertions.assertEquals(mem.getStack().get(1), mo2);
+    }
 }
