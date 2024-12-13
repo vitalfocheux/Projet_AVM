@@ -2,6 +2,7 @@ package fr.m1comp5.mjj;
 
 import fr.m1comp5.*;
 import fr.m1comp5.MjjDebug.InterpreterDebugger;
+import fr.m1comp5.custom.exception.VisitorException;
 import fr.m1comp5.mjj.generated.*;
 
 import java.util.ArrayList;
@@ -54,7 +55,8 @@ public class VisitorMjj implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTRoot node, Object data) {
+    public Object visit(ASTRoot node, Object data)
+    {
         node.jjtGetChild(0).jjtAccept(this, data);
         return null;
     }
@@ -119,6 +121,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         }
         catch (Exception e)
         {
+            System.out.println(node.getLine() + node.getColumn());
             throw new RuntimeException(e.getMessage());
         }
         return null;
