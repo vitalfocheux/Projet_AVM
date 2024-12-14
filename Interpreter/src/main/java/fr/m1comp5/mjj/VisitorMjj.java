@@ -1,6 +1,7 @@
 package fr.m1comp5.mjj;
 
 import fr.m1comp5.*;
+import fr.m1comp5.Debug.InterpreterDebugger;
 import fr.m1comp5.MjjDebug.CallStack;
 import fr.m1comp5.MjjDebug.InterpreterDebugger;
 import fr.m1comp5.MjjDebug.InterpreterException;
@@ -45,7 +46,7 @@ public class VisitorMjj implements MiniJajaVisitor {
     public void checkDebugNode(Node node)  {
         if (activesDebugger && debugger != null) {
             try {
-                debugger.onNodeVisit(node);
+                debugger.onNodeVisitMJJ(node);
             } catch (Exception e) {
                 // If an exception is thrown, we deactivate the debugger
                 activesDebugger = false;

@@ -6,9 +6,6 @@
 class factorielle{
     int x=7;
 
-    void pause(){
-	int i;};
-
     int fact(int x){
         int retour;
         if (x==0) {
@@ -21,6 +18,7 @@ class factorielle{
 
     main {
         int res=fact(x);
-        pause(); // res = 5040
+        write("fact =");
+        writeln(res);
     }
 }

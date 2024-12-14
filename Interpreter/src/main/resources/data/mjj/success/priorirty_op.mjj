@@ -1,0 +1,8 @@
+class op {
+
+    main{
+
+        int a = 2+2*0;
+        write(a);
+    }
+}

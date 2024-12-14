@@ -1,0 +1,17 @@
+class C {
+
+    int fct(int max){
+        int y = 5;
+        while(max > 0){
+            y += max;
+            max = max - 1;
+        };
+        return y;
+    };
+
+    main{
+        int x = 0;
+        int t[4];
+        t[1] = fct(1);
+    }
+}
