@@ -1,7 +1,4 @@
-package fr.m1comp5.MjjDebug;
-
-import fr.m1comp5.mjj.generated.ASTIdent;
-import fr.m1comp5.mjj.generated.ASTMethode;
+package fr.m1comp5.Debug;
 
 public class CallStackElement
 {

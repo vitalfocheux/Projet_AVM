@@ -2,9 +2,8 @@ package fr.m1comp5.mjj;
 
 import fr.m1comp5.*;
 import fr.m1comp5.Debug.InterpreterDebugger;
-import fr.m1comp5.MjjDebug.CallStack;
-import fr.m1comp5.MjjDebug.InterpreterDebugger;
-import fr.m1comp5.MjjDebug.InterpreterException;
+import fr.m1comp5.Debug.CallStack;
+import fr.m1comp5.Debug.InterpreterException;
 import fr.m1comp5.custom.exception.VisitorException;
 import fr.m1comp5.mjj.generated.*;
 

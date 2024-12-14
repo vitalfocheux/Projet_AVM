@@ -1,4 +1,4 @@
-package fr.m1comp5.MjjDebug;
+package fr.m1comp5.Debug;
 
 import fr.m1comp5.custom.exception.VisitorException;
 

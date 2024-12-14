@@ -1,6 +1,4 @@
-package fr.m1comp5.MjjDebug;
-
-import fr.m1comp5.mjj.generated.ASTMethode;
+package fr.m1comp5.Debug;
 
 import java.util.EmptyStackException;
 import java.util.Stack;

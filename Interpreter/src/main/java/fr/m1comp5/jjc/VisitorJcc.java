@@ -1,7 +1,7 @@
 package fr.m1comp5.jjc;
 
-import fr.m1comp5.MjjDebug.CallStack;
-import fr.m1comp5.MjjDebug.InterpreterException;
+import fr.m1comp5.Debug.InterpreterException;
+import fr.m1comp5.Debug.CallStack;
 import fr.m1comp5.custom.exception.VisitorException;
 import fr.m1comp5.jjc.generated.*;
 import fr.m1comp5.Memory;
@@ -9,9 +9,6 @@ import fr.m1comp5.MemoryObject;
 import fr.m1comp5.ObjectNature;
 import fr.m1comp5.ObjectType;
 import fr.m1comp5.Debug.InterpreterDebugger;
-
-import java.util.List;
-
 
 public class VisitorJcc implements JajaCodeVisitor {
     private String toDisplay;
