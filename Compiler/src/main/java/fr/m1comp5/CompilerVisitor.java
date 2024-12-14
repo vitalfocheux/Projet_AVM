@@ -31,13 +31,13 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(SimpleNode node, Object data) {
-        return null;
+        return 0;
     }
 
     @Override
     public Object visit(ASTRoot node, Object data) {
         node.childrenAccept(this, data);
-        return null;
+        return 0;
     }
 
     @Override
@@ -203,39 +203,38 @@ public class CompilerVisitor implements MiniJajaVisitor {
     public Object visit(ASTMethode node, Object data) {
         DataModel dm = (DataModel) data;
         int n = (Integer) dm.data[0];
+        System.out.println("at line "+n);
         Mode m = (Mode) dm.data[1];
 
         if (m == Mode.DEFAULT) {
             // Get method ident, type, headers, var declarations and instructions
             var methType = node.jjtGetChild(0);
-            ASTIdent methIdent = (ASTIdent) node.jjtGetChild(1);
-            ASTEntetes methHeaders = (ASTEntetes) node.jjtGetChild(2);
-            ASTVars methVars = (ASTVars) node.jjtGetChild(3);
-            ASTInstrs methInstrs = (ASTInstrs) node.jjtGetChild(4);
             int addrIncr = methType instanceof ASTRien ? 6 : 5;
 
             ASTPush nPush = new ASTPush(JJTPUSH);
             ASTJcNbre pushNbre = new ASTJcNbre(JJTJCNBRE);
             pushNbre.jjtSetValue(n+3);
-            nPush.jjtAddChild(nPush,0);
+            nPush.jjtAddChild(pushNbre,0);
             instrs.add(nPush);
 
             ASTNew nNew = new ASTNew(JJTNEW);
 
-
             ASTType methTypeJjc = new ASTType(JJTTYPE);
             methTypeJjc.jjtSetValue(methType);
+
             ASTJcIdent methIdentJjc = new ASTJcIdent(JJTJCIDENT);
-            methIdentJjc.jjtSetValue(methIdent);
+            methIdentJjc.jjtSetValue(((ASTIdent) node.jjtGetChild(1)).jjtGetValue());
+
             ASTSorte methSorte = new ASTSorte(JJTSORTE);
             methSorte.jjtSetValue(ObjectNature.METH);
+
             ASTJcNbre methNbre = new ASTJcNbre(JJTJCNBRE);
             methNbre.jjtSetValue(0);
 
             nNew.jjtAddChild(methIdentJjc,0);
-            nNew.jjtAddChild(methTypeJjc,0);
-            nNew.jjtAddChild(methSorte,0);
-            nNew.jjtAddChild(methNbre,0);
+            nNew.jjtAddChild(methTypeJjc,1);
+            nNew.jjtAddChild(methSorte,2);
+            nNew.jjtAddChild(methNbre,3);
 
             instrs.add(nNew);
 
@@ -649,13 +648,13 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTVrai node, Object data) {
-        ASTPush push = new ASTPush(JJTPUSH);
+        ASTPush nPush = new ASTPush(JJTPUSH);
         ASTJcVrai tr = new ASTJcVrai(JJTJCVRAI);
 
         tr.jjtSetValue(true);
-        push.jjtAddChild(tr, 0);
+        nPush.jjtAddChild(tr, 0);
 
-        instrs.add(push);
+        instrs.add(nPush);
 
         return 1;
     }

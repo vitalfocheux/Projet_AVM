@@ -2,7 +2,7 @@ package fr.m1comp5;
 
 import fr.m1comp5.jjc.generated.JajaCode;
 import fr.m1comp5.jjc.generated.*;
-import fr.m1comp5.jjc.InterpreterJcc;
+import fr.m1comp5.jjc.InterpreterJjc;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 
@@ -29,7 +28,7 @@ public class InterpreterJjcTest {
 
             rootNode.dump("");
 
-            InterpreterJcc interpreter = new InterpreterJcc(rootNode, new Memory(), InterpreterJcc.getInstrsFromRoot(rootNode));
+            InterpreterJjc interpreter = new InterpreterJjc(rootNode, new Memory(), InterpreterJjc.getInstrsFromRoot(rootNode));
             interpreter.interpret();
             // Initialize the interpreter with the AST root
 
