@@ -1,5 +1,6 @@
 package fr.m1comp5.jjc;
 
+import fr.m1comp5.custom.exception.VisitorException;
 import fr.m1comp5.jjc.generated.ASTJajaCode;
 import fr.m1comp5.jjc.generated.ASTJcnil;
 import fr.m1comp5.jjc.generated.Node;
@@ -19,7 +20,8 @@ public class InterpreterJcc {
         this.instrs = instrs;
     }
 
-    public String interpret() {
+    public String interpret() throws VisitorException
+    {
         int addr = 1;
         while (addr < instrs.size()) {
             instrs.get(addr - 1).jjtAccept(visitorJcc, null);

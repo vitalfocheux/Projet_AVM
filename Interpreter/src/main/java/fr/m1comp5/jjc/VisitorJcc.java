@@ -1,5 +1,7 @@
 package fr.m1comp5.jjc;
 
+import fr.m1comp5.MjjDebug.CallStack;
+import fr.m1comp5.MjjDebug.InterpreterException;
 import fr.m1comp5.custom.exception.VisitorException;
 import fr.m1comp5.jjc.generated.*;
 import fr.m1comp5.Memory;
@@ -12,13 +14,15 @@ import java.util.List;
 
 public class VisitorJcc implements JajaCodeVisitor {
     private String toDisplay;
-    private Memory mem;
+    private final Memory mem;
+    private final CallStack callStack;
     private int addr;
 
     public VisitorJcc(Memory mem) {
         this.toDisplay = "";
         addr = 1;
         this.mem = mem;
+        callStack = new CallStack();
     }
 
     public int getAddr() {
@@ -75,7 +79,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         addr++;
         return null;
@@ -96,7 +100,7 @@ public class VisitorJcc implements JajaCodeVisitor {
                     mem.identVal(id, type, pos);
                 } catch (Exception e)
                 {
-                    System.err.println(e.getMessage());
+                    throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
                 }
                  break;
             case CST :
@@ -107,7 +111,7 @@ public class VisitorJcc implements JajaCodeVisitor {
                 }
                 catch (Exception e)
                 {
-                    System.err.println(e.getMessage());
+                    throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
                 }
                 break;
             case METH:
@@ -118,7 +122,7 @@ public class VisitorJcc implements JajaCodeVisitor {
                 }
                 catch (Exception e)
                 {
-                    System.err.println(e.getMessage());
+                    throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
                 }
         }
         addr++;
@@ -136,7 +140,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            throw new RuntimeException(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         addr++;
         return null;
@@ -146,6 +150,7 @@ public class VisitorJcc implements JajaCodeVisitor {
     public Object visit(ASTInvoke node, Object data) throws VisitorException
     {
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        callStack.pushFunction(id, node.getLine(), node.getColumn());
         try
         {
             mem.getSymbolTable().newScope();
@@ -154,7 +159,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -169,13 +174,14 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            throw new RuntimeException("The ident is not an ident for an array");
+            throw new InterpreterException("The id is not for an array", node.getLine(), node.getColumn(), callStack);
         }
     }
 
     @Override
     public Object visit(ASTReturn node, Object data) throws VisitorException
     {
+        callStack.tryPopFunction();
         try
         {
             mem.getSymbolTable().popScope();
@@ -184,7 +190,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -207,7 +213,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         toDisplay += sb.toString();
@@ -233,7 +239,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         toDisplay += sb.toString();
@@ -263,7 +269,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -283,7 +289,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -300,7 +306,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -318,7 +324,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -339,7 +345,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -361,7 +367,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -388,7 +394,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -411,7 +417,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -429,7 +435,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -467,7 +473,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -486,7 +492,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -506,7 +512,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -526,7 +532,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -546,7 +552,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -570,7 +576,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -590,7 +596,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -610,7 +616,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -630,7 +636,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
@@ -650,7 +656,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;

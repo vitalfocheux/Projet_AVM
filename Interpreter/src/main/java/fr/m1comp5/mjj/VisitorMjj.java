@@ -1,7 +1,9 @@
 package fr.m1comp5.mjj;
 
 import fr.m1comp5.*;
+import fr.m1comp5.MjjDebug.CallStack;
 import fr.m1comp5.MjjDebug.InterpreterDebugger;
+import fr.m1comp5.MjjDebug.InterpreterException;
 import fr.m1comp5.custom.exception.VisitorException;
 import fr.m1comp5.mjj.generated.*;
 
@@ -10,9 +12,10 @@ import java.util.List;
 
 public class VisitorMjj implements MiniJajaVisitor {
     private String toDisplay;
-    private Memory memory;
+    private final Memory memory;
+    private final CallStack callStack;
     private InterpreterDebugger debugger;
-    private boolean activerDebugger;
+    private boolean activesDebugger;
 
     public VisitorMjj() {
         try
@@ -21,8 +24,9 @@ public class VisitorMjj implements MiniJajaVisitor {
         }
         catch (HeapException he)
         {
-            throw new RuntimeException("Can't interpret without the memory");
+            throw new RuntimeException(he.getMessage());
         }
+        callStack = new CallStack();
         this.toDisplay = "";
     }
 
@@ -34,17 +38,17 @@ public class VisitorMjj implements MiniJajaVisitor {
         this.debugger = debug;
     }
 
-    public void ActiverDebugger(boolean flag) {
-        this.activerDebugger = flag;
+    public void ActivesDebugger(boolean flag) {
+        this.activesDebugger = flag;
     }
 
     public void checkDebugNode(Node node)  {
-        if (activerDebugger && debugger != null) {
+        if (activesDebugger && debugger != null) {
             try {
                 debugger.onNodeVisit(node);
             } catch (Exception e) {
                 // If an exception is thrown, we deactivate the debugger
-                activerDebugger = false;
+                activesDebugger = false;
             }
         }
     }
@@ -74,8 +78,7 @@ public class VisitorMjj implements MiniJajaVisitor {
             memory.removeDecl(id);
             memory.getSymbolTable().popScope();
         } catch (Exception e) {
-            System.out.println("Exception is : "+ e.getMessage());
-            throw new RuntimeException(e);
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -87,11 +90,10 @@ public class VisitorMjj implements MiniJajaVisitor {
             if (memory.getSymbolTable().get((String) node.jjtGetValue()).getType() == ObjectType.OMEGA) {
                 throw new Exception();
             }
-            System.out.println("ASTident -> "+(String)node.jjtGetValue() + " = " + memory.getSymbolTable().get((String) node.jjtGetValue()).getValue());
+            System.out.println("ASTident -> "+ node.jjtGetValue() + " = " + memory.getSymbolTable().get((String) node.jjtGetValue()).getValue());
             return memory.getSymbolTable().get((String) node.jjtGetValue()).getValue();
         } catch (Exception e) {
-            System.out.println("Exception is : "+ e.getMessage());
-            throw new RuntimeException(e);
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
     }
 
@@ -121,8 +123,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         }
         catch (Exception e)
         {
-            System.out.println(node.getLine() + node.getColumn());
-            throw new RuntimeException(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -141,10 +142,10 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTCst node, Object data) throws VisitorException {
         ObjectType varType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data); //Var type
-        String varIdent = (String) ((ASTIdent) node.jjtGetChild(1)).jjtGetValue();
+        String id = (String) ((ASTIdent) node.jjtGetChild(1)).jjtGetValue();
 
-        if (varIdent == null) {
-            throw new RuntimeException("Variable name cannot be null.");
+        if (id == null) {
+            throw new InterpreterException("Variable name cannot be null.", node.getLine(), node.getColumn(), callStack);
         }
         Object value = null;
         if (node.jjtGetNumChildren() > 2) {
@@ -155,16 +156,16 @@ public class VisitorMjj implements MiniJajaVisitor {
         {
             if (data == MjjInterpreterMode.DEFAULT)
             {
-                memory.declCst(varIdent, value, varType);
+                memory.declCst(id, value, varType);
             }
             else
             {
-                memory.removeDecl(varIdent);
+                memory.removeDecl(id);
             }
         }
         catch (Exception e)
         {
-            throw new RuntimeException(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
 
         return null;
@@ -173,10 +174,10 @@ public class VisitorMjj implements MiniJajaVisitor {
     @Override
     public Object visit(ASTVar node, Object data) throws VisitorException {
         ObjectType varType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data); //Var type
-        String varIdent = (String) ((ASTIdent) node.jjtGetChild(1)).jjtGetValue();
+        String id = (String) ((ASTIdent) node.jjtGetChild(1)).jjtGetValue();
 
-        if (varIdent == null) {
-            throw new RuntimeException("Variable name cannot be null.");
+        if (id == null) {
+            throw new InterpreterException("Variable name cannot be null.", node.getLine(), node.getColumn(), callStack);
         }
         Object value = null;
         if (node.jjtGetNumChildren() > 2 && data == MjjInterpreterMode.DEFAULT) {
@@ -187,16 +188,16 @@ public class VisitorMjj implements MiniJajaVisitor {
         {
             if (data == MjjInterpreterMode.DEFAULT)
             {
-                memory.declVar(varIdent, value, varType);
+                memory.declVar(id, value, varType);
             }
             else
             {
-                memory.removeDecl(varIdent);
+                memory.removeDecl(id);
             }
         }
         catch (Exception e)
         {
-            throw new RuntimeException(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -219,7 +220,7 @@ public class VisitorMjj implements MiniJajaVisitor {
             }
         } catch (Exception e)
         {
-            throw new RuntimeException(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -242,7 +243,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
 
         return null;
@@ -282,12 +283,13 @@ public class VisitorMjj implements MiniJajaVisitor {
         checkDebugNode(node);
         try
         {
+            callStack.tryPopFunction();
             memory.assignValue(memory.classVariable(), val);
             System.out.println("Return value is " + memory.getVal(memory.classVariable()));
         }
         catch (Exception e)
         {
-            throw new RuntimeException(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -303,8 +305,7 @@ public class VisitorMjj implements MiniJajaVisitor {
                 toDisplay += value;
             }
         } catch (Exception e) {
-            System.out.println("Exception is : "+ e.getMessage());
-            throw new RuntimeException(e);
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -315,14 +316,13 @@ public class VisitorMjj implements MiniJajaVisitor {
         checkDebugNode(node);
         try {
             if (value instanceof String) {
-                toDisplay += (String) ((String) value).replace("\"","");
+                toDisplay += ((String) value).replace("\"","");
                 toDisplay += "\n";
             } else {
                 toDisplay += value+"\n";
             }
         } catch (Exception e) {
-            System.out.println("Exception is : "+ e.getMessage());
-            throw new RuntimeException(e);
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -338,8 +338,7 @@ public class VisitorMjj implements MiniJajaVisitor {
                 node.jjtGetChild(2).jjtAccept(this, data);
             }
         } catch (Exception e) {
-            System.out.println("Exception is : "+ e.getMessage());
-            throw new RuntimeException(e);
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -353,8 +352,7 @@ public class VisitorMjj implements MiniJajaVisitor {
                 node.jjtGetChild(1).jjtAccept(this, data);
             }
         } catch (Exception e) {
-            System.out.println("Exception is : "+ e.getMessage());
-            throw new RuntimeException(e);
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -380,8 +378,7 @@ public class VisitorMjj implements MiniJajaVisitor {
                 memory.assignValue(id, val);
             }
         } catch (Exception e) {
-            System.out.println("Exception is : "+ e.getMessage());
-            throw new RuntimeException(e);
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -404,8 +401,7 @@ public class VisitorMjj implements MiniJajaVisitor {
                 memory.assignValue(id, (int) memory.getSymbolTable().get(id).getValue() + val);
             }
         } catch (Exception e) {
-            System.out.println("Exception is : "+ e.getMessage());
-            throw new RuntimeException(e);
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -431,7 +427,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         }
         catch (Exception e)
         {
-            throw new RuntimeException(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -442,6 +438,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         List<MemoryObject> instantiatedParams = null;
         String funcID = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
         Node lexp = node.jjtGetChild(1);
+        callStack.pushFunction(funcID, node.getLine(), node.getColumn());
         try
         {
             Node params = memory.getParams(funcID);
@@ -459,7 +456,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         }
         catch (Exception e)
         {
-            throw new RuntimeException(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
@@ -562,7 +559,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         }
         catch (Exception e)
         {
-            throw new RuntimeException(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
     }
 
@@ -594,7 +591,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         }
         catch (Exception e)
         {
-            throw new RuntimeException(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
     }
 
@@ -613,7 +610,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         }
         catch (Exception e)
         {
-            throw new RuntimeException(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
     }
 
@@ -642,7 +639,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         return node.jjtGetValue();
     }
 
-    private List<MemoryObject> expParam(ASTListExp lexp, ASTEntetes ent)
+    private List<MemoryObject> expParam(ASTListExp lexp, ASTEntetes ent) throws VisitorException
     {
         if (lexp == null && ent == null)
         {
@@ -664,7 +661,7 @@ public class VisitorMjj implements MiniJajaVisitor {
         return params;
     }
 
-    private void RDeclsAndVars(Node node, Object data)
+    private void RDeclsAndVars(Node node, Object data) throws VisitorException
     {
         if (data == MjjInterpreterMode.DEFAULT)
         {

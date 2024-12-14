@@ -1,9 +1,9 @@
 package fr.m1comp5.custom.exception;
 
-public class VisitorException extends RuntimeException
+public class VisitorException extends Exception
 {
-    private int line;
-    private int column;
+    private final int line;
+    private final int column;
 
     public VisitorException(String message, int line, int column)
     {
@@ -12,12 +12,12 @@ public class VisitorException extends RuntimeException
         this.column = column;
     }
 
-    private int getExceptionColumn()
+    public int getExceptionColumn()
     {
         return column;
     }
 
-    private int getExceptionLine()
+    public int getExceptionLine()
     {
         return line;
     }
