@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static fr.m1comp5.mjj.generated.MiniJajaTreeConstants.*;
+
 public class MemoryTest {
 
     Memory mem;
@@ -19,16 +21,16 @@ public class MemoryTest {
     }
 
     public ASTMethode createMethode(String id){
-        ASTEntier enti = new ASTEntier(0);
-        ASTIdent varIdent = new ASTIdent(1);
+        ASTEntier enti = new ASTEntier(JJTENTIER);
+        ASTIdent varIdent = new ASTIdent(JJTIDENT);
         varIdent.jjtSetValue(id);
 
-        ASTEntetes entetes = new ASTEntetes(3);
-        ASTEntete entete = new ASTEntete(0);
-        ASTEnil enil = new ASTEnil(1);
+        ASTEntetes entetes = new ASTEntetes(JJTENTETES);
+        ASTEntete entete = new ASTEntete(JJTENTETE);
+        ASTEnil enil = new ASTEnil(JJTENIL);
 
-        ASTEntier entettype = new ASTEntier(0);
-        ASTIdent IdentEntete = new ASTIdent(1);
+        ASTEntier entettype = new ASTEntier(JJTENTIER);
+        ASTIdent IdentEntete = new ASTIdent(JJTIDENT);
         IdentEntete.jjtSetValue("x");
         entete.jjtAddChild(entettype, 0);
         entete.jjtAddChild(IdentEntete, 1);
@@ -36,13 +38,13 @@ public class MemoryTest {
         entetes.jjtAddChild(entete, 0);
         entetes.jjtAddChild(enil, 1);
 
-        ASTVnil var = new ASTVnil(4);
-        ASTRetour retour = new ASTRetour(5);
-        ASTNbre retourNbre = new ASTNbre(0);
+        ASTVnil var = new ASTVnil(JJTVNIL);
+        ASTRetour retour = new ASTRetour(JJTRETOUR);
+        ASTNbre retourNbre = new ASTNbre(JJTNBRE);
 
         retourNbre.jjtSetValue(0);
         retour.jjtAddChild(retourNbre, 0);
-        ASTMethode methode = new ASTMethode(0);
+        ASTMethode methode = new ASTMethode(JJTMETHODE);
         methode.jjtAddChild(enti, 0);
         methode.jjtAddChild(varIdent, 1);
         methode.jjtAddChild(entetes, 2);
@@ -153,15 +155,6 @@ public class MemoryTest {
             mem.assignValue("x", true);
         });
     }
-
-    //TODO: Pas sur que ça sois normal de pouvoir faire ça à revoir
-//    @Test
-//    public void assignValueAnIntToBoolOmega() throws SymbolTableException, StackException, HeapException {
-//        mem.getSymbolTable().newScope();
-//        mem.declVar("x", "OMEGA", ObjectType.INT);
-//        mem.assignValue("x", true);
-//        System.err.println(mem.getVal("x").getClass());
-//    }
 
     @Test
     public void getValCst() throws SymbolTableException, StackException {
