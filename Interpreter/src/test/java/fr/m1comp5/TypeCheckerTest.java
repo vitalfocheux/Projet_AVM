@@ -36,7 +36,7 @@ public class TypeCheckerTest {
     }
 
     static Stream<Arguments> fileProvider() throws IOException {
-        return UtilsTest.fileProvider("src/main/resources/data/mjj/success/testsimple.mjj");
+        return UtilsTest.fileProvider("src/main/resources/data/mjj/success");
     }
 }
     /* 
