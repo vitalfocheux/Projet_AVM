@@ -32,7 +32,6 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(SimpleNode node, Object data) {
-        node.childrenAccept(this, data);
         return 0;
     }
 
