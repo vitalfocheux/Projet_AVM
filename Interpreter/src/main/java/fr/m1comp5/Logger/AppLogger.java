@@ -44,7 +44,6 @@ public class AppLogger {
         }
     }
 
-
     public void logInfo(String message) {
         if (debugModeEnabled) {
             notifyListeners("INFO: " + message, TypeMessage.INFO);

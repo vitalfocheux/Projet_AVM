@@ -4,6 +4,7 @@ options {
     MULTI = true;
     VISITOR = true;
     NODE_CLASS = "fr.m1comp5.custom.node.PositionableJjcSimpleNode";
+    VISITOR_EXCEPTION = "fr.m1comp5.custom.exception.VisitorException";
     TRACK_TOKENS = true;
 }
 
