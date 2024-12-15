@@ -1,23 +1,29 @@
 package fr.m1comp5.jjc;
 
+import fr.m1comp5.Debug.InterpreterException;
+import fr.m1comp5.Debug.CallStack;
+import fr.m1comp5.custom.exception.VisitorException;
 import fr.m1comp5.jjc.generated.*;
 import fr.m1comp5.Memory;
 import fr.m1comp5.MemoryObject;
 import fr.m1comp5.ObjectNature;
 import fr.m1comp5.ObjectType;
-
-import java.util.List;
-
+import fr.m1comp5.Debug.InterpreterDebugger;
 
 public class VisitorJcc implements JajaCodeVisitor {
     private String toDisplay;
-    private Memory mem;
+    private final Memory mem;
+    private final CallStack callStack;
     private int addr;
+    private InterpreterDebugger debugger;
+    private boolean activerDebugger;
+
 
     public VisitorJcc(Memory mem) {
         this.toDisplay = "";
         addr = 1;
         this.mem = mem;
+        callStack = new CallStack();
     }
 
     public int getAddr() {
@@ -28,18 +34,39 @@ public class VisitorJcc implements JajaCodeVisitor {
         return toDisplay;
     }
 
+    public void setDebugger(InterpreterDebugger debug) {
+        this.debugger = debug;
+    }
+
+    public void ActiverDebugger(boolean flag) {
+        this.activerDebugger = flag;
+    }
+    public void checkDebugNode(Node node)  {
+        if (activerDebugger && debugger != null) {
+            try {
+                debugger.onNodeVisitJJC(node);
+            } catch (Exception e) {
+                // If an exception is thrown, we deactivate the debugger
+                activerDebugger = false;
+            }
+        }
+    }
+
     @Override
-    public Object visit(SimpleNode node, Object data) {
+    public Object visit(SimpleNode node, Object data) throws VisitorException
+    {
         return null;
     }
 
     @Override
-    public Object visit(ASTRoot node, Object data) {
+    public Object visit(ASTRoot node, Object data) throws VisitorException
+    {
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
     @Override
-    public Object visit(ASTJajaCode node, Object data) {
+    public Object visit(ASTJajaCode node, Object data) throws VisitorException
+    {
         if (addr < 0) return null;
 
         int addrNode = (int) node.jjtGetChild(0).jjtAccept(this, data);
@@ -49,38 +76,43 @@ public class VisitorJcc implements JajaCodeVisitor {
     }
 
     @Override
-    public Object visit(ASTJcnil node, Object data) {
+    public Object visit(ASTJcnil node, Object data) throws VisitorException
+    {
         return null;
     }
 
     @Override
-    public Object visit(ASTInit node, Object data) {
+    public Object visit(ASTInit node, Object data) throws VisitorException
+    {
         mem.getSymbolTable().newScope();
         addr++;
         return null;
     }
 
     @Override
-    public Object visit(ASTSwap node, Object data) {
+    public Object visit(ASTSwap node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         try
         {
             mem.getStack().swap();
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         addr++;
         return null;
     }
 
     @Override
-    public Object visit(ASTNew node, Object data) {
+    public Object visit(ASTNew node, Object data) throws VisitorException
+    {
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         ObjectType type = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
         ObjectNature nature = (ObjectNature) node.jjtGetChild(2).jjtAccept(this, data);
         int pos = (int) node.jjtGetChild(3).jjtAccept(this, data);
-
+        checkDebugNode(node);
         switch (nature) {
             case VAR :
                 try
@@ -88,7 +120,7 @@ public class VisitorJcc implements JajaCodeVisitor {
                     mem.identVal(id, type, pos);
                 } catch (Exception e)
                 {
-                    System.err.println(e.getMessage());
+                    throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
                 }
                  break;
             case CST :
@@ -99,7 +131,7 @@ public class VisitorJcc implements JajaCodeVisitor {
                 }
                 catch (Exception e)
                 {
-                    System.err.println(e.getMessage());
+                    throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
                 }
                 break;
             case METH:
@@ -110,7 +142,7 @@ public class VisitorJcc implements JajaCodeVisitor {
                 }
                 catch (Exception e)
                 {
-                    System.err.println(e.getMessage());
+                    throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
                 }
         }
         addr++;
@@ -118,25 +150,29 @@ public class VisitorJcc implements JajaCodeVisitor {
     }
 
     @Override
-    public Object visit(ASTNewArray node, Object data)
+    public Object visit(ASTNewArray node, Object data) throws VisitorException
     {
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         ObjectType arrayType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
+        checkDebugNode(node);
         try
         {
             mem.declTab(id, mem.getStack().pop().getValue(), arrayType);
         }
         catch (Exception e)
         {
-            throw new RuntimeException(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         addr++;
         return null;
     }
 
     @Override
-    public Object visit(ASTInvoke node, Object data) {
+    public Object visit(ASTInvoke node, Object data) throws VisitorException
+    {
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        callStack.pushFunction(id, node.getLine(), node.getColumn());
+        checkDebugNode(node);
         try
         {
             mem.getSymbolTable().newScope();
@@ -145,26 +181,31 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
 
     @Override
-    public Object visit(ASTLength node, Object data) {
+    public Object visit(ASTLength node, Object data) throws VisitorException
+    {
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
+        checkDebugNode(node);
         try
         {
             return mem.getHeap().getArraySize((int) mem.getSymbolTable().get(id).getValue());
         }
         catch (Exception e)
         {
-            throw new RuntimeException("The ident is not an ident for an array");
+            throw new InterpreterException("The id is not for an array", node.getLine(), node.getColumn(), callStack);
         }
     }
 
     @Override
-    public Object visit(ASTReturn node, Object data) {
+    public Object visit(ASTReturn node, Object data) throws VisitorException
+    {
+        callStack.tryPopFunction();
+        checkDebugNode(node);
         try
         {
             mem.getSymbolTable().popScope();
@@ -173,14 +214,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
 
     @Override
-    public Object visit(ASTWrite node, Object data) {
+    public Object visit(ASTWrite node, Object data) throws VisitorException
+    {
         StringBuilder sb = new StringBuilder();
+        checkDebugNode(node);
         try
         {
             Object msg = mem.getStack().pop().getValue();
@@ -195,7 +238,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         toDisplay += sb.toString();
@@ -203,8 +246,10 @@ public class VisitorJcc implements JajaCodeVisitor {
     }
 
     @Override
-    public Object visit(ASTWriteLn node, Object data) {
+    public Object visit(ASTWriteLn node, Object data) throws VisitorException
+    {
         StringBuilder sb = new StringBuilder();
+        checkDebugNode(node);
         try
         {
             Object msg = mem.getStack().pop().getValue();
@@ -220,7 +265,7 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         toDisplay += sb.toString();
@@ -228,7 +273,9 @@ public class VisitorJcc implements JajaCodeVisitor {
     }
 
     @Override
-    public Object visit(ASTPush node, Object data) {
+    public Object visit(ASTPush node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         Object value = node.jjtGetChild(0).jjtAccept(this, data);
         ObjectType valType = null;
         if (value instanceof  Integer)
@@ -249,14 +296,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTPop node, Object data) {
+    public Object visit(ASTPop node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         try
         {
             MemoryObject mo = mem.getStack().pop();
@@ -268,14 +317,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTLoad node, Object data) {
+    public Object visit(ASTLoad node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -284,14 +335,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTALoad node, Object data) {
+    public Object visit(ASTALoad node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -301,14 +354,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTStore node, Object data) {
+    public Object visit(ASTStore node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -321,14 +376,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTAStore node, Object data) {
+    public Object visit(ASTAStore node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -342,14 +399,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTIf node, Object data) {
+    public Object visit(ASTIf node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         int address = (int) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -368,19 +427,23 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         return null;
     }
 
     @Override
-    public Object visit(ASTGoTo node, Object data) {
+    public Object visit(ASTGoTo node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         addr = (int) node.jjtGetChild(0).jjtAccept(this, data);
         return null;
     }
 
     @Override
-    public Object visit(ASTInc node, Object data) {
+    public Object visit(ASTInc node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -389,14 +452,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTAInc node, Object data) {
+    public Object visit(ASTAInc node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         String id = (String) node.jjtGetChild(0).jjtAccept(this, data);
         try
         {
@@ -406,31 +471,37 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTNop node, Object data) {
+    public Object visit(ASTNop node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTJcStop node, Object data) {
+    public Object visit(ASTJcStop node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         return null;
     }
 
     @Override
-    public Object visit(ASTJcIdent node, Object data)
+    public Object visit(ASTJcIdent node, Object data) throws VisitorException
     {
         return node.jjtGetValue();
     }
 
     @Override
-    public Object visit(ASTNeg node, Object data) {
+    public Object visit(ASTNeg node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         try
         {
             MemoryObject last = mem.getStack().pop();
@@ -441,14 +512,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTNot node, Object data) {
+    public Object visit(ASTNot node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         try
         {
             MemoryObject last = mem.getStack().pop();
@@ -459,14 +532,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTAdd node, Object data) {
+    public Object visit(ASTAdd node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -478,14 +553,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTSub node, Object data) {
+    public Object visit(ASTSub node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -497,14 +574,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTMul node, Object data) {
+    public Object visit(ASTMul node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -516,14 +595,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTDiv node, Object data) {
+    public Object visit(ASTDiv node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -539,14 +620,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTCmp node, Object data) {
+    public Object visit(ASTCmp node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -558,14 +641,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTSup node, Object data) {
+    public Object visit(ASTSup node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -577,14 +662,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTOr node, Object data) {
+    public Object visit(ASTOr node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -596,14 +683,16 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTAnd node, Object data) {
+    public Object visit(ASTAnd node, Object data) throws VisitorException
+    {
+        checkDebugNode(node);
         try
         {
             MemoryObject secondOperand = mem.getStack().pop();
@@ -615,14 +704,14 @@ public class VisitorJcc implements JajaCodeVisitor {
         }
         catch (Exception e)
         {
-            System.err.println(e.getMessage());
+            throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
         }
         ++addr;
         return null;
     }
 
     @Override
-    public Object visit(ASTType node, Object data)
+    public Object visit(ASTType node, Object data) throws VisitorException
     {
         ObjectType ftype = null;
         String type = (String) node.jjtGetValue();
@@ -642,7 +731,8 @@ public class VisitorJcc implements JajaCodeVisitor {
     }
 
     @Override
-    public Object visit(ASTSorte node, Object data) {
+    public Object visit(ASTSorte node, Object data) throws VisitorException
+    {
         ObjectNature nature = null;
         String type = (String) node.jjtGetValue();
         if (type.equals("var"))
@@ -661,22 +751,26 @@ public class VisitorJcc implements JajaCodeVisitor {
     }
 
     @Override
-    public Object visit(ASTJcNbre node, Object data) {
+    public Object visit(ASTJcNbre node, Object data) throws VisitorException
+    {
         return node.jjtGetValue();
     }
 
     @Override
-    public Object visit(ASTJcVrai node, Object data) {
+    public Object visit(ASTJcVrai node, Object data) throws VisitorException
+    {
         return node.jjtGetValue();
     }
 
     @Override
-    public Object visit(ASTJcFalse node, Object data) {
+    public Object visit(ASTJcFalse node, Object data) throws VisitorException
+    {
         return node.jjtGetValue();
     }
 
     @Override
-    public Object visit(ASTJcChaine node, Object data) {
+    public Object visit(ASTJcChaine node, Object data) throws VisitorException
+    {
         return node.jjtGetValue();
     }
 

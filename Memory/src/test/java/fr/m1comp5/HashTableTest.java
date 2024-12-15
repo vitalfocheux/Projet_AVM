@@ -56,8 +56,19 @@ public class HashTableTest {
     @Test
     public void testPutSameTwice() throws SymbolTableException{
         MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
+        MemoryObject obj2 = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
         Assertions.assertTrue(hashTable.put(obj));
-        Assertions.assertThrows(SymbolTableException.class, () -> {hashTable.put(obj);});
+        Assertions.assertThrows(SymbolTableException.class, () -> {hashTable.put(obj2);});
+        Assertions.assertEquals(hashTable.getCount(), 1);
+        Assertions.assertEquals(obj, hashTable.get("id"));
+    }
+
+    @Test
+    public void testPutSameIdTwice() throws SymbolTableException {
+        MemoryObject obj = new MemoryObject("id", 1, ObjectNature.VAR, ObjectType.INT);
+        MemoryObject obj2 = new MemoryObject("id", 2, ObjectNature.VAR, ObjectType.INT);
+        Assertions.assertTrue(hashTable.put(obj));
+        Assertions.assertThrows(SymbolTableException.class, () -> {hashTable.put(obj2);});
         Assertions.assertEquals(hashTable.getCount(), 1);
         Assertions.assertEquals(obj, hashTable.get("id"));
     }
@@ -108,6 +119,21 @@ public class HashTableTest {
             Assertions.assertEquals(hashTable.getCount(), size-i-1);
             Assertions.assertNull(hashTable.get("id"+i));
         }
+    }
+
+    @Test
+    public void testUpdateNullId(){
+        Assertions.assertThrows(SymbolTableException.class, () -> {hashTable.update(null, 1);});
+    }
+
+    @Test
+    public void testUpdateNullValue(){
+        Assertions.assertThrows(SymbolTableException.class, () -> {hashTable.update("id", null);});
+    }
+
+    @Test
+    public void testUpdateNullIdNullValue(){
+        Assertions.assertThrows(SymbolTableException.class, () -> {hashTable.update(null, null);});
     }
 
     @Test

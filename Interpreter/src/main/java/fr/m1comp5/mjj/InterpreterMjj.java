@@ -1,6 +1,7 @@
 package fr.m1comp5.mjj;
 
-import fr.m1comp5.MjjDebug.InterpreterDebugger;
+import fr.m1comp5.custom.exception.VisitorException;
+import fr.m1comp5.Debug.InterpreterDebugger;
 import fr.m1comp5.mjj.generated.Node;
 
 public class InterpreterMjj {
@@ -13,9 +14,10 @@ public class InterpreterMjj {
         VisitorMjj = new VisitorMjj();
     }
 
-    public String interpret() {
+    public String interpret() throws VisitorException
+    {
         System.out.println("Activating debugger...");
-        VisitorMjj.ActiverDebugger(true);
+        VisitorMjj.ActivesDebugger(true);
         System.out.println("Starting interpretation...");
         root.jjtAccept(VisitorMjj, null);
         if (debugger != null) {

@@ -1,4 +1,5 @@
 package fr.m1comp5;
+import fr.m1comp5.custom.exception.VisitorException;
 import fr.m1comp5.mjj.generated.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,8 @@ public class TypeCheckerTest {
     }
 
     @Test 
-    public void testTableau() {
+    public void testTableau() throws VisitorException
+    {
         ASTEntier int1 = new ASTEntier(0);
         ASTIdent tabl = new ASTIdent(0);
         tabl.jjtSetValue("tab");  
@@ -73,7 +75,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testVariableDeclaration() {
+    public void testVariableDeclaration() throws VisitorException
+    {
         ASTEntier entier = new ASTEntier(0);
         ASTIdent varIdent = new ASTIdent(1);
         varIdent.jjtSetValue("myVar");
@@ -95,7 +98,8 @@ public class TypeCheckerTest {
 
    
     @Test 
-    public void testCst() {
+    public void testCst() throws VisitorException
+    {
         ASTCst cst = new ASTCst(0);
         ASTEntier entier = new ASTEntier(0);
         ASTIdent cstIdent = new ASTIdent(1);
@@ -111,7 +115,8 @@ public class TypeCheckerTest {
     }
     
     @Test
-    public void testMethodDeclaration() {
+    public void testMethodDeclaration() throws VisitorException
+    {
         ASTCst cst = new ASTCst(0);
         ASTEntier entier = new ASTEntier(0);
         ASTIdent cstIdent = new ASTIdent(1);
@@ -161,7 +166,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testAffectation() {
+    public void testAffectation() throws VisitorException
+    {
         // Déclarer la variable x avant de tester l'affectation
         ASTEntier entier = new ASTEntier(0);
         ASTIdent varIdent = new ASTIdent(0);
@@ -189,7 +195,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testTantque() {
+    public void testTantque() throws VisitorException
+    {
         ASTVrai vrai = new ASTVrai(0);
         ASTInil inil = new ASTInil(1);
         ASTTantQue tantque = new ASTTantQue(0);
@@ -201,7 +208,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testTantqueNoBoolean() {
+    public void testTantqueNoBoolean() throws VisitorException
+    {
         ASTNbre nbre = new ASTNbre(0);
         nbre.jjtSetValue(4);
         ASTInil inil = new ASTInil(1);
@@ -217,7 +225,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testIfConditionTypeCheck() {
+    public void testIfConditionTypeCheck() throws VisitorException
+    {
         ASTVrai vrai = new ASTVrai(0);
         ASTInil inil = new ASTInil(1);
         ASTSi ifNode = new ASTSi(0);
@@ -230,7 +239,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testIfConditionTypeCheck2() {
+    public void testIfConditionTypeCheck2() throws VisitorException
+    {
         ASTNbre nbre = new ASTNbre(0);
         nbre.jjtSetValue(1);
         ASTInil inil = new ASTInil(1);
@@ -246,7 +256,8 @@ public class TypeCheckerTest {
     }
 
     @Test 
-    public void testNegation() {
+    public void testNegation() throws VisitorException
+    {
         ASTVrai vrai = new ASTVrai(0);
         ASTNot not = new ASTNot(0);
         not.jjtAddChild(vrai, 0);
@@ -257,7 +268,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testNegationNoBoolean() {
+    public void testNegationNoBoolean() throws VisitorException
+    {
         ASTNbre nbre = new ASTNbre(0);
         nbre.jjtSetValue(2);
         ASTNot not = new ASTNot(0);
@@ -271,7 +283,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testANDoperation() {
+    public void testANDoperation() throws VisitorException
+    {
         ASTVrai vrai = new ASTVrai(0);
         ASTFaux faux = new ASTFaux(1);
         ASTEt et = new ASTEt(0);
@@ -284,7 +297,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testANDoperationNoBoolean() {
+    public void testANDoperationNoBoolean() throws VisitorException
+    {
         ASTNbre nbre = new ASTNbre(0);
         nbre.jjtSetValue(2);
         ASTFaux faux = new ASTFaux(1);
@@ -300,7 +314,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testORoperation() {
+    public void testORoperation() throws VisitorException
+    {
         ASTVrai vrai = new ASTVrai(0);
         ASTFaux faux = new ASTFaux(1);
         ASTOu ou = new ASTOu(0);
@@ -312,7 +327,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testORoperationNoBoolean() {
+    public void testORoperationNoBoolean() throws VisitorException
+    {
         ASTNbre nbre = new ASTNbre(0);
         nbre.jjtSetValue(2);
         ASTFaux faux = new ASTFaux(1);
@@ -328,7 +344,8 @@ public class TypeCheckerTest {
     }
 
     @Test 
-    public void testADDoperation() {
+    public void testADDoperation() throws VisitorException
+    {
         ASTNbre nbre1 = new ASTNbre(0);
         nbre1.jjtSetValue(2);
         ASTNbre nbre2 = new ASTNbre(1);
@@ -343,7 +360,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testADDoperationNoInteger() {
+    public void testADDoperationNoInteger() throws VisitorException
+    {
         ASTNbre nbre = new ASTNbre(0);
         nbre.jjtSetValue(2);
         ASTVrai vrai = new ASTVrai(1);
@@ -358,7 +376,8 @@ public class TypeCheckerTest {
                 "Expected log message for non-integer operand in ADD operation");
     }
     @Test
-    public void TestORoperation(){
+    public void TestORoperation() throws VisitorException
+    {
         ASTVrai vrai = new ASTVrai(0);
         ASTFaux faux = new ASTFaux(1);
         ASTOu ou = new ASTOu(0);
@@ -369,7 +388,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testSUBoperation(){
+    public void testSUBoperation() throws VisitorException
+    {
         ASTNbre nbre1 = new ASTNbre(0);
         nbre1.jjtSetValue(2);
         ASTNbre nbre2 = new ASTNbre(1);
@@ -383,7 +403,8 @@ public class TypeCheckerTest {
         
     }
     @Test
-    public void testSUBoperationNoInteger() {
+    public void testSUBoperationNoInteger() throws VisitorException
+    {
         ASTNbre nbre = new ASTNbre(0);
         nbre.jjtSetValue(2);
         ASTVrai vrai = new ASTVrai(1);
@@ -397,7 +418,8 @@ public class TypeCheckerTest {
      }
 
     @Test
-    public void testMULoperation(){
+    public void testMULoperation() throws VisitorException
+    {
         ASTNbre nbre1 = new ASTNbre(0);
         nbre1.jjtSetValue(2);
         ASTNbre nbre2 = new ASTNbre(1);
@@ -410,7 +432,8 @@ public class TypeCheckerTest {
 
     }
     @Test
-    public void testMULoperationNoInteger() {
+    public void testMULoperationNoInteger() throws VisitorException
+    {
         ASTNbre nbre = new ASTNbre(0);
         nbre.jjtSetValue(2);
         ASTVrai vrai = new ASTVrai(1);
@@ -424,7 +447,8 @@ public class TypeCheckerTest {
     }
  
     @Test
-    public void testListexpvide(){
+    public void testListexpvide() throws VisitorException
+    {
         ASTExnil exnil = new ASTExnil(0);
         ASTListExp listexp = new ASTListExp(0);
         listexp.jjtAddChild(exnil, 0);
@@ -435,7 +459,8 @@ public class TypeCheckerTest {
     }
  
     @Test 
-    public void testListexp1(){
+    public void testListexp1() throws VisitorException
+    {
         ASTNbre nbre1 = new ASTNbre(0);
         nbre1.jjtSetValue(2);
         ASTNbre nbre2 = new ASTNbre(1);
@@ -452,7 +477,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testListexp2() {
+    public void testListexp2() throws VisitorException
+    {
         ASTIncrement incrementNode = increment("z",4);
         ASTListExp listexp = new ASTListExp(0);
         ASTExnil exnil = new ASTExnil(0);
@@ -465,7 +491,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void  testEntetes(){
+    public void  testEntetes() throws VisitorException
+    {
         ASTEntetes entetes = new ASTEntetes(0);
        
         ASTEntetes entests1 = new ASTEntetes(0);
@@ -496,7 +523,8 @@ public class TypeCheckerTest {
     }
      
     @Test 
-    public void testAppelI(){
+    public void testAppelI() throws VisitorException
+    {
         // declarer methode int zero(x:entier){return 0;}
         ASTEntier enti = new ASTEntier(0);
         ASTIdent nomMeth = new ASTIdent(0);
@@ -557,7 +585,8 @@ public class TypeCheckerTest {
     }
 
     @Test 
-    public void testAppelE(){
+    public void testAppelE() throws VisitorException
+    {
         // declarer methode int zero(x:entier){return 0;}
         ASTEntier enti = new ASTEntier(0);
         ASTIdent nomMeth = new ASTIdent(0);
@@ -619,7 +648,8 @@ public class TypeCheckerTest {
     }
 
     @Test
-    public void testIncrementOnInteger() {
+    public void testIncrementOnInteger() throws VisitorException
+    {
         // Déclarer une variable y de type entier
         ASTCst cst = new ASTCst(0);
         ASTEntier entier = new ASTEntier(0);
@@ -645,7 +675,8 @@ public class TypeCheckerTest {
     }
     
     @Test
-    public void testIncrementOnNonInteger() {
+    public void testIncrementOnNonInteger() throws VisitorException
+    {
         // Déclarer une variable y de type BOOLEAN 
         ASTBooleen booleen = new ASTBooleen(0);
         ASTIdent varIdent = new ASTIdent(1);
@@ -670,7 +701,8 @@ public class TypeCheckerTest {
     }
 
     // Créer une constante entière
-    public void creerCstInt(String nom, int valeur){
+    public void creerCstInt(String nom, int valeur) throws VisitorException
+    {
         ASTCst cst = new ASTCst(0);
         ASTEntier entier = new ASTEntier(0);
         ASTIdent cstIdent = new ASTIdent(1);
@@ -685,7 +717,8 @@ public class TypeCheckerTest {
 
     }
     // Créer un nœud d'incrémentation
-    public ASTIncrement  increment(String nom, int valeur){
+    public ASTIncrement  increment(String nom, int valeur) throws VisitorException
+    {
         ASTIncrement incrementNode = new ASTIncrement(0);
         creerCstInt(nom, valeur);
         ASTIdent varIdent1 = new ASTIdent(0);
@@ -695,7 +728,8 @@ public class TypeCheckerTest {
     }
 
     @Test 
-    public void testInstrs(){
+    public void testInstrs() throws VisitorException
+    {
         ASTIncrement inc = increment("x", 0); 
         ASTInstrs instrs = new ASTInstrs(0);
         ASTInil inil = new ASTInil(0);
@@ -707,7 +741,8 @@ public class TypeCheckerTest {
 
     }
     @Test
-    public void testInstrs2(){
+    public void testInstrs2() throws VisitorException
+    {
         ASTIncrement inc = increment("x", 0); 
         ASTIncrement inc2 = increment("y", 0); 
         ASTInstrs instrs1 = new ASTInstrs(0);
@@ -727,7 +762,8 @@ public class TypeCheckerTest {
     }
 
     @Test 
-    public void testecrire(){
+    public void testecrire() throws VisitorException
+    {
         ASTIdent ident = new ASTIdent(0);
         ident.jjtSetValue("x");
         ASTEcrire ecrire = new ASTEcrire(0);
@@ -737,7 +773,8 @@ public class TypeCheckerTest {
 
     }
     @Test
-    public void testecrire2(){
+    public void testecrire2() throws VisitorException
+    {
         ASTChaine chaine = new ASTChaine(0);
         chaine.jjtSetValue("Hello World");
         ASTEcrire ecrire = new ASTEcrire(0);

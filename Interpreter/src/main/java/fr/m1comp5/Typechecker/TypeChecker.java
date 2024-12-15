@@ -1,5 +1,6 @@
 package fr.m1comp5.Typechecker;
 import fr.m1comp5.*;
+import fr.m1comp5.custom.exception.VisitorException;
 import fr.m1comp5.mjj.generated.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +23,15 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTRoot node, Object data) {
+    public Object visit(ASTRoot node, Object data) throws VisitorException
+    {
         return visitChildren(node, data);
     } 
    
 
      @Override
-     public Object visit(ASTClasse node, Object data) {
+     public Object visit(ASTClasse node, Object data) throws VisitorException
+     {
 
         ASTIdent classNameNode = (ASTIdent) node.jjtGetChild(0);
         String className = (String) classNameNode.jjtGetValue(); 
@@ -46,7 +49,7 @@ public class TypeChecker implements MiniJajaVisitor {
     
         try {
             stack.pop(); // Retirer la portée de la classe après traitement
-            } catch (StackException e ) {
+            } catch (StackException e) {
             e.printStackTrace();
         }
 
@@ -78,12 +81,14 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTDecls node, Object data) {
+    public Object visit(ASTDecls node, Object data) throws VisitorException
+    {
         return visitChildren(node, data);
     }
 
     @Override
-    public Object visit(ASTCst node, Object data) {
+    public Object visit(ASTCst node, Object data) throws VisitorException
+    {
         ObjectType cstType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         String cstName = (String) node.jjtGetChild(1).jjtAccept(this, data);
         Object  cstValue =  node.jjtGetChild(2).jjtAccept(this, data);
@@ -104,12 +109,14 @@ public class TypeChecker implements MiniJajaVisitor {
     }
     
    @Override
-    public Object visit(ASTVars node, Object data) {
+    public Object visit(ASTVars node, Object data) throws VisitorException
+   {
         return visitChildren(node, data);
     }
 
     @Override
-    public Object visit(ASTVar node, Object data) {
+    public Object visit(ASTVar node, Object data) throws VisitorException
+    {
         ASTIdent identNode = (ASTIdent) node.jjtGetChild(1);
         ObjectType varType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         String varName = identNode.jjtGetValue().toString();
@@ -139,7 +146,8 @@ public class TypeChecker implements MiniJajaVisitor {
 
 
     @Override
-    public Object visit(ASTTableau node, Object data) {
+    public Object visit(ASTTableau node, Object data) throws VisitorException
+    {
         String arrayName = (String) node.jjtGetChild(1).jjtAccept(this, data);  // nom 
         ObjectType arrayType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data); // type 
 
@@ -166,7 +174,8 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTMethode node, Object data) {
+    public Object visit(ASTMethode node, Object data) throws VisitorException
+    {
         Object returnTypeObject = node.jjtGetChild(0).jjtAccept(this, data);
         if (!(returnTypeObject instanceof ObjectType)) {
             logger.logError("Expected ObjectType but found " + returnTypeObject.getClass().getSimpleName());
@@ -228,7 +237,8 @@ public class TypeChecker implements MiniJajaVisitor {
         return null;
     }
 
-    private void collectParamTypes(ASTEntetes entetesNode, List<ObjectType> paramTypes, Object data) {
+    private void collectParamTypes(ASTEntetes entetesNode, List<ObjectType> paramTypes, Object data) throws VisitorException
+    {
         for (int i = 0; i < entetesNode.jjtGetNumChildren(); i++) {
             SimpleNode child = (SimpleNode) entetesNode.jjtGetChild(i);
             if (child instanceof ASTEntete) {
@@ -245,7 +255,8 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-public Object visit(ASTMain node, Object data) {
+public Object visit(ASTMain node, Object data) throws VisitorException
+    {
     if (isDefined("main", ObjectType.VOID, ObjectNature.METH)) {
         logger.logError("Main method is already defined.");
         return null;
@@ -278,12 +289,14 @@ public Object visit(ASTMain node, Object data) {
     }
 
     @Override
-    public Object visit(ASTEntetes node, Object data) {
+    public Object visit(ASTEntetes node, Object data) throws VisitorException
+    {
         return visitChildren(node, data);
     }
 
     @Override
-    public Object visit(ASTEntete node, Object data) {
+    public Object visit(ASTEntete node, Object data) throws VisitorException
+    {
         return visitChildren(node, data);
     }
 
@@ -293,28 +306,33 @@ public Object visit(ASTMain node, Object data) {
     }
 
     @Override
-    public Object visit(ASTInstrs node, Object data) {
+    public Object visit(ASTInstrs node, Object data) throws VisitorException
+    {
         return visitChildren(node, data);
     }
 
     @Override
-    public Object visit(ASTRetour node, Object data) {
+    public Object visit(ASTRetour node, Object data) throws VisitorException
+    {
         return visitChildren(node, data);
     }
 
 
     @Override
-    public Object visit(ASTEcrire node, Object data) {
+    public Object visit(ASTEcrire node, Object data) throws VisitorException
+    {
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
     @Override
-    public Object visit(ASTEcrireLn node, Object data) {
+    public Object visit(ASTEcrireLn node, Object data) throws VisitorException
+    {
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
     @Override
-    public Object visit(ASTSi node, Object data) {
+    public Object visit(ASTSi node, Object data) throws VisitorException
+    {
         ObjectType conditionType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         if (conditionType != ObjectType.BOOLEAN) {
             logger.logError("Condition in if statement must be boolean.");
@@ -323,7 +341,8 @@ public Object visit(ASTMain node, Object data) {
     }
 
     @Override
-    public Object visit(ASTTantQue node, Object data) {
+    public Object visit(ASTTantQue node, Object data) throws VisitorException
+    {
         ObjectType conditionType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         if (conditionType != ObjectType.BOOLEAN) {
             logger.logError("Condition in while statement must be boolean.");
@@ -332,7 +351,8 @@ public Object visit(ASTMain node, Object data) {
     }
     
     @Override
-    public Object visit(ASTAffectation node, Object data) {
+    public Object visit(ASTAffectation node, Object data) throws VisitorException
+    {
         String identName = (String)  node.jjtGetChild(0).jjtAccept(this, data);
         
         ObjectType assignedType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
@@ -352,7 +372,8 @@ public Object visit(ASTMain node, Object data) {
     }
 
     @Override
-    public Object visit(ASTIncrement node, Object data) {
+    public Object visit(ASTIncrement node, Object data) throws VisitorException
+    {
         String varName = (String) node.jjtGetChild(0).jjtAccept(this, data); //  nom de la variable
         MemoryObject mo = lookupSymbol(varName); 
 
@@ -367,7 +388,8 @@ public Object visit(ASTMain node, Object data) {
     }
 
     @Override
-    public Object visit(ASTAppelI node, Object data) {
+    public Object visit(ASTAppelI node, Object data) throws VisitorException
+    {
         String methodName = (String) node.jjtGetChild(0).jjtAccept(this, data);
         List<ObjectType> actualParamTypes = new ArrayList<>();
 
@@ -415,7 +437,8 @@ public Object visit(ASTMain node, Object data) {
     }
     
     @Override
-    public Object visit(ASTListExp node, Object data) {
+    public Object visit(ASTListExp node, Object data) throws VisitorException
+    {
 
         if (node.jjtGetNumChildren() == 2) {
             SimpleNode firstChild = (SimpleNode) node.jjtGetChild(0);
@@ -442,7 +465,8 @@ public Object visit(ASTMain node, Object data) {
     }
 
     @Override
-    public Object visit(ASTExp node, Object data) {
+    public Object visit(ASTExp node, Object data) throws VisitorException
+    {
         Object result = null;
         for (int i = 0; i < node.jjtGetNumChildren(); i++) {
             result = node.jjtGetChild(i).jjtAccept(this, data);
@@ -451,7 +475,8 @@ public Object visit(ASTMain node, Object data) {
     }
     
     
-    private void collectParamTypesFromListexp(ASTListExp listexpNode, List<ObjectType> paramTypes, Object data) {
+    private void collectParamTypesFromListexp(ASTListExp listexpNode, List<ObjectType> paramTypes, Object data) throws VisitorException
+    {
         if (listexpNode.jjtGetNumChildren() == 2) {
             SimpleNode firstChild = (SimpleNode) listexpNode.jjtGetChild(0);
             SimpleNode secondChild = (SimpleNode) listexpNode.jjtGetChild(1);
@@ -479,7 +504,8 @@ public Object visit(ASTMain node, Object data) {
         } 
     }
     @Override
-    public Object visit(ASTAppelE node, Object data) {
+    public Object visit(ASTAppelE node, Object data) throws VisitorException
+    {
         String methodName = (String) node.jjtGetChild(0).jjtAccept(this, data);
 
         // Construire la signature de la méthode à partir des paramètres
@@ -535,27 +561,32 @@ public Object visit(ASTMain node, Object data) {
     }
 
     @Override
-    public Object visit(ASTNot node, Object data) {
+    public Object visit(ASTNot node, Object data) throws VisitorException
+    {
         return visitUnaryOperation(node, data, ObjectType.BOOLEAN);
     }
 
     @Override
-    public Object visit(ASTNeg node, Object data) {
+    public Object visit(ASTNeg node, Object data) throws VisitorException
+    {
         return visitUnaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTEt node, Object data) {
+    public Object visit(ASTEt node, Object data) throws VisitorException
+    {
         return visitBinaryOperation(node, data, ObjectType.BOOLEAN);
     }
 
     @Override
-    public Object visit(ASTOu node, Object data) {
+    public Object visit(ASTOu node, Object data) throws VisitorException
+    {
         return visitBinaryOperation(node, data, ObjectType.BOOLEAN);
     }
 
     @Override
-    public Object visit(ASTEq node, Object data) {
+    public Object visit(ASTEq node, Object data) throws VisitorException
+    {
 
         ObjectType leftType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         ObjectType rightType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
@@ -567,7 +598,8 @@ public Object visit(ASTMain node, Object data) {
     }
 
     @Override
-    public Object visit(ASTSup node, Object data) {
+    public Object visit(ASTSup node, Object data) throws VisitorException
+    {
 
         ObjectType leftType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         ObjectType rightType = (ObjectType) node.jjtGetChild(1).jjtAccept(this, data);
@@ -579,27 +611,32 @@ public Object visit(ASTMain node, Object data) {
     }
 
     @Override
-    public Object visit(ASTAdd node, Object data) {
+    public Object visit(ASTAdd node, Object data) throws VisitorException
+    {
         return visitBinaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTSub node, Object data) {
+    public Object visit(ASTSub node, Object data) throws VisitorException
+    {
         return visitBinaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTMul node, Object data) {
+    public Object visit(ASTMul node, Object data) throws VisitorException
+    {
         return visitBinaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTSomme node, Object data) {
+    public Object visit(ASTSomme node, Object data) throws VisitorException
+    {
         return visitBinaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTDiv node, Object data) {
+    public Object visit(ASTDiv node, Object data) throws VisitorException
+    {
 
         Object value = node.jjtGetChild(1).jjtAccept(this, data);
 
@@ -641,7 +678,8 @@ public Object visit(ASTMain node, Object data) {
 
 
     @Override
-    public Object visit(ASTTab node, Object data) {
+    public Object visit(ASTTab node, Object data) throws VisitorException
+    {
         return visitChildren(node, data);
     }
 
@@ -685,7 +723,8 @@ public Object visit(ASTMain node, Object data) {
         return null ; 
     }
 
-    private ObjectType visitBinaryOperation(SimpleNode node, Object data, ObjectType expectedType) {    
+    private ObjectType visitBinaryOperation(SimpleNode node, Object data, ObjectType expectedType) throws VisitorException
+    {
         
         ObjectType leftType = getNodeType(node.jjtGetChild(0), data);
         ObjectType rightType = getNodeType(node.jjtGetChild(1), data);
@@ -696,7 +735,8 @@ public Object visit(ASTMain node, Object data) {
         return expectedType;
     }
     
-    private ObjectType getNodeType(Node node, Object data) {
+    private ObjectType getNodeType(Node node, Object data) throws VisitorException
+    {
         if (node instanceof ASTIdent || node instanceof  ASTVar || node instanceof ASTCst || node instanceof ASTTableau ) {
             String varName = (String) node.jjtAccept(this, data);
             MemoryObject memoryObject = lookupSymbol(varName);
@@ -724,7 +764,8 @@ public Object visit(ASTMain node, Object data) {
     }
 
 
-    private ObjectType visitUnaryOperation(SimpleNode node, Object data, ObjectType expectedType) {
+    private ObjectType visitUnaryOperation(SimpleNode node, Object data, ObjectType expectedType) throws VisitorException
+    {
        
         ObjectType operandType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
 
@@ -734,7 +775,8 @@ public Object visit(ASTMain node, Object data) {
         return expectedType;
     }
 
-    private Object visitChildren(SimpleNode node, Object data) {
+    private Object visitChildren(SimpleNode node, Object data) throws VisitorException
+    {
         for (int i = 0; i < node.jjtGetNumChildren(); i++) {
             node.jjtGetChild(i).jjtAccept(this, data);
         }
@@ -790,7 +832,8 @@ public Object visit(ASTMain node, Object data) {
         return methods;
     }
     @Override
-    public Object visit(SimpleNode node, Object data) {
+    public Object visit(SimpleNode node, Object data) throws VisitorException
+    {
         visitChildren(node,null);
         return node.jjtAccept(this, data);
     }
