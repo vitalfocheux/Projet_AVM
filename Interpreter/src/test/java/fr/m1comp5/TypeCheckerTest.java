@@ -33,7 +33,6 @@ public class TypeCheckerTest {
             assertTrue(loggerListener.getMessages().isEmpty());
             
         });
-        //logger.close();
     }
 
     static Stream<Arguments> fileProvider() throws IOException {
