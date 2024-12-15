@@ -1,0 +1,15 @@
+class fct{
+
+    int sum(int a, int b, int c){
+        return a + b + c;
+    };
+
+    main{
+        int a = 1;
+        int b = 2;
+        int c = 3;
+        int d = sum(a, b, c);
+        write("sum = ");
+        writeln(d);
+    }
+}
