@@ -2,7 +2,15 @@ package fr.m1comp5;
 import fr.m1comp5.mjj.generated.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.stream.Stream;
 
 import fr.m1comp5.Logger.AppLogger;
 import fr.m1comp5.Logger.TestLoggerListener;
@@ -11,12 +19,27 @@ import fr.m1comp5.Typechecker.TypeChecker;
 
 public class TypeCheckerTest {
 
-    private TypeChecker typeChecker;
+    private TypeChecker typeChecker =  new TypeChecker();
     TestLoggerListener loggerListener = new TestLoggerListener();
     AppLogger logger = AppLogger.getInstance();
 
+        @ParameterizedTest
+    @MethodSource("fileProvider")
+    void testTypeChecker(String filepath) {
+        assertDoesNotThrow(() -> {
+            MiniJaja parser = new MiniJaja(new FileReader(filepath));
+            SimpleNode rootNode = parser.start();
+            typeChecker.visit(rootNode, null);
+            assertTrue(loggerListener.getMessages().isEmpty());
+        });
+        //logger.close();
+    }
 
-    
+    static Stream<Arguments> fileProvider() throws IOException {
+        return UtilsTest.fileProvider("src/main/resources/data/mjj/success/testsimple.mjj");
+    }
+}
+    /* 
     @BeforeEach
     public void setUp() {
         typeChecker = new TypeChecker();
@@ -748,4 +771,4 @@ public class TypeCheckerTest {
     }
 
 }
-
+ */
