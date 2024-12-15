@@ -17,11 +17,11 @@ public class PositionableMjjSimpleNode extends SimpleNode
 
     public int getColumn()
     {
-        return jjtGetFirstToken().beginColumn;
+        return jjtGetFirstToken() == null ? -1 : jjtGetFirstToken().beginColumn;
     }
 
     public int getLine()
     {
-        return jjtGetFirstToken().beginLine;
+        return jjtGetFirstToken() == null ? -1 : jjtGetFirstToken().beginLine;
     }
 }
