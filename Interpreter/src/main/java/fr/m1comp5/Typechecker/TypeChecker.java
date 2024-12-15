@@ -59,15 +59,16 @@ public class TypeChecker implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTIdent node, Object data) {
-        Object value = node.jjtGetValue();
+        
+        Object value = node.jjtGetValue(); 
 
         if (value instanceof String) {
-            String ident = (String) value;
-            if (ident.matches("[a-zA-Z][a-zA-Z0-9]*")) {
-                return ident;
+            String identv = (String) value;
+            if (identv.matches("[a-zA-Z][a-zA-Z0-9]*")) {
+                return identv;
             } else {
 
-                logger.logError("TypeChecker  : Invalid identifier: " + ident
+                logger.logError("TypeChecker  : Invalid identifier: " + identv
                         + ". Identifiers must start with a letter and contain only letters and digits.", node.getLine(),
                         node.getColumn());
             }
@@ -550,7 +551,7 @@ public class TypeChecker implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTExp node, Object data) {
-        return visitChildren(node, data);
+        return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
     private void collectParamTypesFromListexp(ASTListExp listexpNode, List<ObjectType> paramTypes, Object data) {
@@ -719,10 +720,10 @@ public class TypeChecker implements MiniJajaVisitor {
 
         ASTIdent identNode = (ASTIdent) node.jjtGetChild(0);
         Object value = identNode.jjtGetValue();
-        if (value instanceof String) {
+        if (value instanceof Integer) {
             return ObjectType.INT;
         } else {
-            logger.logError("TypeChecker  : Expected a string identifier, but got: " + value, node.getLine(),
+            logger.logError("TypeChecker  : Expected a INT identifier, but got: " + value, node.getLine(),
                     node.getColumn());
         }
 
@@ -829,6 +830,9 @@ public class TypeChecker implements MiniJajaVisitor {
     private ObjectType getNodeType(Node node, Object data) {
         if (node instanceof ASTIdent) {
             Object value = node.jjtAccept(this, data);
+             if (value instanceof ObjectType) {
+                return (ObjectType) value;
+              }
             if (value instanceof String) {
                 String varName = (String) value;
                 MemoryObject memoryObject = lookupSymbolident(varName);
@@ -837,20 +841,21 @@ public class TypeChecker implements MiniJajaVisitor {
                 } else {
                     logger.logInfo("variable " + varName + " is not defined.");
                 }
-            } else {
-                logger.logError("TypeChecker : Expected a string identifier, but got: " + value, 0, 0);
+            } 
+            else if (node instanceof ASTExp){
+                return (ObjectType) node.jjtAccept(this, data);
             }
         } else if (node instanceof ASTVar || node instanceof ASTCst || node instanceof ASTTableau
                 || node instanceof ASTTab) {
             Object value = node.jjtAccept(this, data);
-            if (value instanceof String) {
+             if (value instanceof String) {
                 String varName = (String) value;
-                MemoryObject memoryObject = lookupSymbol(varName);
+                MemoryObject memoryObject = lookupSymbolident(varName);
                 if (memoryObject != null) {
                     return memoryObject.getType();
                 }
-            } else {
-                logger.logError("TypeChecker : Expected a string identifier, but got: " + value, 0, 0);
+            }if (value instanceof Integer) {
+                return ObjectType.INT;
             }
         } else if (node instanceof ASTAppelE) {
             return (ObjectType) visitMethodCall((SimpleNode) node, data);
@@ -876,7 +881,6 @@ public class TypeChecker implements MiniJajaVisitor {
                     + operandTypep.getClass().getSimpleName(), 0, 0);
             return null;
         }
-        // ObjectType operandType = (ObjectType) operandTypep;
         if (operandTypep != expectedType) {
             logger.logError("TypeChecker  : Type mismatch during unary op Expected  " + expectedType + " for operand.",
                     0, 0);

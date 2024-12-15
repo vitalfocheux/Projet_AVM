@@ -23,7 +23,7 @@ public class TypeCheckerTest {
     TestLoggerListener loggerListener = new TestLoggerListener();
     AppLogger logger = AppLogger.getInstance();
 
-        @ParameterizedTest
+    @ParameterizedTest
     @MethodSource("fileProvider")
     void testTypeChecker(String filepath) {
         assertDoesNotThrow(() -> {
@@ -31,6 +31,7 @@ public class TypeCheckerTest {
             SimpleNode rootNode = parser.start();
             typeChecker.visit(rootNode, null);
             assertTrue(loggerListener.getMessages().isEmpty());
+            
         });
         //logger.close();
     }
