@@ -1,0 +1,13 @@
+class C {
+    int x = 0;
+
+    int f(int p) {
+        return p;
+     };
+
+     main {
+        x = 3;
+
+        x += f(x);
+     }
+}

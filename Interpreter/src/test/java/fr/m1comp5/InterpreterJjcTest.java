@@ -1,6 +1,6 @@
 package fr.m1comp5;
 
-import fr.m1comp5.jjc.InterpreterJcc;
+import fr.m1comp5.jjc.InterpreterJjc;
 import fr.m1comp5.jjc.generated.JajaCode;
 import fr.m1comp5.jjc.generated.Node;
 
@@ -27,7 +27,7 @@ public class InterpreterJjcTest {
             for(int i = 0; i < root.jjtGetNumChildren(); i++) {
                 instrs.add(root.jjtGetChild(i));
             }
-            InterpreterJcc interpreter = new InterpreterJcc(root, mem, instrs);
+            InterpreterJjc interpreter = new InterpreterJjc(root, mem, instrs);
             System.out.println(interpreter.interpret());
         });
     }
