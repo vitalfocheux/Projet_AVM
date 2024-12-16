@@ -20,4 +20,4 @@ class ASTIf extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=71f1c9e0ebb2ef4e5bd098e893de5d5a (do not edit this line) */
+/* JavaCC - OriginalChecksum=ad34ea799eff9f6b7ec4699ad2556cb3 (do not edit this line) */

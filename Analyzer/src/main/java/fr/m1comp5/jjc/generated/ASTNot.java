@@ -20,4 +20,4 @@ class ASTNot extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=a3bac48570c031701bdbed5be7a75965 (do not edit this line) */
+/* JavaCC - OriginalChecksum=e2112c2019200e9ecb9b529988181c1b (do not edit this line) */

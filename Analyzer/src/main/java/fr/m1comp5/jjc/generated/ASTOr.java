@@ -20,4 +20,4 @@ class ASTOr extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=a813a59199320e847956e93cdb9d7c99 (do not edit this line) */
+/* JavaCC - OriginalChecksum=d408eaf5bc7db5c464263b349b7477b4 (do not edit this line) */

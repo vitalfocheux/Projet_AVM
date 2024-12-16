@@ -20,4 +20,4 @@ class ASTRoot extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=fc5002f4e0543ba63a0b9bf592596bb9 (do not edit this line) */
+/* JavaCC - OriginalChecksum=ef2aabae8520ae74b0c1999620749bc7 (do not edit this line) */

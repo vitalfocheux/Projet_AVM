@@ -20,4 +20,4 @@ class ASTType extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=a5744a71719dd40297ca91ccfc95ad37 (do not edit this line) */
+/* JavaCC - OriginalChecksum=52d430dc3a83e67cfb726ce9547e2a57 (do not edit this line) */

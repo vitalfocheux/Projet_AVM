@@ -20,4 +20,4 @@ class ASTALoad extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=bb071f46b06cd6ed0844b88a5c7e5c78 (do not edit this line) */
+/* JavaCC - OriginalChecksum=889f7d84787928f86a8ee66623948562 (do not edit this line) */

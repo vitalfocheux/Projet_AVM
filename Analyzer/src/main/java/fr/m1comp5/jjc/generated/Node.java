@@ -38,4 +38,4 @@ interface Node {
   /** Accept the visitor. **/
   public Object jjtAccept(JajaCodeVisitor visitor, Object data) throws fr.m1comp5.custom.exception.VisitorException;
 }
-/* JavaCC - OriginalChecksum=ea0112795ce43d1f4eb16fccc3c11b3d (do not edit this line) */
+/* JavaCC - OriginalChecksum=aee4f37beca7016fd79d224e62446083 (do not edit this line) */

@@ -92,4 +92,4 @@ public interface JajaCodeTreeConstants
     "JcChaine",
   };
 }
-/* JavaCC - OriginalChecksum=a6fd42b5b08f389a42e694b53428a186 (do not edit this line) */
+/* JavaCC - OriginalChecksum=a8b179c51d271df18789175f0944e47b (do not edit this line) */

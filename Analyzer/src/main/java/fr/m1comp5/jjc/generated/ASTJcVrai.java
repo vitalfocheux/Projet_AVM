@@ -20,4 +20,4 @@ class ASTJcVrai extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=c8a51a46b184a3a5145bb7b0f793ebd2 (do not edit this line) */
+/* JavaCC - OriginalChecksum=6f08b56b8355ac9c88b382320f3ddd01 (do not edit this line) */

@@ -20,4 +20,4 @@ class ASTDiv extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=b0b6bf2211fdc260165f9c0da52582f2 (do not edit this line) */
+/* JavaCC - OriginalChecksum=c0448360fec91152b6902b796d6fb8fb (do not edit this line) */

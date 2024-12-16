@@ -20,4 +20,4 @@ class ASTGoTo extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=0c4c9fa600f794be9bab1348922aebfa (do not edit this line) */
+/* JavaCC - OriginalChecksum=c1311af9717e2201ca26019135d8bfc7 (do not edit this line) */

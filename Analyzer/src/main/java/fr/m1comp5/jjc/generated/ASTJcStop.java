@@ -20,4 +20,4 @@ class ASTJcStop extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=563b08ee29b29d35c6a4a480be2e4b42 (do not edit this line) */
+/* JavaCC - OriginalChecksum=da29e4f7793069d140bcfd096ebc7df1 (do not edit this line) */

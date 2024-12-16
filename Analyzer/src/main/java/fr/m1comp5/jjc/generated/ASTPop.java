@@ -20,4 +20,4 @@ class ASTPop extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=5cdcf1ea10cea918402d6640b4db6b15 (do not edit this line) */
+/* JavaCC - OriginalChecksum=5b4db084425da44d69855e7316d15c63 (do not edit this line) */

@@ -20,4 +20,4 @@ class ASTJcNbre extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=4a9f449450bcc6775f0af39263d63dc4 (do not edit this line) */
+/* JavaCC - OriginalChecksum=e9dd3708a7f13a943ccad31cb047cffe (do not edit this line) */
