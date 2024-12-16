@@ -23,10 +23,12 @@ public class TypeCheckerTest {
     TestLoggerListener loggerListener = new TestLoggerListener();
     AppLogger logger = AppLogger.getInstance();
 
+
     @ParameterizedTest
     @MethodSource("fileProvider")
     void testTypeChecker(String filepath) {
         assertDoesNotThrow(() -> {
+            logger.setLogLevel(AppLogger.LogLevel.ERROR_ONLY); // change level if you want to see debug messages info
             MiniJaja parser = new MiniJaja(new FileReader(filepath));
             SimpleNode rootNode = parser.start();
             typeChecker.visit(rootNode, null);

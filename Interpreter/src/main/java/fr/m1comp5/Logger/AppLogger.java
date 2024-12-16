@@ -14,10 +14,17 @@ public class AppLogger {
         ERROR
     }
 
+    public enum LogLevel {
+        ERROR_ONLY,
+        INFO_ERROR_DEBUG
+    }
+
+
     private Set<LoggerListener> loggerListeners = new HashSet<>();
     private static AppLogger instance;
     private PrintWriter logWriter;
     private Set<String> loggedMessages = new HashSet<>(); // Ensemble pour stocker les messages déjà logués
+    private LogLevel logLevel = LogLevel.INFO_ERROR_DEBUG; 
 
 
     private AppLogger() {
@@ -63,12 +70,25 @@ public class AppLogger {
     private void log(String message, TypeMessage typeMessage) {
         if (!loggedMessages.contains(message)) {
             loggedMessages.add(message);
-            System.out.println(message);
-            writeToFile(message);
-            notifyListeners(message, typeMessage);
+            if (shouldLog(typeMessage)) {
+                System.out.println(message);
+                writeToFile(message);
+                notifyListeners(message, typeMessage);
+            }
         }
     }
 
+    private boolean shouldLog(TypeMessage typeMessage) {
+        if (logLevel == LogLevel.ERROR_ONLY && typeMessage != TypeMessage.ERROR) {
+            return false;
+        }
+        return true;
+    }
+    
+    public void setLogLevel(LogLevel level) {
+        this.logLevel = level;
+    }
+    
     public void logInfo(String message) {
         String formattedMessage = "INFO: " + message;
         log(formattedMessage, TypeMessage.INFO);
