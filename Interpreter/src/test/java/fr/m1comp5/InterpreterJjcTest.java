@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 public class InterpreterJjcTest {
     @ParameterizedTest
     @MethodSource("fileProvider")
-    void testInterpreterMiniJaja(String filepath) {
+    public void testInterpreterJajaCode(String filepath) {
         Assertions.assertDoesNotThrow(() -> {
             JajaCode jjc = new JajaCode(new FileReader(filepath));
             Node root = jjc.start();
