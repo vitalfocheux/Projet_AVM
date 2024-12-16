@@ -1,0 +1,38 @@
+INFO: TypeChecker : Method pause has no parameters.
+INFO: pause()<pause(),null,METH,VOID>
+INFO: TypeChecker : Adding method pause() to symbol table.
+INFO: TypeChecker : Method fact has 1 parameters.
+INFO: TypeChecker : Adding method fact(INT) to symbol table.
+INFO: TypeChecker : Method in appel  fact has 1 parameters.
+INFO: TypeChecker : Method signature check signature fact(INT)
+INFO: TypeChecker : Method in appel pause has no parameters.
+INFO: TypeChecker : Method signature check signature pause()
+INFO: TypeChecker : Method f has 1 parameters.
+INFO: TypeChecker : Adding method f(INT) to symbol table.
+INFO: TypeChecker : Method g has no parameters.
+INFO: g()<g(),null,METH,VOID>
+INFO: TypeChecker : Adding method g() to symbol table.
+INFO: TypeChecker : Method in appel  f has 1 parameters.
+INFO: TypeChecker : Method signature check signature f(INT)
+INFO: TypeChecker : Method in appel g has no parameters.
+INFO: TypeChecker : Method signature check signature g()
+INFO: TypeChecker : Method partition has 2 parameters.
+INFO: TypeChecker : Adding method partition(INT,INT) to symbol table.
+INFO: TypeChecker : Method trirapide has 2 parameters.
+INFO: TypeChecker : Adding method trirapide(INT,INT) to symbol table.
+INFO: TypeChecker : Method in appel  partition has 2 parameters.
+INFO: TypeChecker : Method signature check signature partition(INT,INT)
+INFO: TypeChecker : Method in appel  trirapide has 2 parameters.
+INFO: TypeChecker : Method signature check signature trirapide(INT,INT)
+INFO: TypeChecker : Method somme has 1 parameters.
+INFO: TypeChecker : Adding method somme(INT) to symbol table.
+INFO: TypeChecker : Method test has 2 parameters.
+INFO: TypeChecker : Adding method test(INT,INT) to symbol table.
+INFO: TypeChecker : Method in appel  test has 2 parameters.
+INFO: TypeChecker : Method signature check signature test(INT,INT)
+INFO: TypeChecker : Method in appel  somme has 1 parameters.
+INFO: TypeChecker : Method signature check signature somme(INT)
+INFO: TypeChecker : Method fct has 1 parameters.
+INFO: TypeChecker : Adding method fct(INT) to symbol table.
+INFO: TypeChecker : Method in appel  fct has 1 parameters.
+INFO: TypeChecker : Method signature check signature fct(INT)
