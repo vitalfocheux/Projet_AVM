@@ -95,7 +95,7 @@ SKIP :
 <DEFAULT> TOKEN :
 {
     <TRUE: "vrai">                                                       |
-    <FALSE: "false">                                                     |
+    <FALSE: "faux">                                                     |
     <IDENTIFIER: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9", "_"])*> |
     <NUMBER: (["0"-"9"])+>                                               |
     <STRING:  "\"" (~["\""])* "\"">
