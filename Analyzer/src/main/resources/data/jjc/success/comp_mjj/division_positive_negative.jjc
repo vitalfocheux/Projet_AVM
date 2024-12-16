@@ -1,0 +1,7 @@
+Init
+Push(42)
+Push(3)
+Div
+Push(0)
+Pop
+JcStop
