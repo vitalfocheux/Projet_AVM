@@ -1,0 +1,7 @@
+1 Init
+2 Push(true)
+3 Push(true)
+4 Or
+5 Push(0)
+6 Pop
+7 JcStop

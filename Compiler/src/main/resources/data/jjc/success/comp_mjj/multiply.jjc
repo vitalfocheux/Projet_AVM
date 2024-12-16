@@ -1,0 +1,7 @@
+1 Init
+2 Push(6)
+3 Push(7)
+4 Mul
+5 Push(0)
+6 Pop
+7 JcStop

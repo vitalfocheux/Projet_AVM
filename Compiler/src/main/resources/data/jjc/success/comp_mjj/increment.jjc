@@ -1,0 +1,11 @@
+1 Init
+2 Push(41)
+3 New(a)
+4 Push(1)
+5 Inc(a)
+6 Load(a)
+7 Push(0)
+8 Swap
+9 Pop
+10 Pop
+11 JcStop

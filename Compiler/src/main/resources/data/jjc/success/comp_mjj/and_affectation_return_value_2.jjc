@@ -1,0 +1,16 @@
+1 Init
+2 New(a)
+3 Push(true)
+4 New(b)
+5 Push(false)
+6 Store(a)
+7 Load(a)
+8 Load(b)
+9 And
+10 Push(0)
+11 Swap
+12 Pop
+13 Swap
+14 Pop
+15 Pop
+16 JcStop
