@@ -19,6 +19,8 @@ public class AppLogger {
     private Set<LoggerListener> loggerListeners = new HashSet<>();
     private static AppLogger instance;
     private PrintWriter logWriter;
+    private Set<String> loggedMessages = new HashSet<>(); // Ensemble pour stocker les messages déjà logués
+
 
     private AppLogger() {
         try {
@@ -65,8 +67,37 @@ public class AppLogger {
             logWriter.println(message);
         }
     }
+    private void log(String message, TypeMessage typeMessage) {
+        if (!loggedMessages.contains(message)) {
+            loggedMessages.add(message);
+            System.out.println(message);
+            writeToFile(message);
+            notifyListeners(message, typeMessage);
+        }
+    }
 
+    public void logInfo(String message) {
+        String formattedMessage = "INFO: " + message;
+        log(formattedMessage, TypeMessage.INFO);
+    }
 
+    public void logDebug(String message) {
+        String formattedMessage = "DEBUG: " + message;
+        log(formattedMessage, TypeMessage.DEBUG);
+    }
+
+    public void logError(String message, int line, int column) {
+        String formattedMessage = "ERROR: " + message + " (ligne " + line + ", colonne " + column + ")";
+        log(formattedMessage, TypeMessage.ERROR);
+    }
+
+    public void close() {
+        if (logWriter != null) {
+            logWriter.close();
+        }
+    }
+
+/* 
     public void logInfo(String message) {
         String formattedMessage = "INFO: " + message;
         System.out.println(formattedMessage);
@@ -92,5 +123,5 @@ public class AppLogger {
         if (logWriter != null) {
             logWriter.close();
         }
-    }
+    } */
 }
