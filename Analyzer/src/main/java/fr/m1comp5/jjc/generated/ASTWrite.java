@@ -20,4 +20,4 @@ class ASTWrite extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=bb68f5272c3226abe96e4cc6c8d580f1 (do not edit this line) */
+/* JavaCC - OriginalChecksum=e9e54911f01be2fb31803bafe067dadf (do not edit this line) */

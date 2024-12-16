@@ -20,4 +20,4 @@ class ASTReturn extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=5070ad31e030984f14336c2a2696aea6 (do not edit this line) */
+/* JavaCC - OriginalChecksum=f783f1046ebb80d5dfed61e9c31d0800 (do not edit this line) */

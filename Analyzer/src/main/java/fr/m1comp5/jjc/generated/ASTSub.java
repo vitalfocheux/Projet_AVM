@@ -20,4 +20,4 @@ class ASTSub extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=de3fb822b2d5a6e499d40eb9fa92502c (do not edit this line) */
+/* JavaCC - OriginalChecksum=4edcf6492a7c1819f0a6e8aa023ec04c (do not edit this line) */

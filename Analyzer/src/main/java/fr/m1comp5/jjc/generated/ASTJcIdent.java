@@ -20,4 +20,4 @@ class ASTJcIdent extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=ee1190479f56cfc746f63e240662bc05 (do not edit this line) */
+/* JavaCC - OriginalChecksum=b7c85fc68014c5a83b3e86f8ad1f4cf8 (do not edit this line) */

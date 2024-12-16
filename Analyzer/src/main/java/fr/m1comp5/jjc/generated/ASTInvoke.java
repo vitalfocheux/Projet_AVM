@@ -20,4 +20,4 @@ class ASTInvoke extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=f9195a0c46ef057ae9bd6b49c3c3fe42 (do not edit this line) */
+/* JavaCC - OriginalChecksum=2b1a7c473cfb2997de51bf250b08f3f4 (do not edit this line) */

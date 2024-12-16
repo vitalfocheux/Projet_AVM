@@ -20,4 +20,4 @@ class ASTJcChaine extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=f7918e54a1a141b3b46a981bac5eb9f3 (do not edit this line) */
+/* JavaCC - OriginalChecksum=7e04caec6d939d4c0bc7701c62e6a6a4 (do not edit this line) */

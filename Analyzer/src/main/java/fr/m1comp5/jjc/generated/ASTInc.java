@@ -20,4 +20,4 @@ class ASTInc extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=478b2db8895f1810d62583d2521325a9 (do not edit this line) */
+/* JavaCC - OriginalChecksum=d7b0454c40408b918471ed893418c795 (do not edit this line) */

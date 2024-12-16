@@ -20,4 +20,4 @@ class ASTJcnil extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=d0fdd5034b6642fdb3052e523b07e750 (do not edit this line) */
+/* JavaCC - OriginalChecksum=4c1f5dc92eb91887100b1fae503bbffe (do not edit this line) */

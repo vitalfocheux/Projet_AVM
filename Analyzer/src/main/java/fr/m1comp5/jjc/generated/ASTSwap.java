@@ -20,4 +20,4 @@ class ASTSwap extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=9424cc940d4d48a27785329c911a9bac (do not edit this line) */
+/* JavaCC - OriginalChecksum=f9082cd008b6ec3c6168c296182852de (do not edit this line) */

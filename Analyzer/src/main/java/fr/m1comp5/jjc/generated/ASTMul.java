@@ -20,4 +20,4 @@ class ASTMul extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=8a588aa31ea8abab7bb3edd445fa50db (do not edit this line) */
+/* JavaCC - OriginalChecksum=b5a758bfed0f5c866e665b16bf5f63d7 (do not edit this line) */

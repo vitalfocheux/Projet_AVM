@@ -20,4 +20,4 @@ class ASTNewArray extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=e43b9e546901f2b6f75b0ffb68ce7c48 (do not edit this line) */
+/* JavaCC - OriginalChecksum=78ae98311990d53d99046347d10e9025 (do not edit this line) */
