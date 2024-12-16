@@ -700,7 +700,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         ASTPush nPush = new ASTPush(JJTPUSH);
         ASTJcVrai tr = new ASTJcVrai(JJTJCVRAI);
 
-        tr.jjtSetValue(true);
+        tr.jjtSetValue("vrai");
         nPush.jjtAddChild(tr, 0);
 
         instrs.add(nPush);
@@ -713,7 +713,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         ASTPush push = new ASTPush(JJTPUSH);
         ASTJcFalse fl = new ASTJcFalse(JJTJCFALSE);
 
-        fl.jjtSetValue(false);
+        fl.jjtSetValue("faux");
         push.jjtAddChild(fl, 0);
 
         instrs.add(push);

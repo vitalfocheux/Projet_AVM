@@ -44,21 +44,21 @@ public class Compiler {
             if (instr.jjtGetNumChildren() > 0) {
                 sb.append("(");
                 if (instr.jjtGetNumChildren() == 4) {
-                    sb.append(((ASTJcIdent) instr.jjtGetChild(0)).jjtGetValue()).append(",");
-                    sb.append(((ASTType) instr.jjtGetChild(1)).jjtGetValue()).append(",");
-                    sb.append(((ASTSorte) instr.jjtGetChild(2)).jjtGetValue()).append(",");
-                    sb.append(((ASTJcNbre) instr.jjtGetChild(3)).jjtGetValue());
+                    sb.append(((ASTJcIdent) instr.jjtGetChild(0)).jjtGetValue().toString().toLowerCase()).append(",");
+                    sb.append(((ASTType) instr.jjtGetChild(1)).jjtGetValue().toString().toLowerCase()).append(",");
+                    sb.append(((ASTSorte) instr.jjtGetChild(2)).jjtGetValue().toString().toLowerCase()).append(",");
+                    sb.append(((ASTJcNbre) instr.jjtGetChild(3)).jjtGetValue().toString().toLowerCase());
                 } else {
                     if (instr.jjtGetChild(0) instanceof ASTJcChaine) {
-                        sb.append(((ASTJcChaine) instr.jjtGetChild(0)).jjtGetValue());
+                        sb.append(((ASTJcChaine) instr.jjtGetChild(0)).jjtGetValue().toString().toLowerCase());
                     } else if (instr.jjtGetChild(0) instanceof ASTJcNbre) {
-                        sb.append(((ASTJcNbre) instr.jjtGetChild(0)).jjtGetValue());
+                        sb.append(((ASTJcNbre) instr.jjtGetChild(0)).jjtGetValue().toString().toLowerCase());
                     } else if (instr.jjtGetChild(0) instanceof ASTJcIdent) {
-                        sb.append(((ASTJcIdent) instr.jjtGetChild(0)).jjtGetValue());
+                        sb.append(((ASTJcIdent) instr.jjtGetChild(0)).jjtGetValue().toString().toLowerCase());
                     } else if (instr.jjtGetChild(0) instanceof ASTJcVrai) {
-                        sb.append(((ASTJcVrai) instr.jjtGetChild(0)).jjtGetValue());
+                        sb.append(((ASTJcVrai) instr.jjtGetChild(0)).jjtGetValue().toString().toLowerCase());
                     } else if (instr.jjtGetChild(0) instanceof ASTJcFalse) {
-                        sb.append(((ASTJcFalse) instr.jjtGetChild(0)).jjtGetValue());
+                        sb.append(((ASTJcFalse) instr.jjtGetChild(0)).jjtGetValue().toString().toLowerCase());
                     }
                 }
                 sb.append(")");
