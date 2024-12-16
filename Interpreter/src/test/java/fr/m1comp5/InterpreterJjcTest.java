@@ -25,6 +25,7 @@ public class InterpreterJjcTest {
             Memory mem = new Memory();
             List<Node> instrs = new ArrayList<>();
             for(int i = 0; i < root.jjtGetNumChildren(); i++) {
+                System.out.println(root.jjtGetChild(i));
                 instrs.add(root.jjtGetChild(i));
             }
             InterpreterJjc interpreter = new InterpreterJjc(root, mem, instrs);

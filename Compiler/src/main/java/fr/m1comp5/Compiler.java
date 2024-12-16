@@ -40,7 +40,7 @@ public class Compiler {
                 continue;
             }
             sb.append(count + " ");
-            sb.append(instr.toString());
+            sb.append(instr.toString().toLowerCase());
             if (instr.jjtGetNumChildren() > 0) {
                 sb.append("(");
                 if (instr.jjtGetNumChildren() == 4) {
