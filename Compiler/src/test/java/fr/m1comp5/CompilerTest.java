@@ -1,8 +1,5 @@
 package fr.m1comp5;
 
-import fr.m1comp5.jjc.generated.JajaCode;
-import fr.m1comp5.jjc.generated.Node;
-
 import fr.m1comp5.mjj.generated.MiniJaja;
 import fr.m1comp5.mjj.generated.SimpleNode;
 import org.junit.jupiter.api.Assertions;
