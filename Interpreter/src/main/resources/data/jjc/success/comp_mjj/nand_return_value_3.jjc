@@ -1,0 +1,7 @@
+Init
+Push(true)
+Push(false)
+And
+Push(0)
+Pop
+JcStop

@@ -1,0 +1,6 @@
+Init
+Push("oui")
+WriteLn
+Push(0)
+Pop
+JcStop
