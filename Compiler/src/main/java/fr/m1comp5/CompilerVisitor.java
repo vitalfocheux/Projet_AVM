@@ -36,15 +36,13 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTRoot node, Object data) throws VisitorException
-    {
+    public Object visit(ASTRoot node, Object data) throws VisitorException {
         node.childrenAccept(this, data);
         return 0;
     }
 
     @Override
-    public Object visit(ASTClasse node, Object data) throws VisitorException
-    {
+    public Object visit(ASTClasse node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -71,14 +69,12 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTDecls node, Object data) throws VisitorException
-    {
+    public Object visit(ASTDecls node, Object data) throws VisitorException {
         return compileDeclsVars(node, data);
     }
 
     @Override
-    public Object visit(ASTVars node, Object data) throws VisitorException
-    {
+    public Object visit(ASTVars node, Object data) throws VisitorException {
         return compileDeclsVars(node, data);
     }
 
@@ -88,20 +84,17 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTVar node, Object data) throws VisitorException
-    {
+    public Object visit(ASTVar node, Object data) throws VisitorException {
         return compileVarCst(node, data, ObjectNature.VAR);
     }
 
     @Override
-    public Object visit(ASTCst node, Object data) throws VisitorException
-    {
+    public Object visit(ASTCst node, Object data) throws VisitorException {
         return compileVarCst(node, data, ObjectNature.CST);
     }
 
     @Override
-    public Object visit(ASTTableau node, Object data) throws VisitorException
-    {
+    public Object visit(ASTTableau node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -136,8 +129,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTEntetes node, Object data) throws VisitorException
-    {
+    public Object visit(ASTEntetes node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -198,8 +190,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTMain node, Object data) throws VisitorException
-    {
+    public Object visit(ASTMain node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -225,8 +216,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTMethode node, Object data) throws VisitorException
-    {
+    public Object visit(ASTMethode node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -267,7 +257,20 @@ public class CompilerVisitor implements MiniJajaVisitor {
             ASTGoTo nGoTo = new ASTGoTo(JJTGOTO);
             instrs.add(nGoTo);
 
-            int nens = (int) node.jjtGetChild(2).jjtAccept(this, new DataModel(n+3, Mode.DEFAULT));
+            int count = 0;
+            if (node.jjtGetChild(2) instanceof ASTEntetes) {
+                ASTEntetes entetes = (ASTEntetes) node.jjtGetChild(2);
+                while (entetes instanceof ASTEntetes) {
+                    count++;
+                    if (entetes.jjtGetChild(1) instanceof ASTEntetes) {
+                        entetes = (ASTEntetes) entetes.jjtGetChild(1);
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            int nens = (int) node.jjtGetChild(2).jjtAccept(this, new DataModel(n+3, Mode.DEFAULT, count));
             int ndvs = (int) node.jjtGetChild(3).jjtAccept(this, new DataModel(n+3+nens, Mode.DEFAULT));
             int niss = (int) node.jjtGetChild(4).jjtAccept(this, new DataModel(n+3+nens+ndvs, Mode.DEFAULT));
 
@@ -318,8 +321,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTInstrs node, Object data) throws VisitorException
-    {
+    public Object visit(ASTInstrs node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -332,8 +334,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTSomme node, Object data) throws VisitorException
-    {
+    public Object visit(ASTSomme node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -374,8 +375,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTIncrement node, Object data) throws VisitorException
-    {
+    public Object visit(ASTIncrement node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -421,8 +421,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTAffectation node, Object data) throws VisitorException
-    {
+    public Object visit(ASTAffectation node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -463,8 +462,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTAppelE node, Object data) throws VisitorException
-    {
+    public Object visit(ASTAppelE node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -489,8 +487,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTAppelI node, Object data) throws VisitorException
-    {
+    public Object visit(ASTAppelI node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -518,8 +515,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTRetour node, Object data) throws VisitorException
-    {
+    public Object visit(ASTRetour node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -529,8 +525,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTEcrire node, Object data) throws VisitorException
-    {
+    public Object visit(ASTEcrire node, Object data) throws VisitorException {
         int ne = (int) node.jjtGetChild(0).jjtAccept(this, data);
 
         ASTWrite write = new ASTWrite(JJTWRITE);
@@ -541,8 +536,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTEcrireLn node, Object data) throws VisitorException
-    {
+    public Object visit(ASTEcrireLn node, Object data) throws VisitorException {
         int ne = (int) node.jjtGetChild(0).jjtAccept(this, data);
 
         ASTWriteLn writeln = new ASTWriteLn(JJTWRITELN);
@@ -552,8 +546,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTSi node, Object data) throws VisitorException
-    {
+    public Object visit(ASTSi node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         if (node.jjtGetParent().jjtGetParent() instanceof ASTMethode) {
             dm.data[0] = instrs.size()+1;
@@ -591,8 +584,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTTantQue node, Object data) throws VisitorException
-    {
+    public Object visit(ASTTantQue node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -641,8 +633,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTTab node, Object data) throws VisitorException
-    {
+    public Object visit(ASTTab node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -736,68 +727,57 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTNot node, Object data) throws VisitorException
-    {
+    public Object visit(ASTNot node, Object data) throws VisitorException {
         return compileOp1(node, data);
     }
 
     @Override
-    public Object visit(ASTNeg node, Object data) throws VisitorException
-    {
+    public Object visit(ASTNeg node, Object data) throws VisitorException {
         return compileOp1(node, data);
     }
 
     @Override
-    public Object visit(ASTEt node, Object data) throws VisitorException
-    {
+    public Object visit(ASTEt node, Object data) throws VisitorException {
         return compileOp2(node, data);
     }
 
     @Override
-    public Object visit(ASTOu node, Object data) throws VisitorException
-    {
+    public Object visit(ASTOu node, Object data) throws VisitorException {
         return compileOp2(node, data);
     }
 
     @Override
-    public Object visit(ASTEq node, Object data) throws VisitorException
-    {
+    public Object visit(ASTEq node, Object data) throws VisitorException {
         return compileOp2(node, data);
     }
 
     @Override
-    public Object visit(ASTSup node, Object data) throws VisitorException
-    {
+    public Object visit(ASTSup node, Object data) throws VisitorException {
         return compileOp2(node, data);
     }
 
     @Override
-    public Object visit(ASTAdd node, Object data) throws VisitorException
-    {
+    public Object visit(ASTAdd node, Object data) throws VisitorException {
         return compileOp2(node, data);
     }
 
     @Override
-    public Object visit(ASTSub node, Object data) throws VisitorException
-    {
+    public Object visit(ASTSub node, Object data) throws VisitorException {
         return compileOp2(node, data);
     }
 
     @Override
-    public Object visit(ASTMul node, Object data) throws VisitorException
-    {
+    public Object visit(ASTMul node, Object data) throws VisitorException {
         return compileOp2(node, data);
     }
 
     @Override
-    public Object visit(ASTDiv node, Object data) throws VisitorException
-    {
+    public Object visit(ASTDiv node, Object data) throws VisitorException {
         return compileOp2(node, data);
     }
 
     @Override
-    public Object visit(ASTListExp node, Object data) throws VisitorException
-    {
+    public Object visit(ASTListExp node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -824,20 +804,12 @@ public class CompilerVisitor implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTExp node, Object data) throws VisitorException
-    {
+    public Object visit(ASTExp node, Object data) throws VisitorException {
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
     @Override
     public Object visit(ASTOmega node, Object data) {
-//        ASTPush push = new ASTPush(JJTPUSH);
-//        ASTJcChaine var = new ASTJcChaine(JJTJCCHAINE);
-//
-//        var.jjtSetValue(ObjectType.OMEGA);
-//        push.jjtAddChild(var,0);
-//        instrs.add(push);
-
         return 0;
     }
 
@@ -872,8 +844,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         return opNode;
     }
 
-    private int compileOp2(Node node, Object data) throws VisitorException
-    {
+    private int compileOp2(Node node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -891,8 +862,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         return 0;
     }
 
-    private int compileOp1(Node node, Object data) throws VisitorException
-    {
+    private int compileOp1(Node node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -919,8 +889,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         return 2;
     }
 
-    private int compileDeclsVars(Node node, Object data) throws VisitorException
-    {
+    private int compileDeclsVars(Node node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -940,8 +909,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         return 0;
     }
 
-    private int compileVarCst(Node node, Object data, ObjectNature nature) throws VisitorException
-    {
+    private int compileVarCst(Node node, Object data, ObjectNature nature) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
