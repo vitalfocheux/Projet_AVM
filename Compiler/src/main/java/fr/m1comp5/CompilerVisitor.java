@@ -85,12 +85,12 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTVar node, Object data) throws VisitorException {
-        return compileVarCst(node, data, ObjectNature.VAR);
+        return compileVarCst(node, data, "var");
     }
 
     @Override
     public Object visit(ASTCst node, Object data) throws VisitorException {
-        return compileVarCst(node, data, ObjectNature.CST);
+        return compileVarCst(node, data, "cst");
     }
 
     @Override
@@ -110,9 +110,9 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
             ASTType tabType = new ASTType(JJTTYPE);
             if (node.jjtGetChild(0) instanceof ASTEntier) {
-                tabType.jjtSetValue(ObjectType.INT);
+                tabType.jjtSetValue("entier");
             } else {
-                tabType.jjtSetValue(ObjectType.BOOLEAN);
+                tabType.jjtSetValue("booleen");
             }
 
             newTab.jjtAddChild(tabIdent,0);
@@ -242,7 +242,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
             methIdentJjc.jjtSetValue(((ASTIdent) node.jjtGetChild(1)).jjtGetValue());
 
             ASTSorte methSorte = new ASTSorte(JJTSORTE);
-            methSorte.jjtSetValue(ObjectNature.METH);
+            methSorte.jjtSetValue("meth");
 
             ASTJcNbre methNbre = new ASTJcNbre(JJTJCNBRE);
             methNbre.jjtSetValue(0);
@@ -909,7 +909,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         return 0;
     }
 
-    private int compileVarCst(Node node, Object data, ObjectNature nature) throws VisitorException {
+    private int compileVarCst(Node node, Object data, String nature) throws VisitorException {
         DataModel dm = (DataModel) data;
         dm.data[0] = instrs.size()+1;
         int n = (Integer) dm.data[0];
@@ -925,9 +925,9 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
             ASTType varType = new ASTType(JJTTYPE);
             if (node.jjtGetChild(0) instanceof ASTEntier) {
-                varType.jjtSetValue(ObjectType.INT);
+                varType.jjtSetValue("entier");
             } else {
-                varType.jjtSetValue(ObjectType.VOID);
+                varType.jjtSetValue("booleen");
             }
 
             ASTSorte varNature = new ASTSorte(JJTSORTE);
