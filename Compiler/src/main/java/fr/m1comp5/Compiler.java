@@ -39,7 +39,7 @@ public class Compiler {
             if (instr == null) {
                 continue;
             }
-            sb.append(count + " ");
+            //sb.append(count + " ");
             sb.append(instr.toString());
             if (instr.jjtGetNumChildren() > 0) {
                 sb.append("(");
@@ -63,6 +63,10 @@ public class Compiler {
     }
 
     public void writeJjcFile(String filename) {
+        //src/main/resources/data/mjj/success
+        //target/bin/
+        File file = new File("./bin/"+filename+".jjc");
+        file.getParentFile().mkdirs();
         try (BufferedWriter bw = new BufferedWriter(new FileWriter("./bin/"+filename+".jjc"))) {
             bw.write(jjcToString());
         } catch (Exception e) {
