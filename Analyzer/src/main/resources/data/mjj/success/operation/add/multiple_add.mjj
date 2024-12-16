@@ -1,0 +1,7 @@
+class add {
+
+    main{
+        int a = 1+1+1+1;
+        write(a);
+    }
+}
