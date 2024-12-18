@@ -20,4 +20,4 @@ class ASTAdd extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=1ef029c92d1166ed384ef01850a87e76 (do not edit this line) */
+/* JavaCC - OriginalChecksum=b3de88b5029b50548fc63445b36c1020 (do not edit this line) */

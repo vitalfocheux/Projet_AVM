@@ -20,4 +20,4 @@ class ASTPush extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=7aaf15d37d4b0d337003cddaaab1793a (do not edit this line) */
+/* JavaCC - OriginalChecksum=f6bf3e51abc792a699cc39919c9a6d8b (do not edit this line) */

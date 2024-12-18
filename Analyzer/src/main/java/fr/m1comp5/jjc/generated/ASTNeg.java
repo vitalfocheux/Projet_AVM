@@ -20,4 +20,4 @@ class ASTNeg extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=c200576b881f0c942165c5b36ef9b62d (do not edit this line) */
+/* JavaCC - OriginalChecksum=c8827557abce8dba7b36dcdcbfaf593c (do not edit this line) */

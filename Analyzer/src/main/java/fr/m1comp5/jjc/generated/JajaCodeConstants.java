@@ -155,7 +155,7 @@ public interface JajaCodeConstants {
     "\"cst\"",
     "\"meth\"",
     "\"vrai\"",
-    "\"false\"",
+    "\"faux\"",
     "<IDENTIFIER>",
     "<NUMBER>",
     "<STRING>",

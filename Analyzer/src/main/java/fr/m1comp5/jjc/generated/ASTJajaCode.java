@@ -20,4 +20,4 @@ class ASTJajaCode extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=f0ea08fc52bf6a56bcd212e413d868d1 (do not edit this line) */
+/* JavaCC - OriginalChecksum=e6fbb2bde70156861e88f65f2c646982 (do not edit this line) */

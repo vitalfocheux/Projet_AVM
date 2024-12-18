@@ -46,4 +46,4 @@ public interface JajaCodeVisitor
   public Object visit(ASTJcFalse node, Object data) throws fr.m1comp5.custom.exception.VisitorException;
   public Object visit(ASTJcChaine node, Object data) throws fr.m1comp5.custom.exception.VisitorException;
 }
-/* JavaCC - OriginalChecksum=be8b6b442a5ca427906ad5ea37b9ef4a (do not edit this line) */
+/* JavaCC - OriginalChecksum=651d4a498c62e44786683e7349b508ac (do not edit this line) */

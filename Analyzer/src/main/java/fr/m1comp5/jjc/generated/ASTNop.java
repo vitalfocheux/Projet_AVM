@@ -20,4 +20,4 @@ class ASTNop extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=7c6669c887fec8b646742f96f7940272 (do not edit this line) */
+/* JavaCC - OriginalChecksum=d96a477f15ea130f974eba74228e190b (do not edit this line) */

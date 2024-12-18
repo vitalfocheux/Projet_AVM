@@ -20,4 +20,4 @@ class ASTSorte extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=6c6d056c99aa32af69a7953ffd36ea8b (do not edit this line) */
+/* JavaCC - OriginalChecksum=76435b04ffad03584e4fac400f0c2aab (do not edit this line) */

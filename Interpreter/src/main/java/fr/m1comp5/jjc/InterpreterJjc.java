@@ -2,7 +2,6 @@ package fr.m1comp5.jjc;
 
 import fr.m1comp5.custom.exception.VisitorException;
 import fr.m1comp5.jjc.generated.ASTJajaCode;
-import fr.m1comp5.jjc.generated.ASTJcnil;
 import fr.m1comp5.jjc.generated.Node;
 import fr.m1comp5.mjj.VisitorMjj;
 import fr.m1comp5.Memory;
@@ -11,14 +10,14 @@ import fr.m1comp5.Debug.InterpreterDebugger;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InterpreterJcc {
+public class InterpreterJjc {
     private Node root;
     private VisitorJcc visitorJcc;
     private List<Node> instrs;
     private InterpreterDebugger debugger;
 
 
-    public InterpreterJcc(Node root, Memory mem, List<Node> instrs) {
+    public InterpreterJjc(Node root, Memory mem, List<Node> instrs) {
         this.root = root;
         visitorJcc = new VisitorJcc(mem);
         this.instrs = instrs;

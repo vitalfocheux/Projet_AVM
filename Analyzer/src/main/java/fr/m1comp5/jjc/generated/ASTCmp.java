@@ -20,4 +20,4 @@ class ASTCmp extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=73fcfad4709a313177b499372cca96b3 (do not edit this line) */
+/* JavaCC - OriginalChecksum=dde525814314d94dad7260b760daadd6 (do not edit this line) */

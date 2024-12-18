@@ -1,0 +1,6 @@
+1 Init
+2 Push("oui")
+3 WriteLn
+4 Push(0)
+5 Pop
+6 JcStop

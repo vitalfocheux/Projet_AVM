@@ -20,4 +20,4 @@ class ASTAStore extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=adf17a3ab39b7640aa003845c765e72b (do not edit this line) */
+/* JavaCC - OriginalChecksum=4a12697e783766614732613ef91b4716 (do not edit this line) */

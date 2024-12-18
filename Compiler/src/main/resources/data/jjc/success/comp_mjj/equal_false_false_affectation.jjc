@@ -1,0 +1,15 @@
+1 Init
+2 Push(false)
+3 New(a)
+4 Push(false)
+5 New(b)
+6 Load(a)
+7 Load(b)
+8 Cmp
+9 Push(0)
+10 Swap
+11 Pop
+12 Swap
+13 Pop
+14 Pop
+15 JcStop

@@ -20,4 +20,4 @@ class ASTLoad extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=4cc90afac5fd84c65bba0ebd0cd0997d (do not edit this line) */
+/* JavaCC - OriginalChecksum=0e9b753cf442aedf6efbec30fcf69eb7 (do not edit this line) */

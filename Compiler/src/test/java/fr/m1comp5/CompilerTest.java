@@ -1,8 +1,5 @@
 package fr.m1comp5;
 
-import fr.m1comp5.jjc.generated.JajaCode;
-import fr.m1comp5.jjc.generated.Node;
-
 import fr.m1comp5.mjj.generated.MiniJaja;
 import fr.m1comp5.mjj.generated.SimpleNode;
 import org.junit.jupiter.api.Assertions;
@@ -19,18 +16,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class CompilerUnitTest {
+public class CompilerTest {
     @ParameterizedTest
     @MethodSource("fileProvider")
     void testCompiler(String filepath) {
-//        Assertions.assertDoesNotThrow(() -> {
-//            MiniJaja mjj = new MiniJaja(new FileReader(filepath));
-//            SimpleNode root = mjj.start();
-//            Compiler compiler = new Compiler(root);
-//            compiler.compile();
-//            String javaCode = compiler.jjcToString();
-//            System.out.println(javaCode);
-//        });
+        Assertions.assertDoesNotThrow(() -> {
+            MiniJaja mjj = new MiniJaja(new FileReader(filepath));
+            SimpleNode root = mjj.start();
+            Compiler compiler = new Compiler(root);
+            compiler.compile();
+            String javaCode = compiler.jjcToString();
+            System.out.println(javaCode);
+        });
     }
 
     static Stream<Arguments> fileProvider() throws IOException {

@@ -20,4 +20,4 @@ class ASTLength extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=ec461682a2f9ddb14142db17e64e7be2 (do not edit this line) */
+/* JavaCC - OriginalChecksum=ade49da40ca3291dd71cc6daedfdb65b (do not edit this line) */

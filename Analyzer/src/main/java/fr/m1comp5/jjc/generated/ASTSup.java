@@ -20,4 +20,4 @@ class ASTSup extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=cefa836b146b852971370345b9594a8b (do not edit this line) */
+/* JavaCC - OriginalChecksum=7c5bc883010cadb0198d982cda20be5c (do not edit this line) */

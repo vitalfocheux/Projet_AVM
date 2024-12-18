@@ -20,4 +20,4 @@ class ASTInit extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=e3052bb83e9ad7b09da81e3b47abca67 (do not edit this line) */
+/* JavaCC - OriginalChecksum=4c83b32b56414ea0aa282196d5c49158 (do not edit this line) */

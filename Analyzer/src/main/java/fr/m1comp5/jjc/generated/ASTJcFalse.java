@@ -20,4 +20,4 @@ class ASTJcFalse extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=824be531792973d240cf778772c6ccf5 (do not edit this line) */
+/* JavaCC - OriginalChecksum=3b8e34fa2b88f3a53e5b175f72fb05b4 (do not edit this line) */

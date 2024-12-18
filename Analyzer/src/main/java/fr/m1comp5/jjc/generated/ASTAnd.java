@@ -20,4 +20,4 @@ class ASTAnd extends fr.m1comp5.custom.node.PositionableJjcSimpleNode {
     visitor.visit(this, data);
   }
 }
-/* JavaCC - OriginalChecksum=38c17fbbebe5910b31081560f66bcb21 (do not edit this line) */
+/* JavaCC - OriginalChecksum=d064918c823fce4de363dca21b47791d (do not edit this line) */

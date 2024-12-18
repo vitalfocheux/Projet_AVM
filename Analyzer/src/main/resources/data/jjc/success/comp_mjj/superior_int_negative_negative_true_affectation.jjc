@@ -1,0 +1,15 @@
+Init
+Push(12)
+New(a)
+Push(42)
+New(b)
+Load(a)
+Load(b)
+Sup
+Push(0)
+Swap
+Pop
+Swap
+Pop
+Pop
+JcStop
