@@ -214,12 +214,12 @@ private void number() #JcNbre : {int x = 0; Token t;}
 
 private void trueValue() #JcVrai : {boolean x = true;}
 {
-    <TRUE> {jjtThis.jjtSetValue(x);}
+    <TRUE> {jjtThis.value = x;}
 }
 
 private void falseValue() #JcFalse : {boolean x = false;}
 {
-    <FALSE> {jjtThis.jjtSetValue(x);}
+    <FALSE> {jjtThis.value = x;}
 }
 
 private void string() #JcChaine : {Token t;}

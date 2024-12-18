@@ -28,6 +28,7 @@ public class InterpreterJjc {
         visitorJcc.ActiverDebugger(true);
         int addr = 1;
         while (addr < instrs.size()) {
+            System.out.println(addr);
             instrs.get(addr - 1).jjtAccept(visitorJcc, null);
             addr = visitorJcc.getAddr();
         }
