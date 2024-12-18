@@ -2,7 +2,6 @@ package fr.m1comp5;
 
 
 import fr.m1comp5.mjj.generated.MiniJaja;
-import fr.m1comp5.mjj.generated.Node;
 import fr.m1comp5.mjj.generated.ParseException;
 import fr.m1comp5.mjj.generated.SimpleNode;
 import fr.m1comp5.mjj.InterpreterMjj;
@@ -16,8 +15,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -29,7 +26,6 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import java.io.*;
 import java.nio.file.Files;
-import java.time.Duration;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,8 +53,7 @@ public class MiniJajaWindow extends Application {
     private Map<Tab, File> tabFileMap = new HashMap<>();
     private Scene scene;
     private boolean folderTreeOpened = false;
-    //private InterpreterDebugger debugger;
-    private boolean isDebugging = false;
+
 
 
 
@@ -435,7 +430,6 @@ public class MiniJajaWindow extends Application {
             openFolderDialog();
         });
 
-        // Premier groupe : fichiers
         toolBar.getItems().addAll(
                 createToolBarButton("New", "/icon/new-file.png", this::newFile),
                 createToolBarButton("Open File", "/icon/open-file.png", this::openFile),
@@ -443,26 +437,13 @@ public class MiniJajaWindow extends Application {
                 createToolBarButton("Save", "/icon/save.png", this::saveFile)
         );
 
-        // Séparateur entre les groupes
         toolBar.getItems().add(new Separator());
 
-        // Deuxième groupe : exécution
         toolBar.getItems().addAll(
                 createToolBarButton("Build", "/icon/build.png", this::buildCode),
                 createToolBarButton("Run", "/icon/run.png", this::executeCode)
         );
 
-        // Séparateur pour le groupe debug
-        toolBar.getItems().add(new Separator());
-/*
-        // Troisième groupe : débogage
-        toolBar.getItems().addAll(
-                createToolBarButton("Start Debug", "/icon/debug.png", this::startDebugging),
-                createToolBarButton("Step", "/icon/step.png", this::stepDebug),
-                createToolBarButton("Continue", "/icon/continue.png", this::continueDebug),
-                createToolBarButton("Stop", "/icon/stop.png", this::stopDebugging)
-        );
-*/
         return toolBar;
     }
 
@@ -488,10 +469,10 @@ public class MiniJajaWindow extends Application {
     }
 
     private SplitPane createMainContent() {
-        // Créer le SplitPane principal
+
         mainSplitPane = new SplitPane();
 
-        // initialisation de tous les composants
+
         if (fileExplorer == null) setupFileExplorer();
         if (editorTabPane == null) setupTabPane();
         if (consoleArea == null) {
@@ -500,7 +481,7 @@ public class MiniJajaWindow extends Application {
             consoleArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 14px;");
         }
 
-        // Créer le SplitPane vertical pour l'éditeur et la console
+
         SplitPane centerSplitPane = new SplitPane();
         centerSplitPane.setOrientation(Orientation.VERTICAL);
         centerSplitPane.getItems().addAll(editorTabPane, consoleArea);
@@ -536,13 +517,13 @@ public class MiniJajaWindow extends Application {
         File selectedDirectory = directoryChooser.showDialog(null);
 
         if (selectedDirectory != null) {
-            // Ajouter l'explorateur s'il n'est pas déjà présent
+
             if (!mainSplitPane.getItems().contains(fileExplorer)) {
                 mainSplitPane.getItems().add(0, fileExplorer);
                 mainSplitPane.setDividerPositions(0.2);
             }
 
-            // Mettre à jour l'arborescence
+
             TreeItem<File> root = buildFileTreeItem(selectedDirectory);
             fileExplorer.setRoot(root);
             root.setExpanded(true);
@@ -555,7 +536,7 @@ public class MiniJajaWindow extends Application {
         newCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(newCodeArea));
         newCodeArea.setStyle("-fx-font-family: 'JetBrains Mono', Consolas, monospace; -fx-font-size: 16px;");
 
-        // Initialiser la coloration syntaxique
+
         newCodeArea.textProperty().addListener((obs, oldText, newText) -> {
             Platform.runLater(() -> {
                 newCodeArea.setStyleSpans(0, computeHighlighting(newText));
@@ -572,7 +553,7 @@ public class MiniJajaWindow extends Application {
 
     private void setupFileExplorer() {
         fileExplorer = new TreeView<>();
-        fileExplorer.setShowRoot(true); // Changé à true pour voir le dossier racine
+        fileExplorer.setShowRoot(true);
         fileExplorer.setPrefWidth(200);
 
 
@@ -966,160 +947,6 @@ public class MiniJajaWindow extends Application {
         }
         primaryStage.setTitle(title);
     }
-
-/*
-    private void setupDebugger() {
-        debugger = new StepDebugger();  // ou DebugBreakpoint pour le mode breakpoint
-        debugger.setEventHandler((isFinished, node) -> {
-            Platform.runLater(() -> {
-                if (isFinished) {
-                    isDebugging = false;
-                    updateDebugUI(false);
-                    consoleArea.appendText("Debug finished\n");
-                } else {
-                    highlightCurrentNode(node);
-                }
-            });
-        });
-    }
-
-    private void startDebugging() {
-        if (getCurrentCodeArea() == null) return;
-
-        try {
-            String code = getCurrentCodeArea().getText();
-            consoleArea.appendText("=== Debug Started ===\n");
-
-            MiniJaja mjj = new MiniJaja(new ByteArrayInputStream(code.getBytes()));
-            SimpleNode root = mjj.start();
-
-            // Initialiser l'interpréteur
-            InterpreterMjj interpreter = new InterpreterMjj(root);
-
-            // Initialiser le débogueur
-            if (debugger == null) {
-                debugger = new StepDebugger();
-                debugger.setEventHandler((isFinished, node) -> {
-                    Platform.runLater(() -> {
-                        if (isFinished) {
-                            consoleArea.appendText("Debug finished\n");
-                            isDebugging = false;
-                        } else {
-                            consoleArea.appendText("Stopped at: " + node.toString() + "\n");
-                            highlightCurrentLine();
-                        }
-                    });
-                });
-            }
-
-            consoleArea.appendText("Setting up debugger...\n");
-
-            // Important : utiliser l'interface Debugger explicitement
-            Debugger debuggableInterpreter = interpreter;
-            debugger.setInterpreter(debuggableInterpreter);
-
-            isDebugging = true;
-            consoleArea.appendText("Starting debug execution...\n");
-            debugger.startInterpreter();
-
-        } catch (Exception e) {
-            consoleArea.appendText("Debug error: " + e.getMessage() + "\n");
-            e.printStackTrace();
-        }
-    }
-    private void highlightCurrentLine() {
-        Platform.runLater(() -> {
-            CodeArea currentCodeArea = getCurrentCodeArea();
-            if (currentCodeArea != null) {
-                // Reset all styles
-                currentCodeArea.clearStyle(0, currentCodeArea.getLength());
-
-                // Get the start and end position of current line
-                int lineStart = currentCodeArea.position(currentCodeArea.getCurrentParagraph(), 0).toOffset();
-                int lineEnd = lineStart + currentCodeArea.getParagraph(currentCodeArea.getCurrentParagraph()).length();
-
-                // Apply new style
-                currentCodeArea.setStyle(lineStart, lineEnd, Collections.singleton("debug-current-line"));
-
-                // Ensure the line is visible
-                currentCodeArea.requestFollowCaret();
-            }
-        });
-    }
-
-    private void stepDebug() {
-        if (debugger != null && isDebugging) {
-            consoleArea.appendText("Executing next step...\n");
-            debugger.nextInterpret();
-        } else {
-            consoleArea.appendText("Debugger not running. Start debug first.\n");
-        }
-    }
-    private void continueDebug() {
-        // Pour le mode breakpoint - continue jusqu'au prochain point d'arrêt
-        if (debugger != null) {
-            debugger.nextInterpret();
-        }
-    }
-
-    private void stopDebugging() {
-        if (debugger != null) {
-            debugger.stopInterpreter();
-            isDebugging = false;
-            consoleArea.appendText("Debug session stopped manually\n");
-
-            // Nettoyer la surbrillance
-            CodeArea currentCodeArea = getCurrentCodeArea();
-            if (currentCodeArea != null) {
-                currentCodeArea.setStyle("-fx-background-color: white;");
-            }
-        }
-    }
-
-    private void updateDebugUI(boolean debugging) {
-        // Mettre à jour l'état des boutons selon l'état du débogage
-    }
-
-    private void highlightCurrentNode(Node node) {
-        // Mettre en surbrillance la ligne correspondant au nœud en cours d'exécution
-        // Vous devrez implémenter une façon de mapper les nœuds AST aux lignes de code
-    }
-
-    private void toggleBreakpoint() {
-        CodeArea currentCodeArea = getCurrentCodeArea();
-        if (currentCodeArea != null) {
-            int currentLine = currentCodeArea.getCurrentParagraph();
-            int lineStart = currentCodeArea.position(currentLine, 0).toOffset();
-            int lineEnd = lineStart + currentCodeArea.getParagraph(currentLine).length();
-
-            // Toggle style for breakpoint
-            if (hasBreakpoint(currentLine)) {
-                currentCodeArea.clearStyle(lineStart, lineEnd);
-                removeBreakpoint(currentLine);
-            } else {
-                currentCodeArea.setStyle(lineStart, lineEnd, Collections.singleton("breakpoint-line"));
-                addBreakpoint(currentLine);
-            }
-
-            consoleArea.appendText("Breakpoint toggled at line " + (currentLine + 1) + "\n");
-        }
-    }
-    // Garder trace des breakpoints
-    private Set<Integer> breakpoints = new HashSet<>();
-
-    private boolean hasBreakpoint(int line) {
-        return breakpoints.contains(line);
-    }
-
-    private void addBreakpoint(int line) {
-        breakpoints.add(line);
-    }
-
-    private void removeBreakpoint(int line) {
-        breakpoints.remove(line);
-    }
-*/
-
     private boolean checkSaveBeforeClosing(Tab tab) {
         if (!tab.getText().endsWith("*")) {
             return true;
@@ -1214,8 +1041,5 @@ public class MiniJajaWindow extends Application {
             Platform.exit();
         }
     }
-    /*
-    public static void main(String[] args) {
-        launch(args);
-    }  */
+
 }
