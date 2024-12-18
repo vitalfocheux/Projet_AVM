@@ -30,6 +30,20 @@ public class Memory {
     }
 
     public void declVar(String ident, Object value, ObjectType type) throws StackException, SymbolTableException {
+        if (value instanceof String s)
+        {
+            if (s.equals("OMEGA"))
+            {
+                if (type == ObjectType.INT)
+                {
+                    value = 0;
+                }
+                else if (type == ObjectType.BOOLEAN)
+                {
+                    value = false;
+                }
+            }
+        }
         MemoryObject mo = new MemoryObject(ident, value, ObjectNature.VAR, type);
         symbolTable.putObjectInCurrentScope(mo);
         stack.push(mo);
