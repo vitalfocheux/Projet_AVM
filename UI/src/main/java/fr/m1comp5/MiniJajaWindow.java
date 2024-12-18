@@ -444,11 +444,6 @@ public class MiniJajaWindow extends Application {
 
         toolBar.getItems().add(new Separator());
 
-        toolBar.getItems().addAll(
-                createToolBarButton("Build", "/icon/build.png", this::buildCode),
-                createToolBarButton("Run", "/icon/run.png", this::executeCode)
-        );
-
         return toolBar;
     }
 
