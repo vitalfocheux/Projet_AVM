@@ -302,7 +302,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
             ASTReturn nReturn = new ASTReturn(JJTRETURN);
             instrs.add(nReturn);
 
-            return n+nens+ndvs+niss+nrdvs+addrIncr+1;
+            return n+nens+ndvs+niss+nrdvs+addrIncr;
         }
         if (m == Mode.RETRAIT) {
             return retraitDss();
@@ -555,34 +555,29 @@ public class CompilerVisitor implements MiniJajaVisitor {
         } else {
             dm.data[0] = instrs.size();
         }
+
         int n = (Integer) dm.data[0];
-        Mode m = (Mode) dm.data[1];
+        int ne = (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
 
-        if (m == Mode.DEFAULT) {
-            int ne = (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
+        ASTIf nIf = new ASTIf(JJTIF);
+        instrs.add(nIf);
 
-            ASTIf nIf = new ASTIf(JJTIF);
-            instrs.add(nIf);
+        int ns1 = (int) node.jjtGetChild(2).jjtAccept(this, new DataModel(n+ne+1, Mode.DEFAULT));
 
-            int ns1 = (int) node.jjtGetChild(2).jjtAccept(this, new DataModel(n+ne+1, Mode.DEFAULT));
+        ASTJcNbre ifNbre = new ASTJcNbre(JJTJCNBRE);
+        ifNbre.jjtSetValue(n+ne+ns1+2);
+        nIf.jjtAddChild(ifNbre,0);
 
-            ASTJcNbre ifNbre = new ASTJcNbre(JJTJCNBRE);
-            ifNbre.jjtSetValue(n+ne+ns1+2+1);
-            nIf.jjtAddChild(ifNbre,0);
+        ASTGoTo nGoTo = new ASTGoTo(JJTGOTO);
+        instrs.add(nGoTo);
 
-            ASTGoTo nGoTo = new ASTGoTo(JJTGOTO);
-            instrs.add(nGoTo);
+        int ns = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+ne+ns1+2, Mode.DEFAULT));
 
-            int ns = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+ne+ns1+2, Mode.DEFAULT));
+        ASTJcNbre addrGoto = new ASTJcNbre(JJTJCNBRE);
+        addrGoto.jjtSetValue(n+ne+ns1+ns+2);
+        nGoTo.jjtAddChild(addrGoto,0);
 
-            ASTJcNbre addrGoto = new ASTJcNbre(JJTJCNBRE);
-            addrGoto.jjtSetValue(n+ne+ns1+ns+2);
-            nGoTo.jjtAddChild(addrGoto,0);
-
-            return ne+ns1+ns+2+1;
-        }
-
-        return 0;
+        return ne+ns1+ns+2;
     }
 
     @Override

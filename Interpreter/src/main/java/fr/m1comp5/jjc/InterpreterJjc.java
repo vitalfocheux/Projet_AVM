@@ -24,7 +24,7 @@ public class InterpreterJjc {
     public String interpret() throws VisitorException
     {
         System.out.println("Activating debugger...");
-        visitorJcc.ActiverDebugger(true);
+        visitorJcc.ActivesDebugger(true);
         int addr = 1;
         int count =0;
         StringBuilder sb = new StringBuilder();

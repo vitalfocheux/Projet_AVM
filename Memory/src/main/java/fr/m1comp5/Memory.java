@@ -123,10 +123,6 @@ public class Memory {
         MemoryObject mo = stack.searchVariableFromTop(ident);
         if (mo == null) throw new SymbolTableException("Unknown symbol");
         if (value == null) throw new RuntimeException("Cannot assign null value");
-        if (mo.getType() != ObjectType.OMEGA && (!(value.getClass().equals(mo.getValue().getClass())) && !mo.getValue().equals("OMEGA")))
-        {
-            throw new RuntimeException("Cannot assign value of type " + value.getClass() + " to " + mo.getType());
-        }
 
         switch (mo.getNature()) {
             case METH:

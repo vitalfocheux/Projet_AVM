@@ -19,7 +19,7 @@ public class VisitorJjc implements JajaCodeVisitor {
     private final CallStack callStack;
     private int addr;
     private InterpreterDebugger debugger;
-    private boolean activerDebugger;
+    private boolean activesDebugger;
 
 
     public VisitorJjc(Memory mem) {
@@ -41,16 +41,16 @@ public class VisitorJjc implements JajaCodeVisitor {
         this.debugger = debug;
     }
 
-    public void ActiverDebugger(boolean flag) {
-        this.activerDebugger = flag;
+    public void ActivesDebugger(boolean flag) {
+        this.activesDebugger = flag;
     }
     public void checkDebugNode(Node node)  {
-        if (activerDebugger && debugger != null) {
+        if (activesDebugger && debugger != null) {
             try {
                 debugger.onNodeVisitJJC(node);
             } catch (Exception e) {
                 // If an exception is thrown, we deactivate the debugger
-                activerDebugger = false;
+                activesDebugger = false;
             }
         }
     }
@@ -334,7 +334,9 @@ public class VisitorJjc implements JajaCodeVisitor {
         try
         {
             MemoryObject mo = mem.getSymbolTable().get(id);
-            mem.getStack().push(new MemoryObject(null, mo.getValue(), ObjectNature.CST, mo.getType()));
+            MemoryObject loadedObject = new MemoryObject(null, mo.getValue(), ObjectNature.CST, mo.getType());
+            setOmegaValueFor(loadedObject);
+            mem.getStack().push(loadedObject);
         }
         catch (Exception e)
         {
@@ -792,6 +794,29 @@ public class VisitorJjc implements JajaCodeVisitor {
     public String toString()
     {
         return toDisplay;
+    }
+
+    private void setOmegaValue(MemoryObject mo)
+    {
+        if (mo.getValue() instanceof ObjectType ot && ot == ObjectType.OMEGA)
+        {
+            if (mo.getType() == ObjectType.INT)
+            {
+                mo.setValue(0);
+            }
+            else if (mo.getType() == ObjectType.BOOLEAN)
+            {
+                mo.setValue(false);
+            }
+        }
+    }
+
+    private void setOmegaValueFor(MemoryObject... memoryObjArray)
+    {
+        for (MemoryObject mo : memoryObjArray)
+        {
+            setOmegaValue(mo);
+        }
     }
 
 }
