@@ -9,6 +9,9 @@ import fr.m1comp5.MemoryObject;
 import fr.m1comp5.ObjectNature;
 import fr.m1comp5.ObjectType;
 import fr.m1comp5.Debug.InterpreterDebugger;
+import fr.m1comp5.mjj.generated.ASTBooleen;
+import fr.m1comp5.mjj.generated.ASTEntier;
+import fr.m1comp5.mjj.generated.ASTRien;
 
 public class VisitorJjc implements JajaCodeVisitor {
     private String toDisplay;
@@ -16,7 +19,7 @@ public class VisitorJjc implements JajaCodeVisitor {
     private final CallStack callStack;
     private int addr;
     private InterpreterDebugger debugger;
-    private boolean activerDebugger;
+    private boolean activesDebugger;
 
 
     public VisitorJjc(Memory mem) {
@@ -38,16 +41,16 @@ public class VisitorJjc implements JajaCodeVisitor {
         this.debugger = debug;
     }
 
-    public void ActiverDebugger(boolean flag) {
-        this.activerDebugger = flag;
+    public void ActivesDebugger(boolean flag) {
+        this.activesDebugger = flag;
     }
     public void checkDebugNode(Node node)  {
-        if (activerDebugger && debugger != null) {
+        if (activesDebugger && debugger != null) {
             try {
                 debugger.onNodeVisitJJC(node);
             } catch (Exception e) {
                 // If an exception is thrown, we deactivate the debugger
-                activerDebugger = false;
+                activesDebugger = false;
             }
         }
     }
@@ -331,7 +334,9 @@ public class VisitorJjc implements JajaCodeVisitor {
         try
         {
             MemoryObject mo = mem.getSymbolTable().get(id);
-            mem.getStack().push(new MemoryObject(null, mo.getValue(), ObjectNature.CST, mo.getType()));
+            MemoryObject loadedObject = new MemoryObject(null, mo.getValue(), ObjectNature.CST, mo.getType());
+            setOmegaValueFor(loadedObject);
+            mem.getStack().push(loadedObject);
         }
         catch (Exception e)
         {
@@ -636,7 +641,7 @@ public class VisitorJjc implements JajaCodeVisitor {
             MemoryObject firstOperand = mem.getStack().pop();
             if (secondOperand.getType() == firstOperand.getType())
             {
-                mem.getStack().push(new MemoryObject(null, firstOperand.equals(secondOperand), ObjectNature.CST, ObjectType.BOOLEAN));
+                mem.getStack().push(new MemoryObject(null, firstOperand.getValue().equals(secondOperand.getValue()), ObjectNature.CST, ObjectType.BOOLEAN));
             }
         }
         catch (Exception e)
@@ -714,18 +719,36 @@ public class VisitorJjc implements JajaCodeVisitor {
     public Object visit(ASTType node, Object data) throws VisitorException
     {
         ObjectType ftype = null;
-        String type = (String) node.jjtGetValue();
-        if (type.equals("booleen"))
+        Object type = node.jjtGetValue();
+        if (type instanceof String s)
+        {
+            ftype = switch (s) {
+                case "booleen" -> ObjectType.BOOLEAN;
+                case "entier" -> ObjectType.INT;
+                default -> ftype;
+            };
+        }
+        else
+        {
+            ftype = getTypeForMethod(type);
+        }
+        return ftype;
+    }
+
+    public ObjectType getTypeForMethod(Object type)
+    {
+        ObjectType ftype = null;
+        if (type instanceof ASTRien)
+        {
+            ftype = ObjectType.VOID;
+        }
+        else if (type instanceof ASTBooleen)
         {
             ftype = ObjectType.BOOLEAN;
         }
-        else if (type.equals("entier"))
+        else if (type instanceof ASTEntier)
         {
             ftype = ObjectType.INT;
-        }
-        else if (type.equals("void"))
-        {
-            ftype = ObjectType.VOID;
         }
         return ftype;
     }
@@ -735,18 +758,12 @@ public class VisitorJjc implements JajaCodeVisitor {
     {
         ObjectNature nature = null;
         String type = (String) node.jjtGetValue();
-        if (type.equals("var"))
-        {
-            nature = ObjectNature.VAR;
-        }
-        else if (type.equals("cst"))
-        {
-            nature = ObjectNature.CST;
-        }
-        else if (type.equals("meth"))
-        {
-            nature = ObjectNature.METH;
-        }
+        nature = switch (type) {
+            case "var" -> ObjectNature.VAR;
+            case "cst" -> ObjectNature.CST;
+            case "meth" -> ObjectNature.METH;
+            default -> nature;
+        };
         return nature;
     }
 
@@ -759,13 +776,13 @@ public class VisitorJjc implements JajaCodeVisitor {
     @Override
     public Object visit(ASTJcVrai node, Object data) throws VisitorException
     {
-        return node.jjtGetValue();
+        return true;
     }
 
     @Override
     public Object visit(ASTJcFalse node, Object data) throws VisitorException
     {
-        return node.jjtGetValue();
+        return false;
     }
 
     @Override
@@ -777,6 +794,29 @@ public class VisitorJjc implements JajaCodeVisitor {
     public String toString()
     {
         return toDisplay;
+    }
+
+    private void setOmegaValue(MemoryObject mo)
+    {
+        if (mo.getValue() instanceof ObjectType ot && ot == ObjectType.OMEGA)
+        {
+            if (mo.getType() == ObjectType.INT)
+            {
+                mo.setValue(0);
+            }
+            else if (mo.getType() == ObjectType.BOOLEAN)
+            {
+                mo.setValue(false);
+            }
+        }
+    }
+
+    private void setOmegaValueFor(MemoryObject... memoryObjArray)
+    {
+        for (MemoryObject mo : memoryObjArray)
+        {
+            setOmegaValue(mo);
+        }
     }
 
 }

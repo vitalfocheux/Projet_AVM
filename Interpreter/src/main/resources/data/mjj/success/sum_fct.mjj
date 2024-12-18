@@ -1,6 +1,11 @@
 class fct{
 
     int sum(int a, int b, int c){
+        if (a > 0) {
+            a = a;
+        } else {
+            b = b;
+        };
         return a + b + c;
     };
 

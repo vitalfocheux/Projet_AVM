@@ -36,5 +36,11 @@
       <artifactId>Compiler</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
+      <dependency>
+          <groupId>fr.m1comp5</groupId>
+          <artifactId>Compiler</artifactId>
+          <version>1.0-SNAPSHOT</version>
+          <scope>test</scope>
+      </dependency>
   </dependencies>
 </project>

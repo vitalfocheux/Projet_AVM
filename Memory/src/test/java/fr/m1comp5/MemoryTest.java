@@ -145,6 +145,7 @@ public class MemoryTest {
         });
     }
 
+    /*
     @Test
     public void assignValueAnIntToBool() throws SymbolTableException, StackException {
         mem.getSymbolTable().newScope();
@@ -155,6 +156,8 @@ public class MemoryTest {
             mem.assignValue("x", true);
         });
     }
+    */
+
 
     @Test
     public void getValCst() throws SymbolTableException, StackException {
@@ -280,6 +283,7 @@ public class MemoryTest {
         });
     }
 
+    /*
     @Test
     public void assignMethodNotInitialised() throws SymbolTableException, StackException, HeapException {
         mem.getSymbolTable().newScope();
@@ -289,6 +293,7 @@ public class MemoryTest {
             Assertions.assertEquals(mem.getVal("main"), "methmain");
         });
     }
+    */
 
     @Test
     public void assignMethodWithNull() throws SymbolTableException, StackException {

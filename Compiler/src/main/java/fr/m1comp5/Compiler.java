@@ -30,8 +30,8 @@ public class Compiler {
             return instrs;
         } catch (Exception e) {
             System.err.println(e.getMessage());
-            return null;
         }
+        return null;
     }
 
     public String jjcToString() {

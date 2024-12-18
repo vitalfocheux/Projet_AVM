@@ -63,11 +63,26 @@ public class Memory {
     }
 
     public void identVal(String ident, ObjectType type, int s) throws StackException, SymbolTableException {
+
         MemoryObject mo = stack.getObjectFromTheTop(s);
         symbolTable.removeObjectFromCurrentScope(mo);
         mo.setId(ident);
         mo.setType(type);
         mo.setNature(ObjectNature.VAR);
+        if (mo.getValue() instanceof String str)
+        {
+            if (str.equals("OMEGA"))
+            {
+                if (type == ObjectType.INT)
+                {
+                    mo.setValue(0);
+                }
+                else if (type == ObjectType.BOOLEAN)
+                {
+                    mo.setValue(false);
+                }
+            }
+        }
         symbolTable.putObjectInCurrentScope(mo);
     }
 
@@ -108,10 +123,6 @@ public class Memory {
         MemoryObject mo = stack.searchVariableFromTop(ident);
         if (mo == null) throw new SymbolTableException("Unknown symbol");
         if (value == null) throw new RuntimeException("Cannot assign null value");
-        if (mo.getType() != ObjectType.OMEGA && (!(value.getClass().equals(mo.getValue().getClass())) && !mo.getValue().equals("OMEGA")))
-        {
-            throw new RuntimeException("Cannot assign value of type " + value.getClass() + " to " + mo.getType());
-        }
 
         switch (mo.getNature()) {
             case METH:

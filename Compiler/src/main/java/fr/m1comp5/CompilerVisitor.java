@@ -229,6 +229,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
             ASTPush nPush = new ASTPush(JJTPUSH);
             ASTJcNbre pushNbre = new ASTJcNbre(JJTJCNBRE);
+            System.out.println(instrs.size());
             pushNbre.jjtSetValue(n+3);
             nPush.jjtAddChild(pushNbre,0);
             instrs.add(nPush);
@@ -548,39 +549,35 @@ public class CompilerVisitor implements MiniJajaVisitor {
     @Override
     public Object visit(ASTSi node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
+
         if (node.jjtGetParent().jjtGetParent() instanceof ASTMethode) {
             dm.data[0] = instrs.size()+1;
         } else {
             dm.data[0] = instrs.size();
         }
+
         int n = (Integer) dm.data[0];
-        Mode m = (Mode) dm.data[1];
+        int ne = (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
 
-        if (m == Mode.DEFAULT) {
-            int ne = (int) node.jjtGetChild(0).jjtAccept(this, data);
+        ASTIf nIf = new ASTIf(JJTIF);
+        instrs.add(nIf);
 
-            ASTIf nIf = new ASTIf(JJTIF);
-            instrs.add(nIf);
+        int ns1 = (int) node.jjtGetChild(2).jjtAccept(this, new DataModel(n+ne+1, Mode.DEFAULT));
 
-            int ns1 = (int) node.jjtGetChild(2).jjtAccept(this, new DataModel(n+ne+1, Mode.DEFAULT));
+        ASTJcNbre ifNbre = new ASTJcNbre(JJTJCNBRE);
+        ifNbre.jjtSetValue(n+ne+ns1+2);
+        nIf.jjtAddChild(ifNbre,0);
 
-            ASTJcNbre ifNbre = new ASTJcNbre(JJTJCNBRE);
-            ifNbre.jjtSetValue(n+ne+ns1+2);
-            nIf.jjtAddChild(ifNbre,0);
+        ASTGoTo nGoTo = new ASTGoTo(JJTGOTO);
+        instrs.add(nGoTo);
 
-            ASTGoTo nGoTo = new ASTGoTo(JJTGOTO);
-            instrs.add(nGoTo);
+        int ns = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+ne+ns1+2, Mode.DEFAULT));
 
-            int ns = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+ne+ns1+2, Mode.DEFAULT));
+        ASTJcNbre addrGoto = new ASTJcNbre(JJTJCNBRE);
+        addrGoto.jjtSetValue(n+ne+ns1+ns+2);
+        nGoTo.jjtAddChild(addrGoto,0);
 
-            ASTJcNbre addrGoto = new ASTJcNbre(JJTJCNBRE);
-            addrGoto.jjtSetValue(n+ne+ns1+ns+2);
-            nGoTo.jjtAddChild(addrGoto,0);
-
-            return ne+ns1+ns+2;
-        }
-
-        return 0;
+        return ne+ns1+ns+2;
     }
 
     @Override
@@ -591,7 +588,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         Mode m = (Mode) dm.data[1];
 
         if (m == Mode.DEFAULT) {
-            int ne = (int) node.jjtGetChild(0).jjtAccept(this, data);
+            int ne = (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
 
             fr.m1comp5.jjc.generated.ASTNot nNot = new fr.m1comp5.jjc.generated.ASTNot(JJTNOT);
             instrs.add(nNot);
@@ -810,6 +807,12 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTOmega node, Object data) {
+        ASTPush push = new ASTPush(JJTPUSH);
+        ASTJcChaine var = new ASTJcChaine(JJTJCCHAINE);
+
+        var.jjtSetValue(ObjectType.OMEGA);
+        push.jjtAddChild(var,0);
+        instrs.add(push);
         return 0;
     }
 
