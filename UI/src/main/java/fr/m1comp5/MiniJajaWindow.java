@@ -1,5 +1,6 @@
 package fr.m1comp5;
 
+import fr.m1comp5.jjc.InterpreterJjc;
 import fr.m1comp5.jjc.generated.Node;
 import fr.m1comp5.mjj.generated.MiniJaja;
 import fr.m1comp5.mjj.generated.ParseException;
