@@ -100,7 +100,7 @@ public class AppLogger {
     }
 
     public void logError(String message, int line, int column) {
-        String formattedMessage = "ERRO " + message + " (ligne " + line + ", colonne " + column + ")";
+        String formattedMessage = "ERROR " + message + " (ligne " + line + ", colonne " + column + ")";
         log(formattedMessage, TypeMessage.ERROR);
     }
 
