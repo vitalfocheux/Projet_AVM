@@ -1,0 +1,7 @@
+1 Init
+2 Push(0)
+3 Push(42)
+4 Div
+5 Push(0)
+6 Pop
+7 JcStop

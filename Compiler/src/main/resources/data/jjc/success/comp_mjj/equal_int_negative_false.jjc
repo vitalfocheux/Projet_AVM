@@ -1,0 +1,7 @@
+1 Init
+2 Push(42)
+3 Push(12)
+4 Cmp
+5 Push(0)
+6 Pop
+7 JcStop

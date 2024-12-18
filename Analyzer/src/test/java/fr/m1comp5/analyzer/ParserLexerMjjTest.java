@@ -16,51 +16,21 @@ import java.util.stream.Stream;
 
 public class ParserLexerMjjTest
 {
-    //TODO: Comparer les fichiers de sortie avec les fichiers de référence grâce à la commande diff
-    private void testASTParser(String path, SimpleNode root){
-        List<String> paths = Arrays.stream(path.split("\\\\")).toList();
-        boolean exceptionCaught = false;
-
-        File outputFile = new File("target/resources/mjj/ast/"+paths.get(paths.size()-1));
-        outputFile.getParentFile().mkdirs();
-        try (PrintStream out = new PrintStream(new FileOutputStream(outputFile))) {
-            System.setOut(out);
-            root.dump("");
-        } catch (FileNotFoundException e) {
-            exceptionCaught = true;
-            e.printStackTrace();
-        } finally {
-            System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
-        }
-        Assertions.assertFalse(exceptionCaught);
-    }
 
     @ParameterizedTest
     @MethodSource("fileProvider")
     void testParser(String filepath) throws ParseException {
-        try(InputStream is = new FileInputStream(filepath)){
-            Reader reader = new InputStreamReader(is);
-            MiniJaja mjjparser = new MiniJaja(reader);
-
-            boolean exceptionCaught = false;
-            try
-            {
-                //System.out.println(filepath);
+        Assertions.assertDoesNotThrow(() -> {
+            try(InputStream is = new FileInputStream(filepath)){
+                Reader reader = new InputStreamReader(is);
+                MiniJaja mjjparser = new MiniJaja(reader);
                 SimpleNode n = mjjparser.start();
-                testASTParser(filepath, n);
-                //n.dump("");
+            }catch (FileNotFoundException e){
+                System.out.println("File: "+filepath+" not found");
+            }catch (IOException e){
+                e.printStackTrace();
             }
-            catch (ParseException e)
-            {
-                exceptionCaught = true;
-                System.out.println(e.getMessage());
-            }
-            Assertions.assertFalse(exceptionCaught);
-        }catch (FileNotFoundException e){
-            System.out.println("File: "+filepath+" not found");
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        });
     }
 
     @ParameterizedTest

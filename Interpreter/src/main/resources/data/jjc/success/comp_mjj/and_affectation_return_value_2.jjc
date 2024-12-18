@@ -1,0 +1,16 @@
+Init
+New(a)
+Push(true)
+New(b)
+Push(false)
+Store(a)
+Load(a)
+Load(b)
+And
+Push(0)
+Swap
+Pop
+Swap
+Pop
+Pop
+JcStop

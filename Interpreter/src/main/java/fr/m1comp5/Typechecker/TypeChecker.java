@@ -1,6 +1,7 @@
 package fr.m1comp5.Typechecker;
 
 import fr.m1comp5.*;
+import fr.m1comp5.custom.exception.VisitorException;
 import fr.m1comp5.mjj.generated.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +20,13 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTRoot node, Object data) {
+    public Object visit(ASTRoot node, Object data) throws VisitorException
+    {
         return visitChildren(node, data);
     }
 
     @Override
-    public Object visit(ASTClasse node, Object data) {
+    public Object visit(ASTClasse node, Object data) throws VisitorException {
 
         ASTIdent classNameNode = (ASTIdent) node.jjtGetChild(0);
         String className = (String) classNameNode.jjtGetValue();
@@ -58,7 +60,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTIdent node, Object data) {
+    public Object visit(ASTIdent node, Object data) throws VisitorException {
 
         Object value = node.jjtGetValue();
 
@@ -80,19 +82,20 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTVnil node, Object data) {
+    public Object visit(ASTVnil node, Object data) throws VisitorException {
         return ObjectType.OMEGA;
     }
 
     @Override
-    public Object visit(ASTDecls node, Object data) {
+    public Object visit(ASTDecls node, Object data) throws VisitorException
+    {
         return visitChildren(node, data);
     }
 
     @Override
-    public Object visit(ASTCst node, Object data) {
-
-        Object cstType = node.jjtGetChild(0).jjtAccept(this, data);
+    public Object visit(ASTCst node, Object data) throws VisitorException
+    {
+        Object cstType = node.jjtGetChild(0).jjtAccept(this, data); 
         if (!(cstType instanceof ObjectType)) 
         {
             logger.logError("Expected ObjectType during decl cst  but got " + cstType.getClass().getSimpleName(),
@@ -127,15 +130,15 @@ public class TypeChecker implements MiniJajaVisitor {
         return cstTypeObject;
 
     }
-
-    @Override
-    public Object visit(ASTVars node, Object data)
-    {
+    
+   @Override
+    public Object visit(ASTVars node, Object data) throws VisitorException
+   {
         return visitChildren(node, data);
     }
 
     @Override
-    public Object visit(ASTVar node, Object data) 
+    public Object visit(ASTVar node, Object data) throws VisitorException
     {   logger.logInfo("en astvar declaration ");
         ASTIdent identNode = (ASTIdent) node.jjtGetChild(1);
         String varName = identNode.jjtGetValue().toString();
@@ -221,7 +224,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTTableau node, Object data) 
+    public Object visit(ASTTableau node, Object data) throws VisitorException 
     { 
         String arrayName = (String) node.jjtGetChild(1).jjtAccept(this, data); 
         // vérifier le type du tableau
@@ -283,7 +286,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTMethode node, Object data) 
+    public Object visit(ASTMethode node, Object data) throws VisitorException
     {
         Object returnTypeObject = node.jjtGetChild(0).jjtAccept(this, data);
        
@@ -394,7 +397,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTMain node, Object data) {
+public Object visit(ASTMain node, Object data) throws VisitorException {
 
         symbolTable.newScope();
         currentMethod = "Methmain";
@@ -420,12 +423,14 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTEntetes node, Object data) {
+    public Object visit(ASTEntetes node, Object data) throws VisitorException
+    {
         return visitChildren(node, data);
     }
 
     @Override
-    public Object visit(ASTEntete node, Object data) {
+    public Object visit(ASTEntete node, Object data) throws VisitorException
+    {
         return visitChildren(node, data);
     }
 
@@ -435,27 +440,31 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTInstrs node, Object data) {
+    public Object visit(ASTInstrs node, Object data) throws VisitorException
+    {
         return visitChildren(node, data);
     }
 
     @Override
-    public Object visit(ASTRetour node, Object data) {
+    public Object visit(ASTRetour node, Object data) throws VisitorException
+    {
+        return visitChildren(node, data);
+    }
+
+    @Override
+    public Object visit(ASTEcrire node, Object data) throws VisitorException
+    {
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
     @Override
-    public Object visit(ASTEcrire node, Object data) {
+    public Object visit(ASTEcrireLn node, Object data) throws VisitorException
+    {
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
     @Override
-    public Object visit(ASTEcrireLn node, Object data) {
-        return node.jjtGetChild(0).jjtAccept(this, data);
-    }
-
-    @Override
-    public Object visit(ASTSi node, Object data) 
+    public Object visit(ASTSi node, Object data) throws VisitorException
     {
         ObjectType conditionType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         if (conditionType != ObjectType.BOOLEAN) {
@@ -466,9 +475,8 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTTantQue node, Object data)
+    public Object visit(ASTTantQue node, Object data) throws VisitorException 
      {
-        logger.logInfo("je suis la en tant que ");
         ObjectType conditionType = (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
         logger.logInfo("le type d'exp de while est "+ conditionType);
         if (conditionType != ObjectType.BOOLEAN) {
@@ -479,7 +487,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTAffectation node, Object data) 
+    public Object visit(ASTAffectation node, Object data)  throws VisitorException
     {
         ObjectType id = getNodeType(node.jjtGetChild(0), data);
         ObjectType id2 = getNodeType(node.jjtGetChild(1), data);
@@ -498,7 +506,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTIncrement node, Object data) 
+    public Object visit(ASTIncrement node, Object data)  throws VisitorException
     {
         String varName = (String) node.jjtGetChild(0).jjtAccept(this, data); // nom de la variable
         
@@ -516,19 +524,19 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTAppelI node, Object data)
+    public Object visit(ASTAppelI node, Object data)  throws VisitorException
     {
         return visitMethodCall(node, data);
     }
 
     @Override
-    public Object visit(ASTAppelE node, Object data)
+    public Object visit(ASTAppelE node, Object data)  throws VisitorException
     {
         return visitMethodCall(node, data);
     }
 
 
-    private Object visitMethodCall(SimpleNode node, Object data) {
+    private Object visitMethodCall(SimpleNode node, Object data) throws VisitorException {
         String methodName = (String) node.jjtGetChild(0).jjtAccept(this, data);
         List<ObjectType> actualParamTypes = new ArrayList<>();
 
@@ -589,7 +597,8 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTListExp node, Object data) {
+    public Object visit(ASTListExp node, Object data) throws VisitorException
+    {
 
         if (node.jjtGetNumChildren() == 2) {
             SimpleNode firstChild = (SimpleNode) node.jjtGetChild(0);
@@ -631,7 +640,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTExp node, Object data) {
+    public Object visit(ASTExp node, Object data)  throws VisitorException{
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
@@ -641,27 +650,32 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTNot node, Object data) {
+    public Object visit(ASTNot node, Object data) throws VisitorException
+    {
         return visitUnaryOperation(node, data, ObjectType.BOOLEAN);
     }
 
     @Override
-    public Object visit(ASTNeg node, Object data) {
+    public Object visit(ASTNeg node, Object data) throws VisitorException
+    {
         return visitUnaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTEt node, Object data) {
+    public Object visit(ASTEt node, Object data) throws VisitorException
+    {
         return visitBinaryOperation(node, data, ObjectType.BOOLEAN);
     }
 
     @Override
-    public Object visit(ASTOu node, Object data) {
+    public Object visit(ASTOu node, Object data) throws VisitorException
+    {
         return visitBinaryOperation(node, data, ObjectType.BOOLEAN);
     }
 
     @Override
-    public Object visit(ASTEq node, Object data) {
+    public Object visit(ASTEq node, Object data) throws VisitorException
+    {
 
        logger.logInfo("en visite de asteq");
         ObjectType leftType = getNodeType(node.jjtGetChild(0), data);
@@ -679,7 +693,8 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTSup node, Object data) {
+    public Object visit(ASTSup node, Object data) throws VisitorException
+    {
 
         ObjectType leftType = getNodeType(node.jjtGetChild(0), data);
         ObjectType rightType = getNodeType(node.jjtGetChild(1), data);
@@ -693,27 +708,31 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTAdd node, Object data) {
+    public Object visit(ASTAdd node, Object data) throws VisitorException
+    {
         return visitBinaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTSub node, Object data) {
+    public Object visit(ASTSub node, Object data) throws VisitorException
+    {
         return visitBinaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTMul node, Object data) {
+    public Object visit(ASTMul node, Object data) throws VisitorException
+    {
         return visitBinaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTSomme node, Object data) {
+    public Object visit(ASTSomme node, Object data) throws VisitorException
+    {
         return visitBinaryOperation(node, data, ObjectType.INT);
     }
 
     @Override
-    public Object visit(ASTDiv node, Object data) {
+    public Object visit(ASTDiv node, Object data)  throws VisitorException{
         Object value = node.jjtGetChild(1);
         
         Object v = ((SimpleNode) value).jjtGetValue();
@@ -792,7 +811,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(ASTTab node, Object data) 
+    public Object visit(ASTTab node, Object data)  throws VisitorException
     { 
         logger.logInfo("dan asttab");
         String id = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
@@ -867,15 +886,15 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     @Override
-    public Object visit(SimpleNode node, Object data) 
+    public Object visit(SimpleNode node, Object data)  throws VisitorException
     {
-        visitChildren(node, null);
+        //visitChildren(node, null);
         return node.jjtAccept(this, data);
     }
 
         /// * Methodes utils pour la verification des types *///
 
-    private ObjectType visitBinaryOperation(SimpleNode node, Object data, ObjectType expectedType) 
+    private ObjectType visitBinaryOperation(SimpleNode node, Object data, ObjectType expectedType)  throws VisitorException
     {
         if (node.jjtGetNumChildren() != 2 || node.jjtGetChild(0) == null || node.jjtGetChild(1) == null) 
         {
@@ -904,7 +923,7 @@ public class TypeChecker implements MiniJajaVisitor {
         return expectedType;
     }
 
-    private ObjectType getNodeType(Node node, Object data) 
+    private ObjectType getNodeType(Node node, Object data) throws VisitorException 
     {
         if (node instanceof ASTIdent) 
         {
@@ -977,7 +996,7 @@ public class TypeChecker implements MiniJajaVisitor {
         return null;
     }
 
-    private ObjectType visitUnaryOperation(SimpleNode node, Object data, ObjectType expectedType) 
+    private ObjectType visitUnaryOperation(SimpleNode node, Object data, ObjectType expectedType) throws VisitorException 
     {
         ObjectType operandTypep = getNodeType(node.jjtGetChild(0), data);
 
@@ -995,7 +1014,7 @@ public class TypeChecker implements MiniJajaVisitor {
         return expectedType;
     }
 
-    private Object visitChildren(SimpleNode node, Object data) 
+    private Object visitChildren(SimpleNode node, Object data) throws VisitorException 
     {
         for (int i = 0; i < node.jjtGetNumChildren(); i++) {
             node.jjtGetChild(i).jjtAccept(this, data);
@@ -1006,7 +1025,7 @@ public class TypeChecker implements MiniJajaVisitor {
 
     // collecter les types des paramètres de la liste d'entetes avec les noms
     private void collectParamTypesName(ASTEntetes entetesNode, List<ObjectType> paramTypes, List<String> nameParam,
-            Object data) 
+            Object data) throws VisitorException 
     {
         for (int i = 0; i < entetesNode.jjtGetNumChildren(); i++) 
         {
@@ -1033,7 +1052,7 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     // Collecter les types des paramètres de la liste d'expressions
-    private void collectParamTypesFromListexp(ASTListExp listexpNode, List<ObjectType> paramTypes, Object data) {
+    private void collectParamTypesFromListexp(ASTListExp listexpNode, List<ObjectType> paramTypes, Object data) throws VisitorException {
         for (int i = 0; i < listexpNode.jjtGetNumChildren(); i++) 
         {
             SimpleNode child = (SimpleNode) listexpNode.jjtGetChild(i);
