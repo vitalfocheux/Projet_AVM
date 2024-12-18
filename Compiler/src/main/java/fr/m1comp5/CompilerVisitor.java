@@ -110,9 +110,9 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
             ASTType tabType = new ASTType(JJTTYPE);
             if (node.jjtGetChild(0) instanceof ASTEntier) {
-                tabType.jjtSetValue(ObjectType.INT);
+                tabType.jjtSetValue("entier");
             } else {
-                tabType.jjtSetValue(ObjectType.BOOLEAN);
+                tabType.jjtSetValue("booleen");
             }
 
             newTab.jjtAddChild(tabIdent,0);
@@ -927,9 +927,9 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
             ASTType varType = new ASTType(JJTTYPE);
             if (node.jjtGetChild(0) instanceof ASTEntier) {
-                varType.jjtSetValue(ObjectType.INT);
+                varType.jjtSetValue("entier");
             } else {
-                varType.jjtSetValue(ObjectType.BOOLEAN);
+                varType.jjtSetValue("booleen");
             }
 
             ASTSorte varNature = new ASTSorte(JJTSORTE);
