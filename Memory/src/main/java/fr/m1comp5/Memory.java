@@ -63,11 +63,26 @@ public class Memory {
     }
 
     public void identVal(String ident, ObjectType type, int s) throws StackException, SymbolTableException {
+
         MemoryObject mo = stack.getObjectFromTheTop(s);
         symbolTable.removeObjectFromCurrentScope(mo);
         mo.setId(ident);
         mo.setType(type);
         mo.setNature(ObjectNature.VAR);
+        if (mo.getValue() instanceof String str)
+        {
+            if (str.equals("OMEGA"))
+            {
+                if (type == ObjectType.INT)
+                {
+                    mo.setValue(0);
+                }
+                else if (type == ObjectType.BOOLEAN)
+                {
+                    mo.setValue(false);
+                }
+            }
+        }
         symbolTable.putObjectInCurrentScope(mo);
     }
 
