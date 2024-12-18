@@ -1,6 +1,6 @@
 ERROR TypeChecker  : Method sum() is not defined. (ligne 0, colonne 0)
-ERROR TypeChecker : Type mismatch Expected type int for both operands. (ligne 5, colonne 26)
-ERROR TypeChecker : Type mismatch Expected type int for both operands. (ligne 4, colonne 29)
+ERROR TypeChecker : Type mismatch Expected type int for both operands. (ligne 5, colonne 12)
+ERROR TypeChecker : Type mismatch Expected type int for both operands. (ligne 4, colonne 15)
 ERROR TypeChecker  : Method f is already defined. (ligne 14, colonne 4)
 ERROR TypeChecker  : Variable a is already defined. (ligne 5, colonne 18)
 ERROR TypeChecker  : Variable a is already defined. (ligne 5, colonne 14)
