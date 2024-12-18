@@ -1,0 +1,9 @@
+class and {
+
+    main {
+        int x = true && 7
+        return x;
+
+    }
+
+}

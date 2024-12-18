@@ -1,0 +1,11 @@
+class superior {
+
+    main {
+
+        int a = -12;
+        boolean b = false;
+        return a > b;
+
+    }
+
+}

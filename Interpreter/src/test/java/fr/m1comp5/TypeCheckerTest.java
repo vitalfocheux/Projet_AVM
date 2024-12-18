@@ -67,7 +67,7 @@ public class TypeCheckerTest {
     
 
     static Stream<Arguments> failureFileProvider() throws IOException {
-        return UtilsTest.fileProvider("src/main/resources/data/mjj/error/type_checker/prog_erreur");
+        return UtilsTest.fileProvider("src/main/resources/data/mjj/error/type_checker");
     }
 
     static Stream<Arguments> fileProvider() throws IOException {
