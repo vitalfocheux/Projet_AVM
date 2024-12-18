@@ -167,4 +167,7 @@ public class Stack {
         }
 
     }
+    public List<MemoryObject> getStackList() {
+        return stackList;
+    }
 }
