@@ -8,7 +8,7 @@ class error {
 
     main {
 
-        return sum();
+        boolean b = even();
 
     }
 

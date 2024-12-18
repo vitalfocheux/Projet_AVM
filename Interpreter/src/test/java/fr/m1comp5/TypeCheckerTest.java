@@ -36,7 +36,8 @@ public class TypeCheckerTest {
     @ParameterizedTest
     @MethodSource("fileProvider")
     void testTypeChecker(String filepath) throws ParseException {
-        try {
+        try 
+        {
             MiniJaja parser = new MiniJaja(new FileReader(filepath));
             SimpleNode rootNode = parser.start();
             typeChecker.visit(rootNode, null);
@@ -64,8 +65,6 @@ public class TypeCheckerTest {
     static Stream<Arguments> fileProvider() throws IOException {
         return UtilsTest.fileProvider("src/main/resources/data/mjj/error/type_checker");
     }
-
-    
     
 }
 /* 
