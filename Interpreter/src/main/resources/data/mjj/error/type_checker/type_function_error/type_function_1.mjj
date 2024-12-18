@@ -6,8 +6,7 @@ class error {
 
     main {
 
-        return sum();
-
+        boolean x = sum()
     }
 
 }

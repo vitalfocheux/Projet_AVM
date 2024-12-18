@@ -1,0 +1,24 @@
+class C {
+  int x = 0;
+  int y = 10;
+  boolean b1 = false;
+  boolean b2 = true;
+
+  
+
+   void f(int z){
+   	x = y * z;
+	x = x / z;
+	x++;
+   };
+
+    main {
+ 	if  (b1 || (!b2)) {
+	f(10); // x = 11;
+   };
+   
+}
+}
+
+
+

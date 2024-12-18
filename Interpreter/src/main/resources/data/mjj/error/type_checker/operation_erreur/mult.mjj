@@ -1,0 +1,11 @@
+class add {
+
+    main {
+
+        int x ;
+        int a = 12;
+        void  b = true;
+        x =  a * b; 
+    }
+
+}
