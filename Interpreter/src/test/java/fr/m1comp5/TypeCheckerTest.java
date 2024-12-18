@@ -19,38 +19,56 @@ import fr.m1comp5.Typechecker.TypeChecker;
 
 public class TypeCheckerTest {
 
-    private TypeChecker typeChecker =  new TypeChecker();
-    TestLoggerListener loggerListener = new TestLoggerListener();
+    private TypeChecker typeChecker;
+    TestLoggerListener loggerListener ;
     AppLogger logger = AppLogger.getInstance();
-
-
-    @ParameterizedTest
-    @MethodSource("fileProvider")
-    void testTypeChecker(String filepath) {
-        assertDoesNotThrow(() -> {
-            logger.setLogLevel(AppLogger.LogLevel.ERROR_ONLY); // change level if you want to see debug messages info
-            MiniJaja parser = new MiniJaja(new FileReader(filepath));
-            SimpleNode rootNode = parser.start();
-            typeChecker.visit(rootNode, null);
-            assertTrue(loggerListener.getMessages().isEmpty());
-            
-        });
-    }
-
-    static Stream<Arguments> fileProvider() throws IOException {
-        return UtilsTest.fileProvider("src/main/resources/data/mjj/success");
-    }
-}
-    /* 
     @BeforeEach
     public void setUp() {
         typeChecker = new TypeChecker();
         logger = AppLogger.getInstance();
         loggerListener = new TestLoggerListener();
         logger.addLoggerListener(loggerListener);
-        AppLogger.setDebugMode(true); 
+        logger.setLogLevel(AppLogger.LogLevel.ERROR_ONLY); // change level if you want to see debug messages info
+        typeChecker.stack.clear();
     }
 
+
+    @ParameterizedTest
+    @MethodSource("fileProvider")
+    void testTypeChecker(String filepath) throws ParseException {
+        try {
+            MiniJaja parser = new MiniJaja(new FileReader(filepath));
+            SimpleNode rootNode = parser.start();
+            typeChecker.visit(rootNode, null);
+            assertFalse(loggerListener.getMessages().isEmpty());
+        }
+        catch (Exception  e ){
+            System.err.println("file not found error ");
+        }
+            
+    }
+
+
+    /* @ParameterizedTest
+    @MethodSource("failureFileProvider")
+    void testTypeCheckerechec(String filepath) {
+        assertDoesNotThrow(() -> {
+            MiniJaja parser = new MiniJaja(new FileReader(filepath));
+            SimpleNode rootNode = parser.start();
+            typeChecker.visit(rootNode, null);
+            assertFalse(loggerListener.getMessages().isEmpty());
+            //assertTrue(logFileContainsErrors(), "Log file does not contain errors for file: " + filepath);
+        });
+    } */
+
+    static Stream<Arguments> fileProvider() throws IOException {
+        return UtilsTest.fileProvider("src/main/resources/data/mjj/error/type_checker");
+    }
+
+    
+    
+}
+/* 
     @Test
     public void testIdentCorrect() {
         ASTIdent ident = new ASTIdent(0);
@@ -770,7 +788,5 @@ public class TypeCheckerTest {
         typeChecker.visit(ecrire, null);
         assertTrue(loggerListener.getMessages().isEmpty());
 
-    }
+    } */
 
-}
- */

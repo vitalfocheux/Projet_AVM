@@ -11,7 +11,7 @@ public class TypeChecker implements MiniJajaVisitor {
     private String currentMethod = null; // Méthode courante
     private AppLogger logger = AppLogger.getInstance(); // Logger pour les messages d'erreur de TypeChecker
     private SymbolTable symbolTable = null;
-    private Stack stack = null;
+    public Stack stack = null;
 
     public TypeChecker() {
         symbolTable = new SymbolTable(); // Initialiser la table des symboles globale
@@ -106,11 +106,11 @@ public class TypeChecker implements MiniJajaVisitor {
         {
             cstValue = node.jjtGetChild(2).jjtAccept(this, data);
         }
-        if (isDefined(cstName, cstTypeObject, ObjectNature.CST)) 
+        if (lookupSymbol(cstName) != null) 
         {
             logger.logError("TypeChecker  : Constant " + cstName + " is already defined.", node.getLine(),
                     node.getColumn());
-
+            return null;
         }
         MemoryObject mo;
         try {
@@ -146,6 +146,12 @@ public class TypeChecker implements MiniJajaVisitor {
             logger.logError(
                     "TypeChecker  : Expected ObjectType during decl var but got " + varType.getClass().getSimpleName(),
                     node.getLine(), node.getColumn());
+            return null;
+        }
+        if (lookupSymbol(varName) != null) 
+        {
+            logger.logError("TypeChecker  : Variable " + varName + " is already defined.", node.getLine(),
+                    node.getColumn());
             return null;
         }
         ObjectType varTypev = (ObjectType) varType;
@@ -239,6 +245,12 @@ public class TypeChecker implements MiniJajaVisitor {
             logger.logError("TypeChecker  : Index must be of type int.", node.getLine(), node.getColumn());
             return null;
         }
+        if (lookupSymbol(arrayName) != null) 
+        {
+            logger.logError("TypeChecker  : Tableau " + arrayName + " is already defined.", node.getLine(),
+                    node.getColumn());
+            return null;
+        } 
 
         if (isDefined(arrayName, arrayType, ObjectNature.TAB)) 
         {
@@ -269,6 +281,7 @@ public class TypeChecker implements MiniJajaVisitor {
     public Object visit(ASTMethode node, Object data) 
     {
         Object returnTypeObject = node.jjtGetChild(0).jjtAccept(this, data);
+       
 
         if (!(returnTypeObject instanceof ObjectType)) 
         {
@@ -297,6 +310,12 @@ public class TypeChecker implements MiniJajaVisitor {
         // Construire la signature de la méthode
         MethodSignature methodSignature = new MethodSignature(methodName, paramTypes);
         currentMethod = methodSignature.toString();
+
+        if (lookupSymbol(methodName)!= null){
+            logger.logError("TypeChecker  : Method " + methodName + " is already defined.", node.getLine(),
+                    node.getColumn());
+            return null;
+        }
 
         // Vérifier si la méthode avec cette signature est déjà définie
         if (isDefinedMeth(methodSignature, returnType, ObjectNature.METH)) {
@@ -352,6 +371,7 @@ public class TypeChecker implements MiniJajaVisitor {
                 MemoryObject mo = symbolTable.get(currentMethod);
                 stack.eraseVariable(currentMethod);
                 symbolTable.removeObjectFromCurrentScope(mo);
+                //symbolTable.popScope();
             } 
             catch (SymbolTableException | StackException e) {
                 e.printStackTrace();
@@ -1039,10 +1059,15 @@ public class TypeChecker implements MiniJajaVisitor {
             {
                 throw new StackException("The stack is empty, cannot lookup symbol");
             }
-            MemoryObject mo = stack.searchVariableFromTop(name);
-            if (mo != null) {
-                return mo;
+            //MemoryObject mo = stack.searchVariableFromTop(name);
+            try {
+            MemoryObject mo = symbolTable.getCurrentScope(name);
+
+            return mo; 
+            } catch (SymbolTableException e) {
+                System.err.println("Error: " + e.getMessage());
             }
+            
         } catch (StackException e) {
             System.err.println("Error: " + e.getMessage());
             return null;
@@ -1059,6 +1084,14 @@ public class TypeChecker implements MiniJajaVisitor {
     }
 
     public Boolean isDefined(String name, ObjectType type, ObjectNature nat) {
+        MemoryObject mo = lookupMethode(name);
+        if (mo != null) {
+            return type == mo.getType() && nat == mo.getNature();
+        }
+        return false;
+    }
+
+    public Boolean isDefinedDecl(String name, ObjectType type, ObjectNature nat) {
         MemoryObject mo = lookupMethode(name);
         if (mo != null) {
             return type == mo.getType() && nat == mo.getNature();

@@ -167,4 +167,10 @@ public class Stack {
         }
 
     }
+
+    public void clear() {
+        stackList.clear();
+        base = -1;
+        top = -1;
+    }
 }

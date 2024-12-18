@@ -90,17 +90,17 @@ public class AppLogger {
     }
     
     public void logInfo(String message) {
-        String formattedMessage = "INFO: " + message;
+        String formattedMessage = "INFO " + message;
         log(formattedMessage, TypeMessage.INFO);
     }
 
     public void logDebug(String message) {
-        String formattedMessage = "DEBUG: " + message;
+        String formattedMessage = "DEBUG " + message;
         log(formattedMessage, TypeMessage.DEBUG);
     }
 
     public void logError(String message, int line, int column) {
-        String formattedMessage = "ERROR: " + message + " (ligne " + line + ", colonne " + column + ")";
+        String formattedMessage = "ERRO " + message + " (ligne " + line + ", colonne " + column + ")";
         log(formattedMessage, TypeMessage.ERROR);
     }
 

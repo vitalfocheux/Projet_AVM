@@ -76,6 +76,20 @@ public class SymbolTable
         return obj;
     }
 
+    public MemoryObject getCurrentScope(String id) throws SymbolTableException
+    {
+        if (scopes.isEmpty())
+        {
+            throw new SymbolTableException("No available scope");
+        }
+        MemoryObject obj = scopes.get(scopes.size() - 1).get(id);
+        if (obj == null)
+        {
+            throw new SymbolTableException("The object doesn't exist in the current scope");
+        }
+        return obj;
+    }
+
     public void updateObjInCurrentScope(String id, Object val) throws SymbolTableException
     {
         if (scopes.isEmpty())
