@@ -1,5 +1,6 @@
 package fr.m1comp5;
 
+
 import fr.m1comp5.mjj.generated.MiniJaja;
 import fr.m1comp5.mjj.generated.ParseException;
 import fr.m1comp5.mjj.generated.SimpleNode;
@@ -25,14 +26,14 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import java.io.*;
 import java.nio.file.Files;
-import java.time.Duration;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 import javafx.util.Pair;
-;
+
+
 
 
 
@@ -51,6 +52,8 @@ public class MiniJajaWindow extends Application {
     private TabPane editorTabPane;
     private Map<Tab, File> tabFileMap = new HashMap<>();
     private Scene scene;
+    private boolean folderTreeOpened = false;
+
 
 
 
@@ -122,6 +125,7 @@ public class MiniJajaWindow extends Application {
     public void start(Stage stage) {
         this.primaryStage = stage;
         tabFileMap = new HashMap<>();
+        //setupDebugger();
         initializeWindow();
     }
 
@@ -422,12 +426,20 @@ public class MiniJajaWindow extends Application {
     private ToolBar createToolBar() {
         ToolBar toolBar = new ToolBar();
 
+        Button folderButton = createToolBarButton("Open Folder", "/icon/open.png", () -> {
+            openFolderDialog();
+        });
+
         toolBar.getItems().addAll(
                 createToolBarButton("New", "/icon/new-file.png", this::newFile),
                 createToolBarButton("Open File", "/icon/open-file.png", this::openFile),
-                createToolBarButton("Open Folder", "/icon/open.png", this::openDirectory), // Nouveau bouton
-                createToolBarButton("Save", "/icon/save.png", this::saveFile),
-                new Separator(),
+                folderButton,
+                createToolBarButton("Save", "/icon/save.png", this::saveFile)
+        );
+
+        toolBar.getItems().add(new Separator());
+
+        toolBar.getItems().addAll(
                 createToolBarButton("Build", "/icon/build.png", this::buildCode),
                 createToolBarButton("Run", "/icon/run.png", this::executeCode)
         );
@@ -457,10 +469,10 @@ public class MiniJajaWindow extends Application {
     }
 
     private SplitPane createMainContent() {
-        // Créer le SplitPane principal
+
         mainSplitPane = new SplitPane();
 
-        // initialisation des tout les composant
+
         if (fileExplorer == null) setupFileExplorer();
         if (editorTabPane == null) setupTabPane();
         if (consoleArea == null) {
@@ -469,22 +481,14 @@ public class MiniJajaWindow extends Application {
             consoleArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 14px;");
         }
 
-        // Panel de gauche (explorateur)
-        VBox fileExplorerWrapper = new VBox();
-        fileExplorerWrapper.getChildren().add(fileExplorer);
-        VBox.setVgrow(fileExplorer, Priority.ALWAYS);
-
 
         SplitPane centerSplitPane = new SplitPane();
         centerSplitPane.setOrientation(Orientation.VERTICAL);
         centerSplitPane.getItems().addAll(editorTabPane, consoleArea);
         centerSplitPane.setDividerPositions(0.7);
 
-
-        if (fileExplorerWrapper != null && centerSplitPane != null) {
-            mainSplitPane.getItems().addAll(fileExplorerWrapper, centerSplitPane);
-            mainSplitPane.setDividerPositions(0.2);
-        }
+        // Ajouter uniquement la partie centrale au début
+        mainSplitPane.getItems().addAll(centerSplitPane);
 
         VBox.setVgrow(mainSplitPane, Priority.ALWAYS);
         return mainSplitPane;
@@ -508,12 +512,31 @@ public class MiniJajaWindow extends Application {
         tabFileMap.put(tab, null);
     }
 
+    private void openFolderDialog() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File selectedDirectory = directoryChooser.showDialog(null);
+
+        if (selectedDirectory != null) {
+
+            if (!mainSplitPane.getItems().contains(fileExplorer)) {
+                mainSplitPane.getItems().add(0, fileExplorer);
+                mainSplitPane.setDividerPositions(0.2);
+            }
+
+
+            TreeItem<File> root = buildFileTreeItem(selectedDirectory);
+            fileExplorer.setRoot(root);
+            root.setExpanded(true);
+            folderTreeOpened = true;
+        }
+    }
+
     private CodeArea createNewCodeArea() {
         CodeArea newCodeArea = new CodeArea();
         newCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(newCodeArea));
         newCodeArea.setStyle("-fx-font-family: 'JetBrains Mono', Consolas, monospace; -fx-font-size: 16px;");
 
-        // Initialiser la coloration syntaxique
+
         newCodeArea.textProperty().addListener((obs, oldText, newText) -> {
             Platform.runLater(() -> {
                 newCodeArea.setStyleSpans(0, computeHighlighting(newText));
@@ -530,7 +553,7 @@ public class MiniJajaWindow extends Application {
 
     private void setupFileExplorer() {
         fileExplorer = new TreeView<>();
-        fileExplorer.setShowRoot(true); // Changé à true pour voir le dossier racine
+        fileExplorer.setShowRoot(true);
         fileExplorer.setPrefWidth(200);
 
 
@@ -924,7 +947,6 @@ public class MiniJajaWindow extends Application {
         }
         primaryStage.setTitle(title);
     }
-
     private boolean checkSaveBeforeClosing(Tab tab) {
         if (!tab.getText().endsWith("*")) {
             return true;
@@ -1019,8 +1041,5 @@ public class MiniJajaWindow extends Application {
             Platform.exit();
         }
     }
-    /*
-    public static void main(String[] args) {
-        launch(args);
-    }  */
+
 }

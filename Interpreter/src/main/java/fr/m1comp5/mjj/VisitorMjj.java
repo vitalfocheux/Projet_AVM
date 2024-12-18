@@ -678,4 +678,8 @@ public class VisitorMjj implements MiniJajaVisitor {
             }
         }
     }
+    public Memory getMemory() {
+        return memory;
+    }
 }
+

@@ -77,7 +77,7 @@ public class InterpreterDebugger {
 
     /**
      * Removes a breakpoint from the specified node.
-     * @param breakpointNode the node where the breakpoint is removed
+     * @param //breakpointNode the node where the breakpoint is removed
      */
     public void removeBreakpointMjj(fr.m1comp5.mjj.generated.Node n) {
         breakpointNodesM.remove(n);
