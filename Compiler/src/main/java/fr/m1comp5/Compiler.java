@@ -23,12 +23,14 @@ public class Compiler {
         addr = 1;
     }
 
-    public void compile() {
+    public List<fr.m1comp5.jjc.generated.Node> compile() {
         try {
             root.jjtAccept(visitor, new DataModel(addr,Mode.DEFAULT));
             instrs = visitor.getInstrs();
+            return instrs;
         } catch (Exception e) {
             System.err.println(e.getMessage());
+            return null;
         }
     }
 

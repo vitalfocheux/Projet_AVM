@@ -840,6 +840,8 @@ public class CompilerVisitor implements MiniJajaVisitor {
         else if (node instanceof ASTEq) opNode = new fr.m1comp5.jjc.generated.ASTCmp(JJTCMP);
         else if (node instanceof ASTOu) opNode = new fr.m1comp5.jjc.generated.ASTOr(JJTOR);
         else if (node instanceof ASTEt) opNode = new fr.m1comp5.jjc.generated.ASTAnd(JJTAND);
+        else if (node instanceof ASTNot) opNode = new fr.m1comp5.jjc.generated.ASTNot(JJTNOT);
+        else if (node instanceof ASTNeg) opNode = new fr.m1comp5.jjc.generated.ASTNeg(JJTNEG);
 
         return opNode;
     }

@@ -90,7 +90,6 @@ public class VisitorMjj implements MiniJajaVisitor {
             if (memory.getSymbolTable().get((String) node.jjtGetValue()).getType() == ObjectType.OMEGA) {
                 throw new Exception();
             }
-            System.out.println("ASTident -> "+ node.jjtGetValue() + " = " + memory.getSymbolTable().get((String) node.jjtGetValue()).getValue());
             return memory.getSymbolTable().get((String) node.jjtGetValue()).getValue();
         } catch (Exception e) {
             throw new InterpreterException(e.getMessage(), node.getLine(), node.getColumn(), callStack);
@@ -285,7 +284,6 @@ public class VisitorMjj implements MiniJajaVisitor {
         {
             callStack.tryPopFunction();
             memory.assignValue(memory.classVariable(), val);
-            System.out.println("Return value is " + memory.getVal(memory.classVariable()));
         }
         catch (Exception e)
         {
@@ -487,7 +485,6 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTEt node, Object data) throws VisitorException {
         boolean exp1 = (boolean) node.jjtGetChild(0).jjtAccept(this, data);
         boolean exp2 = (boolean) node.jjtGetChild(1).jjtAccept(this, data);
-        System.out.println("ASTet -> " + exp1 + " && " + exp2);
         return exp1 && exp2;
     }
 
@@ -495,7 +492,6 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTOu node, Object data) throws VisitorException {
         boolean exp1 = (boolean) node.jjtGetChild(0).jjtAccept(this, data);
         boolean exp2 = (boolean) node.jjtGetChild(1).jjtAccept(this, data);
-        System.out.println("ASTou -> " + exp1 + " || " + exp2);
         return exp1 || exp2;
     }
 
@@ -508,7 +504,6 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTSup node, Object data) throws VisitorException {
         int nb1 = (int) node.jjtGetChild(0).jjtAccept(this, data);
         int nb2 = (int) node.jjtGetChild(1).jjtAccept(this, data);
-        System.out.println("ASTsup -> " + nb1 + " > " + nb2);
         return nb1 > nb2;
     }
 
@@ -516,7 +511,6 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTAdd node, Object data) throws VisitorException {
         int nb1 = (int) node.jjtGetChild(0).jjtAccept(this, data);
         int nb2 = (int) node.jjtGetChild(1).jjtAccept(this, data);
-        System.out.println("ASTadd -> " + nb1 + " + " + nb2);
         return nb1 + nb2;
     }
 
@@ -524,7 +518,6 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTSub node, Object data) throws VisitorException {
         int nb1 = (int) node.jjtGetChild(0).jjtAccept(this, data);
         int nb2 = (int) node.jjtGetChild(1).jjtAccept(this, data);
-        System.out.println("ASTsub -> " + nb1 + " - " + nb2);
         return nb1 - nb2;
     }
 
@@ -532,7 +525,6 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTMul node, Object data) throws VisitorException {
         int nb1 = (int) node.jjtGetChild(0).jjtAccept(this, data);
         int nb2 = (int) node.jjtGetChild(1).jjtAccept(this, data);
-        System.out.println("ASTmul -> " + nb1 + " * " + nb2);
         return nb1 * nb2;
     }
 
@@ -540,7 +532,6 @@ public class VisitorMjj implements MiniJajaVisitor {
     public Object visit(ASTDiv node, Object data) throws VisitorException {
         int nb1 = (int) node.jjtGetChild(0).jjtAccept(this, data);
         int nb2 = (int) node.jjtGetChild(1).jjtAccept(this, data);
-        System.out.println("ASTdiv -> " + nb1 + " / " + nb2);
         return nb1 / nb2;
     }
 
