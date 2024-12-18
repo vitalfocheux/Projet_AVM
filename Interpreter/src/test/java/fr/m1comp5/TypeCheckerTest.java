@@ -34,7 +34,7 @@ public class TypeCheckerTest {
 
 
     @ParameterizedTest
-    @MethodSource("fileProvider")
+    @MethodSource("failureFileProvider")
     void testTypeChecker(String filepath) throws ParseException {
         try 
         {
@@ -50,20 +50,28 @@ public class TypeCheckerTest {
     }
 
 
-    /* @ParameterizedTest
-    @MethodSource("failureFileProvider")
-    void testTypeCheckerechec(String filepath) {
-        assertDoesNotThrow(() -> {
+    @ParameterizedTest
+    @MethodSource("fileProvider")
+    void testTypeCheckerReussi(String filepath) throws ParseException {
+        try {
             MiniJaja parser = new MiniJaja(new FileReader(filepath));
             SimpleNode rootNode = parser.start();
             typeChecker.visit(rootNode, null);
-            assertFalse(loggerListener.getMessages().isEmpty());
-            //assertTrue(logFileContainsErrors(), "Log file does not contain errors for file: " + filepath);
-        });
-    } */
+            assertTrue(loggerListener.getMessages().isEmpty(), "Expected no type errors, but errors were logged.");
+        } catch (Exception e) {
+            System.err.println("Error processing file: " + filepath);
+            e.printStackTrace();
+        }
+    }
+      
+    
+
+    static Stream<Arguments> failureFileProvider() throws IOException {
+        return UtilsTest.fileProvider("src/main/resources/data/mjj/error/type_checker");
+    }
 
     static Stream<Arguments> fileProvider() throws IOException {
-        return UtilsTest.fileProvider("src/main/resources/data/mjj/error/type_checker");
+        return UtilsTest.fileProvider("src/main/resources/data/mjj/success");
     }
     
 }

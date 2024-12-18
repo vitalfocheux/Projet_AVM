@@ -1,0 +1,12 @@
+class Boolean {
+
+    main {
+
+        int a = 2;
+        int b = 3;
+        boolean  v = a || b;
+        return v;
+
+    }
+
+}

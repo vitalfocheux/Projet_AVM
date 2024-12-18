@@ -1,0 +1,9 @@
+class Boolean {
+
+    main {
+        boolean v = 8 || true;
+        return v;
+
+    }
+
+}

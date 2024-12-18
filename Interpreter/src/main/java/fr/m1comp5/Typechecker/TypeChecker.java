@@ -2,6 +2,7 @@ package fr.m1comp5.Typechecker;
 
 import fr.m1comp5.*;
 import fr.m1comp5.custom.exception.VisitorException;
+import fr.m1comp5.jjc.generated.ASTAnd;
 import fr.m1comp5.mjj.generated.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class TypeChecker implements MiniJajaVisitor {
 
         ASTIdent classNameNode = (ASTIdent) node.jjtGetChild(0);
         String className = (String) classNameNode.jjtGetValue();
+        currentMethod = className;
         symbolTable.newScope();
         try {
             MemoryObject classMemoryObject = new MemoryObject(className, "Class" + className, ObjectNature.VAR,
@@ -253,7 +255,7 @@ public class TypeChecker implements MiniJajaVisitor {
         }
         if (lookupSymbol(arrayName) != null) 
         {
-            logger.logError("TypeChecker  : Tableau " + arrayName + " is already defined.", node.getLine(),
+            logger.logError("TypeChecker  : Tableau " + arrayName + " is already defined during declaration.", node.getLine(),
                     node.getColumn());
             return null;
         } 
@@ -400,7 +402,8 @@ public class TypeChecker implements MiniJajaVisitor {
 public Object visit(ASTMain node, Object data) throws VisitorException {
 
         symbolTable.newScope();
-        currentMethod = "Methmain";
+        currentMethod = "main";
+
         visitChildren(node, data);
         try 
         {
@@ -448,7 +451,21 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
     @Override
     public Object visit(ASTRetour node, Object data) throws VisitorException
     {
-        return visitChildren(node, data);
+        ObjectType obj =  (ObjectType) node.jjtGetChild(0).jjtAccept(this, data);
+        logger.logInfo("type de retour est " +obj);
+        if (obj == null){
+            logger.logError("Type return mismatch not expected !",node.getLine(),node.getColumn());
+          return null;
+        }
+        if (currentMethod=="main"){
+            return obj ; 
+        }
+        MemoryObject mo = lookupSymbolidMeth(currentMethod); 
+         if (mo.getType()!=obj){
+            logger.logError("Type de retour invalide expected " + mo.getType() + "but get type " + obj, node.getLine(),node.getColumn());
+            return null;
+         }
+        return obj ; 
     }
 
     @Override
@@ -569,7 +586,7 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
         MemoryObject mo = lookupMethode(methodSignature.toString());
 
         if (mo == null) {
-            logger.logError("TypeChecker  : Method " + methodSignature + " is not defined.", 0, 0);
+            logger.logError("TypeChecker  : Method " + methodSignature + " is not defined.",  node.jjtGetLastToken().beginLine, node.jjtGetLastToken().beginColumn);
             return null;
 
         }
@@ -581,14 +598,14 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
         // Vérifier les types des paramètres
         List<ObjectType> expectedParamTypes = mo.getParamTypes();
         if (expectedParamTypes.size() != actualParamTypes.size()) {
-            logger.logError("TypeChecker : Parameter count mismatch in method " + methodSignature, 0, 0);
+            logger.logError("TypeChecker : Parameter count mismatch in method " + methodSignature,  node.jjtGetLastToken().beginLine, node.jjtGetLastToken().beginColumn);
             return null;
         }
 
         for (int i = 0; i < expectedParamTypes.size(); i++) {
             if (expectedParamTypes.get(i) != actualParamTypes.get(i)) {
                 logger.logError("TypeChecker : Parameter type mismatch in method " + methodSignature + ": expected "
-                        + expectedParamTypes.get(i) + " but got " + actualParamTypes.get(i), 0, 0);
+                        + expectedParamTypes.get(i) + " but got " + actualParamTypes.get(i),  node.jjtGetLastToken().beginLine, node.jjtGetLastToken().beginColumn);
                 return null;
             }
         }
@@ -682,11 +699,8 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
         ObjectType rightType = getNodeType(node.jjtGetChild(1), data);
 
         logger.logInfo("le type de right et left est " + leftType + rightType);
-
-
-        if (leftType != rightType) {
-            logger.logError(
-                    "TypeChecker : Type mismatch Expected same type (Boolean) for both operands for equivalence expression.",
+        if (!(leftType instanceof ObjectType) && !(leftType instanceof ObjectType)){
+            logger.logError(  "TypeChecker : Type mismatch Expected Type Valide (int or boolean) for both operands for equivalence expression.",
                     node.getLine(), node.getColumn());
         }
         return ObjectType.BOOLEAN;
@@ -701,7 +715,7 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
         logger.logInfo("type de leftt type et right type de astsup " + leftType + " " +  rightType);
       
         if (leftType != ObjectType.INT || rightType != ObjectType.INT ){
-            logger.logError("TypeChecker : Type mismatch Expected type int for both operands.", node.getLine(), node.getColumn());
+            logger.logError("TypeChecker : Type mismatch. Expected type 'int' for both operands during '>' :'superior' operation.", node.getLine(), node.getColumn());
         }
         
         return ObjectType.BOOLEAN;
@@ -757,10 +771,9 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
                         node.getColumn());
             }
             if (rightType == ObjectType.INT) {
-                // Résolution possible : éviter la division si "peut-être zéro"
                 if (isPotentiallyZero(node.jjtGetChild(1), data)) {
                     logger.logError(
-                        "TypeChecker: L'expression droite pourrait être égale à zéro.",
+                        "TypeChecker  : Expected type int for division operation.",
                         node.getLine(), node.getColumn()
                     );
                 }
@@ -786,18 +799,12 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
     {
 
         ASTIdent identNode = (ASTIdent) node.jjtGetChild(0);
-        Object value = identNode.jjtGetValue();
-        if (value instanceof Integer) 
-        {
-            return ObjectType.INT;
-        } 
-        else 
-        {
-            logger.logError("TypeChecker  : Expected a INT identifier, but got: " + value, node.getLine(),
-                    node.getColumn());
+        if (identNode ==  null){
+            logger.logError("Expected an identifier while longueur operation",node.getLine(),node.getColumn());
         }
 
-        return null;
+        
+        return ObjectType.INT;
     }
 
     @Override
@@ -813,11 +820,10 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
     @Override
     public Object visit(ASTTab node, Object data)  throws VisitorException
     { 
-        logger.logInfo("dan asttab");
         String id = (String) ((ASTIdent) node.jjtGetChild(0)).jjtGetValue();
         Object indx = getNodeType(node.jjtGetChild(1), data);
 
-        MemoryObject mo = lookupSymbol(id);
+        MemoryObject mo = lookupSymbolidMeth(id);
         if (mo == null) 
         {
             logger.logError("TypeChecker  : Tableau " + id + " is not defined.", node.getLine(), node.getColumn());
@@ -892,33 +898,40 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
         return node.jjtAccept(this, data);
     }
 
-        /// * Methodes utils pour la verification des types *///
+                                    /// * Methodes utils pour la verification des types *///
 
     private ObjectType visitBinaryOperation(SimpleNode node, Object data, ObjectType expectedType)  throws VisitorException
     {
         if (node.jjtGetNumChildren() != 2 || node.jjtGetChild(0) == null || node.jjtGetChild(1) == null) 
         {
-            logger.logError("TypeChecker  : Binary operation must have two operands.", 0,
-                    0);
+            logger.logError("TypeChecker  : Binary operation must have two operands.",  node.jjtGetLastToken().beginLine, node.jjtGetLastToken().beginColumn);
             return null;
         }
 
-        ObjectType leftTypep = getNodeType(node.jjtGetChild(0), data);
-        ObjectType rightTypep = getNodeType(node.jjtGetChild(1), data);
-
-        if (!(leftTypep instanceof ObjectType) || !(rightTypep instanceof ObjectType)) 
+        ObjectType leftType = getNodeType(node.jjtGetChild(0), data);
+        ObjectType rightType = getNodeType(node.jjtGetChild(1), data);
+        logger.logInfo("type leftType " + leftType + "type right " + rightType) ;
+        if (!(leftType instanceof ObjectType) || !(rightType instanceof ObjectType)) 
         {
-            logger.logError("TypeChecker  : Expected ObjectType during binary op but got " + rightTypep, 0, 0);
+            logger.logError("TypeChecker  : Expected ObjectType during binary op but got " + rightType,   node.jjtGetLastToken().beginLine, node.jjtGetLastToken().beginColumn);
+            return null;
+        }
+        if (leftType != expectedType) 
+        {
+            logger.logError("TypeChecker  : Type mismatch during binary Operation. Expected " + expectedType + " for left operand, but got " + leftType + ".",  node.jjtGetLastToken().beginLine, node.jjtGetLastToken().beginColumn);
             return null;
         }
 
-        ObjectType leftType = (ObjectType) leftTypep;
-        ObjectType rightType = (ObjectType) rightTypep;
-
+        if (rightType != expectedType) 
+        {
+            logger.logError("TypeChecker  : Type mismatch during binary Operation. Expected " + expectedType + " for right operand, but got " + rightType + ".",  node.jjtGetLastToken().beginLine, node.jjtGetLastToken().beginColumn);
+            return null;
+        }
         if (leftType != expectedType || rightType != expectedType) 
         {
-            logger.logError("TypeChecker  : Type mismatch during binary Operation Expected " + expectedType + " for operand.",
-                    0, 0);
+             logger.logError("TypeChecker  : Type mismatch during binary Operation Expected " + expectedType + " for operand.",
+            node.jjtGetLastToken().beginLine, node.jjtGetLastToken().beginColumn); 
+                return null;
         }
         return expectedType;
     }
@@ -948,15 +961,21 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
                 }
                 else 
                 {
-                    logger.logInfo("variable " + varName + " is not defined!.");
+                    logger.logError("variable " + varName + " is not defined!.",
+                    ((SimpleNode) node).jjtGetLastToken().beginLine, ((SimpleNode) node).jjtGetLastToken().beginColumn);
                 }
             } else if (node instanceof ASTExp) 
             {
                 return (ObjectType) node.jjtAccept(this, data);
             }
-        } 
+        } else if (node instanceof ASTExp){
+            return (ObjectType) node.jjtAccept(this, data);
+        }
+        else if (node instanceof ASTOu){
+            return (ObjectType) node.jjtAccept(this, data);
+        }
         else if (node instanceof ASTVar || node instanceof ASTCst || node instanceof ASTTableau
-                || node instanceof ASTTab) {
+               ) {
             Object value = node.jjtAccept(this, data);
             if (value instanceof String) 
             {
@@ -971,7 +990,11 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
             {
                 return ObjectType.INT;
             }
+            
         } 
+        else if (node instanceof ASTTab){
+            return (ObjectType) node.jjtAccept(this, data);
+        }
         else if (node instanceof ASTAppelE || node instanceof ASTAppelI) 
         {
             return (ObjectType) visitMethodCall((SimpleNode) node, data);
@@ -983,14 +1006,16 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
         else if (node instanceof ASTVrai || node instanceof ASTFaux) 
         {
             return ObjectType.BOOLEAN;
-        } else {
+        }
+        else {
             Object result = node.jjtAccept(this, data);
+            logger.logInfo("object" + result);
             if (result instanceof ObjectType) 
             {
                 return (ObjectType) result;
             } else 
             {
-                logger.logError("TypeChecker : Expected ObjectType but got " + result, 0, 0);
+                logger.logError("TypeChecker : Expected ObjectType but got " + result, ((SimpleNode) node).jjtGetLastToken().beginLine, ((SimpleNode) node).jjtGetLastToken().beginColumn);
             }
         }
         return null;
@@ -1003,13 +1028,13 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
         if (!(operandTypep instanceof ObjectType))
         {
             logger.logError("TypeChecker  : Expected ObjectType during unary op but got "
-                    + operandTypep.getClass().getSimpleName(), 0, 0);
+                    + operandTypep.getClass().getSimpleName(),node.jjtGetLastToken().beginLine, node.jjtGetLastToken().beginColumn);
             return null;
         }
         if (operandTypep != expectedType) 
         {
             logger.logError("TypeChecker  : Type mismatch during unary op Expected  " + expectedType + " for operand.",
-                    0, 0);
+            ((SimpleNode) node).jjtGetLastToken().beginLine, ((SimpleNode) node).jjtGetLastToken().beginColumn);
         }
         return expectedType;
     }
@@ -1036,7 +1061,7 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
                 String paramName = (String) ((ASTIdent) child.jjtGetChild(1)).jjtGetValue();
                 if (paramType == null) 
                 {
-                    logger.logError("Parameter type cannot be null.", 0, 0);
+                    logger.logError("Parameter type cannot be null.",  entetesNode.jjtGetLastToken().beginLine, entetesNode.jjtGetLastToken().beginColumn);
                 } 
                 else 
                 {
@@ -1061,7 +1086,7 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
                 ObjectType paramType = (ObjectType) child.jjtAccept(this, data);
                 logger.logInfo("TypeChecker : Parameter type: " + paramType);
                 if (paramType == null) {
-                    logger.logError("Parameter type cannot be null.", 0, 0);
+                    logger.logError("Parameter type cannot be null.", listexpNode.jjtGetLastToken().beginLine, listexpNode.jjtGetLastToken().beginColumn);
                 } 
                 else 
                 {
@@ -1076,7 +1101,7 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
             {
                 MemoryObject mo = lookupSymbolidMeth((String) child.jjtGetValue());
                 if (mo == null) {
-                    logger.logError("TypeChecker : Variable " + child.jjtGetValue() + " is not defined.", 0, 0);
+                    logger.logError("TypeChecker : Variable " + child.jjtGetValue() + " is not defined.",   listexpNode.jjtGetLastToken().beginLine, listexpNode.jjtGetLastToken().beginColumn);
                 } 
                 else 
                 {
@@ -1129,7 +1154,6 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
             {
                 throw new StackException("The stack is empty, cannot lookup symbol");
             }
-            //MemoryObject mo = stack.searchVariableFromTop(name);
             try {
             MemoryObject mo = symbolTable.getCurrentScope(name);
 

@@ -1,0 +1,9 @@
+class and {
+
+    main {
+        boolean v = 5 && false;
+        return v;
+
+    }
+
+}
