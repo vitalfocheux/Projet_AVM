@@ -10,7 +10,7 @@ import fr.m1comp5.ObjectNature;
 import fr.m1comp5.ObjectType;
 import fr.m1comp5.Debug.InterpreterDebugger;
 
-public class VisitorJcc implements JajaCodeVisitor {
+public class VisitorJjc implements JajaCodeVisitor {
     private String toDisplay;
     private final Memory mem;
     private final CallStack callStack;
@@ -19,7 +19,7 @@ public class VisitorJcc implements JajaCodeVisitor {
     private boolean activerDebugger;
 
 
-    public VisitorJcc(Memory mem) {
+    public VisitorJjc(Memory mem) {
         this.toDisplay = "";
         addr = 1;
         this.mem = mem;

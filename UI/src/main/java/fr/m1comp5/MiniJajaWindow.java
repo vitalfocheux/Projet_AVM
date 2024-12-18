@@ -1,5 +1,8 @@
 package fr.m1comp5;
 
+import fr.m1comp5.jjc.InterpreterJjc;
+import fr.m1comp5.jjc.generated.JajaCode;
+import fr.m1comp5.jjc.generated.Node;
 import fr.m1comp5.mjj.generated.MiniJaja;
 import fr.m1comp5.mjj.generated.ParseException;
 import fr.m1comp5.mjj.generated.SimpleNode;
@@ -25,7 +28,6 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import java.io.*;
 import java.nio.file.Files;
-import java.time.Duration;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,6 +53,8 @@ public class MiniJajaWindow extends Application {
     private TabPane editorTabPane;
     private Map<Tab, File> tabFileMap = new HashMap<>();
     private Scene scene;
+    private List<Node> instrs;
+    private boolean isCompiled = false;
 
 
 
@@ -428,8 +432,9 @@ public class MiniJajaWindow extends Application {
                 createToolBarButton("Open Folder", "/icon/open.png", this::openDirectory), // Nouveau bouton
                 createToolBarButton("Save", "/icon/save.png", this::saveFile),
                 new Separator(),
-                createToolBarButton("Build", "/icon/build.png", this::buildCode),
-                createToolBarButton("Run", "/icon/run.png", this::executeCode)
+                createToolBarButton("Run MiniJaja", "/icon/run.png", this::executeMiniJaja),
+                createToolBarButton("Compile", "/icon/build.png", this::buildCode),
+                createToolBarButton("Run JajaCode", "/icon/run.png", this::executeJajaCode)
         );
 
         return toolBar;
@@ -713,14 +718,14 @@ public class MiniJajaWindow extends Application {
         String sourceCode = currentCodeArea.getText();
 
         try {
-
             MiniJaja mjj = new MiniJaja(new ByteArrayInputStream(sourceCode.getBytes()));
             SimpleNode root = mjj.start();
 
 
             Compiler compiler = new Compiler(root);
-            compiler.compile();
+            this.instrs = compiler.compile();
             String javaCode = compiler.jjcToString();
+            this.isCompiled = true;
 
             // Afficher le JajaCode dans le panneau
             if (!mainSplitPane.getItems().contains(jajaCodeWrapper)) {
@@ -760,7 +765,7 @@ public class MiniJajaWindow extends Application {
         }
     }
 
-    private void executeCode() {
+    private void executeMiniJaja() {
         CodeArea currentCodeArea = getCurrentCodeArea();
         if (currentCodeArea == null) return;
 
@@ -772,29 +777,75 @@ public class MiniJajaWindow extends Application {
             SimpleNode node = mjj.start();
             InterpreterMjj interpreter = new InterpreterMjj(node);
 
-            Object result = interpreter.interpret();
-            appendToConsole("Compilation successful\n");
+            String result = interpreter.interpret();
+            appendToConsole("MiniJaja Interpretation successful\n");
             appendToConsole("Result: " + result + "\n");
 
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            PrintStream originalOut = System.out;
-            System.setOut(new PrintStream(new OutputStream() {
-                @Override
-                public void write(int b) {
-                    pw.write(b);
-                }
-            }));
-
-            node.dump("");
-            System.setOut(originalOut);
-            appendToConsole(sw.toString());
+//            StringWriter sw = new StringWriter();
+//            PrintWriter pw = new PrintWriter(sw);
+//            PrintStream originalOut = System.out;
+//            System.setOut(new PrintStream(new OutputStream() {
+//                @Override
+//                public void write(int b) {
+//                    pw.write(b);
+//                }
+//            }));
+//
+//            node.dump("");
+//            System.setOut(originalOut);
+//            appendToConsole(sw.toString());
 
         } catch (ParseException pe) {
             highlightError(pe);
             appendToConsole("Syntax error at line " + pe.currentToken.beginLine +
                     ", column " + pe.currentToken.beginColumn + "\n" +
                     pe.getMessage() + "\n");
+        } catch (Exception e) {
+            appendToConsole("Error: " + e.getMessage() + "\n");
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            appendToConsole(sw.toString());
+        }
+    }
+
+    private void executeJajaCode() {
+        CodeArea currentCodeArea = getCurrentCodeArea();
+        if (currentCodeArea == null) return;
+
+        String code = currentCodeArea.getText();
+        consoleArea.clear();
+
+        try {
+            if (!isCompiled) {
+                appendToConsole("MiniJaja is not compiled. Can't execute JajaCode");
+                return;
+            }
+//            JajaCode jjc = new JajaCode(instrs.get(0));
+//            fr.m1comp5.jjc.generated.SimpleNode node = jjc.start();
+            InterpreterJjc interpreter = new InterpreterJjc(null, new Memory(), this.instrs);
+
+            Object result = interpreter.interpret();
+            appendToConsole("JajaCode Interpretation successful\n");
+            appendToConsole("Result: " + result + "\n");
+
+//            StringWriter sw = new StringWriter();
+//            PrintWriter pw = new PrintWriter(sw);
+//            PrintStream originalOut = System.out;
+//            System.setOut(new PrintStream(new OutputStream() {
+//                @Override
+//                public void write(int b) {
+//                    pw.write(b);
+//                }
+//            }));
+//
+//            System.setOut(originalOut);
+//            appendToConsole(sw.toString());
+
+//        } catch (Exception e) {
+//            highlightError(e);
+//            appendToConsole("Syntax error at line " + e.currentToken.beginLine +
+//                    ", column " + e.currentToken.beginColumn + "\n" +
+//                    e.getMessage() + "\n");
         } catch (Exception e) {
             appendToConsole("Error: " + e.getMessage() + "\n");
             StringWriter sw = new StringWriter();
@@ -981,7 +1032,7 @@ public class MiniJajaWindow extends Application {
                     case Q -> exit();
                 }
             } else if (event.getCode() == KeyCode.F5) {
-                executeCode();
+                executeMiniJaja();
             }
         });
     }
