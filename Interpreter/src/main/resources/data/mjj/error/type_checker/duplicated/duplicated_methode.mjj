@@ -1,0 +1,25 @@
+class C {
+  int xx = 0;
+  int yy = 10;
+  boolean b11 = false;
+  boolean b25 = true;
+
+  void f(int z){
+   	xx = yy* z;
+	xx = xx / z;
+   };
+
+   void f(int z){
+   	xx= yy + z ;
+   };
+
+   main {
+ 	if  (b11 || (!b25)) {
+	f(10); // xx= 11;
+   };
+   
+}
+}
+
+
+

@@ -1,0 +1,8 @@
+class Boolean {
+
+    main {
+        boolean f = !ml
+
+    }
+
+}

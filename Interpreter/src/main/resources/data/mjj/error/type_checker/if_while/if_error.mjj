@@ -1,0 +1,8 @@
+class iferror {
+main {
+		int i = 2;
+		if  (true > i) {
+			i++;
+		};
+	}
+}

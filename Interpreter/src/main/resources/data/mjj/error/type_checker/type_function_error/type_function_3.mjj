@@ -5,8 +5,7 @@ class error {
     };
 
     main {
-
-        return sum();
+        int a = sum();
 
     }
 

@@ -1,0 +1,9 @@
+class Boolean {
+
+    main {
+        int v = 5 || 3;
+        return v;
+
+    }
+
+}

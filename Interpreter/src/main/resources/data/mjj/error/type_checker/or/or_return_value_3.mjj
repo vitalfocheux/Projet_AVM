@@ -1,0 +1,9 @@
+class Boolean {
+
+    main {
+        Boolean v = true || 5;
+        return ;
+
+    }
+
+}
