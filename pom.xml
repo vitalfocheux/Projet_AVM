@@ -98,7 +98,6 @@
     <connection>scm:git:https://disc.univ-fcomte.fr/cr700-gitlab/projet-amv-2024/groupe-5.git</connection>
     <developerConnection>scm:git:https://disc.univ-fcomte.fr/cr700-gitlab/projet-amv-2024/groupe-5.git</developerConnection>
     <url>https://disc.univ-fcomte.fr/cr700-gitlab/projet-amv-2024/groupe-5.git</url>
-    <tag>HEAD</tag> <!-- Use 'HEAD' or specify the correct tag -->
   </scm>
 
 </project>
