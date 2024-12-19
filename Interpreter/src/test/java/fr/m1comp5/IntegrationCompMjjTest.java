@@ -1,8 +1,6 @@
 package fr.m1comp5;
 
-import fr.m1comp5.Compiler;
 import fr.m1comp5.jjc.InterpreterJjc;
-import fr.m1comp5.mjj.InterpreterMjj;
 import fr.m1comp5.mjj.generated.MiniJaja;
 import fr.m1comp5.mjj.generated.SimpleNode;
 import org.junit.jupiter.api.Assertions;
@@ -15,7 +13,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
-public class IntegrationCompMjj {
+public class IntegrationCompMjjTest {
     @ParameterizedTest
     @MethodSource("fileProvider")
     void testInterpreterMiniJaja(String filepath) {
