@@ -1,5 +1,6 @@
 package fr.m1comp5;
 
+import fr.m1comp5.Typechecker.TypeChecker;
 import fr.m1comp5.jjc.InterpreterJjc;
 import fr.m1comp5.jjc.generated.Node;
 import fr.m1comp5.mjj.generated.MiniJaja;
@@ -748,7 +749,7 @@ public class MiniJajaWindow extends Application {
 
 
             Compiler compiler = new Compiler(root);
-            compiler.compile();
+            this.instrs = compiler.compile();
             String javaCode = compiler.jjcToString();
 
             // Afficher le JajaCode dans le panneau
@@ -772,6 +773,7 @@ public class MiniJajaWindow extends Application {
 
             consoleArea.clear();
             consoleArea.appendText("Compilation successful\n");
+            isCompiled = true;
 
         } catch (ParseException pe) {
             consoleArea.clear();
@@ -799,25 +801,14 @@ public class MiniJajaWindow extends Application {
         try {
             MiniJaja mjj = new MiniJaja(new ByteArrayInputStream(code.getBytes()));
             SimpleNode node = mjj.start();
+//            TypeChecker typeChecker = new TypeChecker();
+//            typeChecker.visit(node, null);
+
             InterpreterMjj interpreter = new InterpreterMjj(node);
 
             String result = interpreter.interpret();
             appendToConsole("MiniJaja Interpretation successful\n");
             appendToConsole("Result: " + result + "\n");
-
-//            StringWriter sw = new StringWriter();
-//            PrintWriter pw = new PrintWriter(sw);
-//            PrintStream originalOut = System.out;
-//            System.setOut(new PrintStream(new OutputStream() {
-//                @Override
-//                public void write(int b) {
-//                    pw.write(b);
-//                }
-//            }));
-//
-//            node.dump("");
-//            System.setOut(originalOut);
-//            appendToConsole(sw.toString());
 
         } catch (ParseException pe) {
             highlightError(pe);
@@ -852,24 +843,6 @@ public class MiniJajaWindow extends Application {
             appendToConsole("JajaCode Interpretation successful\n");
             appendToConsole("Result: " + result + "\n");
 
-//            StringWriter sw = new StringWriter();
-//            PrintWriter pw = new PrintWriter(sw);
-//            PrintStream originalOut = System.out;
-//            System.setOut(new PrintStream(new OutputStream() {
-//                @Override
-//                public void write(int b) {
-//                    pw.write(b);
-//                }
-//            }));
-//
-//            System.setOut(originalOut);
-//            appendToConsole(sw.toString());
-
-//        } catch (Exception e) {
-//            highlightError(e);
-//            appendToConsole("Syntax error at line " + e.currentToken.beginLine +
-//                    ", column " + e.currentToken.beginColumn + "\n" +
-//                    e.getMessage() + "\n");
         } catch (Exception e) {
             appendToConsole("Error: " + e.getMessage() + "\n");
             StringWriter sw = new StringWriter();

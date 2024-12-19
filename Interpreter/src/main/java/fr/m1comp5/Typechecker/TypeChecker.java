@@ -460,7 +460,7 @@ public Object visit(ASTMain node, Object data) throws VisitorException {
         if (currentMethod=="main"){
             return obj ; 
         }
-        MemoryObject mo = lookupSymbolidMeth(currentMethod); 
+        MemoryObject mo = lookupSymbol(currentMethod);
          if (mo.getType()!=obj){
             logger.logError("Type de retour invalide expected " + mo.getType() + "but get type " + obj, node.getLine(),node.getColumn());
             return null;
