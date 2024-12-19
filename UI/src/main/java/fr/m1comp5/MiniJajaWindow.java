@@ -1,5 +1,8 @@
 package fr.m1comp5;
 
+
+import fr.m1comp5.Logger.AppLogger;
+import fr.m1comp5.Logger.TestLoggerListener;
 import fr.m1comp5.Typechecker.TypeChecker;
 import fr.m1comp5.jjc.InterpreterJjc;
 import fr.m1comp5.jjc.generated.Node;
@@ -57,6 +60,7 @@ public class MiniJajaWindow extends Application {
     private List<Node> instrs;
     private boolean isCompiled = false;
     private boolean folderTreeOpened = false;
+    private TestLoggerListener loggerListener = new TestLoggerListener();
 
 
 
@@ -127,6 +131,7 @@ public class MiniJajaWindow extends Application {
 
     @Override
     public void start(Stage stage) {
+        AppLogger.getInstance().addLoggerListener(loggerListener);
         this.primaryStage = stage;
         tabFileMap = new HashMap<>();
         initializeWindow();
@@ -801,14 +806,23 @@ public class MiniJajaWindow extends Application {
         try {
             MiniJaja mjj = new MiniJaja(new ByteArrayInputStream(code.getBytes()));
             SimpleNode node = mjj.start();
-//            TypeChecker typeChecker = new TypeChecker();
-//            typeChecker.visit(node, null);
+            TypeChecker typeChecker = new TypeChecker();
+            typeChecker.visit(node, null);
 
-            InterpreterMjj interpreter = new InterpreterMjj(node);
+            for (String message : loggerListener.getMessages()) {
+                consoleArea.appendText(message + "\n");
+            }
+            boolean hasErrors = loggerListener.getLevels().stream().anyMatch(level -> level == AppLogger.TypeMessage.ERROR);
 
-            String result = interpreter.interpret();
-            appendToConsole("MiniJaja Interpretation successful\n");
-            appendToConsole("Result: " + result + "\n");
+            if (!hasErrors) {
+                appendToConsole("Type Check successful\n");
+                InterpreterMjj interpreter = new InterpreterMjj(node);
+                String result = interpreter.interpret();
+                appendToConsole("MiniJaja Interpretation successful\n");
+                appendToConsole("Result: " + result + "\n");
+            } else {
+                appendToConsole("Type checking failed. Interpretation aborted.\n");
+            }
 
         } catch (ParseException pe) {
             highlightError(pe);

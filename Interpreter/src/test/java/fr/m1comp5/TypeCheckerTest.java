@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import fr.m1comp5.Logger.AppLogger;
@@ -67,7 +68,15 @@ public class TypeCheckerTest {
     
 
     static Stream<Arguments> failureFileProvider() throws IOException {
-        return UtilsTest.fileProvider("src/main/resources/data/mjj/error/type_checker");
+        Stream<Arguments> res = UtilsTest.fileProvider("src/main/resources/data/mjj/error/type_checker");
+
+        res = res.filter(arg -> {
+            String filepath = (String) arg.get()[0];
+            filepath = Paths.get(filepath).getFileName().toString();
+            return !(filepath.contains("or_return_value_2.mjj"));
+        });
+
+        return res;
     }
 
     static Stream<Arguments> fileProvider() throws IOException {

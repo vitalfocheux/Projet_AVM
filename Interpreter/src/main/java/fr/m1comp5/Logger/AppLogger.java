@@ -24,7 +24,7 @@ public class AppLogger {
     private static AppLogger instance;
     private PrintWriter logWriter;
     private Set<String> loggedMessages = new HashSet<>(); // Ensemble pour stocker les messages déjà logués
-    private LogLevel logLevel = LogLevel.INFO_ERROR_DEBUG; 
+    private LogLevel logLevel = LogLevel.ERROR_ONLY;
 
 
     private AppLogger() {
