@@ -1,6 +1,2 @@
-INFO TypeChecker : Method sum has 3 parameters.
-INFO TypeChecker : Adding method sum(INT,INT,INT) to symbol table.
-INFO type de leftt type et right type de astsup INT INT
-INFO type leftType INTtype right INT
-INFO objectINT
-INFO type de retour est INT
+ERROR TypeChecker  : Type mismatch Cannot assign BOOLEAN to Ident of type INT (ligne 23, colonne 15)
+ERROR TypeChecker  : Type mismatch Cannot assign INT to Ident of type BOOLEAN (ligne 27, colonne 19)
