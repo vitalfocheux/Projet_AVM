@@ -44,7 +44,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
     @Override
     public Object visit(ASTClasse node, Object data) throws VisitorException {
         DataModel dm = (DataModel) data;
-        dm.data[0] = instrs.size()+1;
+        dm.data[0] = instrs.size();
         int n = (Integer) dm.data[0];
         Mode m = (Mode) dm.data[1];
 
@@ -101,7 +101,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         Mode m = (Mode) dm.data[1];
 
         if (m == Mode.DEFAULT) {
-            int ne = (int) node.jjtGetChild(2).jjtAccept(this, data);
+            int ne = (int) node.jjtGetChild(2).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
 
             ASTNewArray newTab = new ASTNewArray(JJTNEWARRAY);
 
@@ -150,7 +150,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
             ASTPop nPop = new ASTPop(JJTPOP);
             instrs.add(nPop);
-            int nrlexp = (int) node.jjtGetChild(1).jjtAccept(this, data);
+            int nrlexp = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n, Mode.RETRAIT));
 
             return nrlexp + 2;
         }
@@ -197,7 +197,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         Mode m = (Mode) dm.data[1];
 
         if (m == Mode.DEFAULT) {
-            int ndvs = (int) node.jjtGetChild(0).jjtAccept(this, data);
+            int ndvs = (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
             int niss = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+ndvs, Mode.DEFAULT));
 
             ASTPush push = new ASTPush(JJTPUSH);
@@ -287,11 +287,6 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
             int nrdvs = (int) node.jjtGetChild(3).jjtAccept(this, new DataModel(n+nens+ndvs+niss+3, Mode.RETRAIT));
 
-//            System.out.println("number line created for exp : "+ nens);
-//            System.out.println("number line created for vars : "+ ndvs);
-//            System.out.println("number line created for instrs : "+ niss);
-//            System.out.println("number line created for rdvs : "+ nrdvs);
-
             ASTJcNbre addrGoTo = new ASTJcNbre(JJTJCNBRE);
             addrGoTo.jjtSetValue(n+nens+ndvs+niss+nrdvs+addrIncr);
             nGoTo.jjtAddChild(addrGoTo,0);
@@ -347,7 +342,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
                 ASTTab nodeTab = (ASTTab) node.jjtGetChild(0);
                 ASTIdent i = (ASTIdent) nodeTab.jjtGetChild(0);
 
-                int ne = (int) varIndex.jjtAccept(this, data);
+                int ne = (int) varIndex.jjtAccept(this, new DataModel(n, Mode.DEFAULT));
                 int ne1 = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+ne, Mode.DEFAULT));
 
                 ASTAInc nAInc = new ASTAInc(JJTAINC);
@@ -360,7 +355,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
                 return ne+ne1+1;
             }
 
-            int ne = (int) node.jjtGetChild(1).jjtAccept(this, data);
+            int ne = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
 
             ASTInc nInc = new ASTInc(JJTINC);
             ASTJcIdent nJcIdent = new ASTJcIdent(JJTJCIDENT);
@@ -393,7 +388,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
                 ASTTab nodeTab = (ASTTab) node.jjtGetChild(0);
                 ASTIdent i = (ASTIdent) nodeTab.jjtGetChild(0);
 
-                int ne = (int) varIndex.jjtAccept(this, data);
+                int ne = (int) varIndex.jjtAccept(this, new DataModel(n, Mode.DEFAULT));
 
                 ASTAInc nAInc = new ASTAInc(JJTAINC);
                 ASTJcIdent nJcIdent = new ASTJcIdent(JJTJCIDENT);
@@ -434,7 +429,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
                 ASTTab nTab = (ASTTab) node.jjtGetChild(0); // Get the array node
                 ASTIdent i = (ASTIdent) nTab.jjtGetChild(0);
 
-                int ne = (int) varIndex.jjtAccept(this, data);
+                int ne = (int) varIndex.jjtAccept(this, new DataModel(n, Mode.DEFAULT));
                 int ne1 = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+ne, Mode.DEFAULT));
 
                 ASTAStore nAStore = new ASTAStore(JJTASTORE);
@@ -447,7 +442,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
                 return ne+ne1+1;
             }
 
-            int ne = (int) node.jjtGetChild(1).jjtAccept(this, data);
+            int ne = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
 
             ASTStore nStore = new ASTStore(JJTSTORE);
             ASTJcIdent nIdentStore = new ASTJcIdent(JJTJCIDENT);
@@ -470,7 +465,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         Mode m = (Mode) dm.data[1];
 
         if (m == Mode.DEFAULT) {
-            int nlexp = (int) node.jjtGetChild(1).jjtAccept(this, data);
+            int nlexp = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
 
             ASTJcIdent nJcIdent = new ASTJcIdent(JJTJCIDENT);
             ASTInvoke nInvoke = new ASTInvoke(JJTINVOKE);
@@ -495,7 +490,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         Mode m = (Mode) dm.data[1];
 
         if (m == Mode.DEFAULT) {
-            int nlexp = (int) node.jjtGetChild(1).jjtAccept(this, data);
+            int nlexp = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
 
             ASTJcIdent nJcIdent = new ASTJcIdent(JJTJCIDENT);
             ASTInvoke nInvoke = new ASTInvoke(JJTINVOKE);
@@ -522,12 +517,17 @@ public class CompilerVisitor implements MiniJajaVisitor {
         int n = (Integer) dm.data[0];
         Mode m = (Mode) dm.data[1];
 
-        return (int) node.jjtGetChild(0).jjtAccept(this, data);
+        return (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
     }
 
     @Override
     public Object visit(ASTEcrire node, Object data) throws VisitorException {
-        int ne = (int) node.jjtGetChild(0).jjtAccept(this, data);
+        DataModel dm = (DataModel) data;
+        dm.data[0] = instrs.size()+1;
+        int n = (Integer) dm.data[0];
+        Mode m = (Mode) dm.data[1];
+
+        int ne = (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
 
         ASTWrite write = new ASTWrite(JJTWRITE);
         instrs.add(write);
@@ -538,7 +538,12 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
     @Override
     public Object visit(ASTEcrireLn node, Object data) throws VisitorException {
-        int ne = (int) node.jjtGetChild(0).jjtAccept(this, data);
+        DataModel dm = (DataModel) data;
+        dm.data[0] = instrs.size()+1;
+        int n = (Integer) dm.data[0];
+        Mode m = (Mode) dm.data[1];
+
+        int ne = (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
 
         ASTWriteLn writeln = new ASTWriteLn(JJTWRITELN);
         instrs.add(writeln);
@@ -577,7 +582,13 @@ public class CompilerVisitor implements MiniJajaVisitor {
         addrGoto.jjtSetValue(n+ne+ns1+ns+2);
         nGoTo.jjtAddChild(addrGoto,0);
 
-        return ne+ns1+ns+2;
+
+        if (node.jjtGetParent().jjtGetParent() instanceof ASTMethode) {
+            return ne+ns1+ns+3;
+        } else {
+            return ne+ns1+ns+1;
+        }
+//        return ne+ns1+ns+2;
     }
 
     @Override
@@ -637,7 +648,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         Mode m = (Mode) dm.data[1];
 
         if (m == Mode.DEFAULT) {
-            int ne = (int) node.jjtGetChild(1).jjtAccept(this, data);
+            int ne = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
 
             ASTALoad nALoad = new ASTALoad(JJTALOAD);
             ASTJcIdent nJcIdent = new ASTJcIdent(JJTJCIDENT);
@@ -792,7 +803,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
 
             ASTPop nPop = new ASTPop(JJTPOP);
             instrs.add(nPop);
-            int nrlexp = (int) node.jjtGetChild(1).jjtAccept(this, data);
+            int nrlexp = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n, Mode.RETRAIT));
 
             return nrlexp+2;
         }
@@ -901,13 +912,13 @@ public class CompilerVisitor implements MiniJajaVisitor {
         Mode m = (Mode) dm.data[1];
 
         if (m == Mode.DEFAULT) {
-            int nds = (int) node.jjtGetChild(0).jjtAccept(this, data);
+            int nds = (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
             int ndss = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n+nds, Mode.DEFAULT));
 
             return nds+ndss;
         }
         if (m == Mode.RETRAIT) {
-            int nrds = (int) node.jjtGetChild(1).jjtAccept(this, data);
+            int nrds = (int) node.jjtGetChild(1).jjtAccept(this, new DataModel(n, Mode.RETRAIT));
             int nrdss = (int) node.jjtGetChild(0).jjtAccept(this, new DataModel(n+nrds, Mode.RETRAIT));
             return nrds+nrdss;
         }
@@ -921,7 +932,7 @@ public class CompilerVisitor implements MiniJajaVisitor {
         Mode m = (Mode) dm.data[1];
 
         if (m == Mode.DEFAULT) {
-            int ne = (int) node.jjtGetChild(2).jjtAccept(this, data);
+            int ne = (int) node.jjtGetChild(2).jjtAccept(this, new DataModel(n, Mode.DEFAULT));
 
             ASTNew newVar = new ASTNew(JJTNEW);
 

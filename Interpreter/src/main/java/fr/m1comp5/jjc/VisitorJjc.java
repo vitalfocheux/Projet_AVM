@@ -1,13 +1,10 @@
 package fr.m1comp5.jjc;
 
+import fr.m1comp5.*;
 import fr.m1comp5.Debug.InterpreterException;
 import fr.m1comp5.Debug.CallStack;
 import fr.m1comp5.custom.exception.VisitorException;
 import fr.m1comp5.jjc.generated.*;
-import fr.m1comp5.Memory;
-import fr.m1comp5.MemoryObject;
-import fr.m1comp5.ObjectNature;
-import fr.m1comp5.ObjectType;
 import fr.m1comp5.Debug.InterpreterDebugger;
 import fr.m1comp5.mjj.generated.ASTBooleen;
 import fr.m1comp5.mjj.generated.ASTEntier;
@@ -98,7 +95,11 @@ public class VisitorJjc implements JajaCodeVisitor {
         checkDebugNode(node);
         try
         {
-            mem.getStack().swap();
+            try {
+                mem.getStack().swap();
+            } catch (StackException ignored) {
+
+            }
         }
         catch (Exception e)
         {
@@ -311,11 +312,15 @@ public class VisitorJjc implements JajaCodeVisitor {
         checkDebugNode(node);
         try
         {
-            MemoryObject mo = mem.getStack().pop();
-            mem.getSymbolTable().removeObjectFromCurrentScope(mo);
-            if (mo.getNature() == ObjectNature.TAB)
-            {
-                mem.getHeap().decrementReference((int) mo.getValue());
+            try {
+                MemoryObject mo = mem.getStack().pop();
+                mem.getSymbolTable().removeObjectFromCurrentScope(mo);
+                if (mo.getNature() == ObjectNature.TAB)
+                {
+                    mem.getHeap().decrementReference((int) mo.getValue());
+                }
+            } catch (StackException ignored) {
+
             }
         }
         catch (Exception e)
