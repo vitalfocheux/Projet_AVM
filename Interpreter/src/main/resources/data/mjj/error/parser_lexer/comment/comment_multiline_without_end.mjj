@@ -1,0 +1,9 @@
+class error {
+
+    /* This is a multiline comment without an end
+    main {
+
+        return 0;
+    }
+
+}

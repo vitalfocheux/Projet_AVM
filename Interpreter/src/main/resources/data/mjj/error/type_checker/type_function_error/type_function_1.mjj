@@ -1,0 +1,12 @@
+class error {
+
+    boolean sum(){
+        return 0;
+    };
+
+    main {
+
+        boolean x = sum()
+    }
+
+}

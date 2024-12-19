@@ -1,0 +1,10 @@
+class error14 {
+main {
+		int i = 2;
+        main{
+		while (true == 0) {
+			i--;
+		};
+        }
+	}
+}

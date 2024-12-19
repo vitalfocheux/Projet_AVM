@@ -1,0 +1,10 @@
+class add {
+
+    main {
+       int x ;
+        int a = (12);
+        boolean b = true;
+        x =  a + b; 
+    }
+
+}

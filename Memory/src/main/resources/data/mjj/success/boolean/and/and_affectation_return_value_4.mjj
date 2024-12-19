@@ -1,0 +1,11 @@
+class and {
+
+    main {
+
+        boolean a = true;
+        boolean b = true;
+        return a && b;
+
+    }
+
+}

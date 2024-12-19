@@ -1,0 +1,31 @@
+class fct{
+
+    int sum(int a, int b, int c){
+        if (a > 0) {
+            a = a;
+        } else {
+            b = b;
+        };
+        return a + b + c;
+    };
+
+    int oui() {
+        int tab[2];
+        int count = 0;
+        while (length(tab) > count) {
+            tab[count] = count;
+            count++;
+        };
+        return 0;
+    };
+
+    main{
+        int a = 1;
+        int b = 2;
+        int c = 3;
+        int non = oui();
+        int d = sum(a, b, c);
+        write("sum = ");
+        writeln(d);
+    }
+}

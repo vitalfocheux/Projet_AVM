@@ -1,0 +1,8 @@
+class mul{
+
+    main{
+        boolean v = true;
+        int a = v*1*1*4;
+        write(a);
+    }
+}

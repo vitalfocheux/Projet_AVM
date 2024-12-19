@@ -1,0 +1,15 @@
+class fact{
+
+    final int N = 7;
+
+    main{
+        int i = 0;
+        int res = 1;
+        while(N > i){
+            i++;
+            res = res * i;
+        };
+        write("fact = ");
+        writeln(res);
+    }
+}

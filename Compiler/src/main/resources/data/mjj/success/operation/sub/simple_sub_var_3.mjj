@@ -1,0 +1,11 @@
+class add {
+
+    main {
+
+        int a = (54);
+        int b = 12;
+        return a - b; // 42
+
+    }
+
+}

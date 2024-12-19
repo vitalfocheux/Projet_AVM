@@ -1,0 +1,9 @@
+1 Init
+2 Push(12)
+3 New(a)
+4 Load(a)
+5 Push(0)
+6 Swap
+7 Pop
+8 Pop
+9 JcStop

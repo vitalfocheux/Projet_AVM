@@ -1,0 +1,9 @@
+class equal {
+
+    main {
+
+        return false == true;
+
+    }
+
+}

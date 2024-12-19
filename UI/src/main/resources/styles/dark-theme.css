@@ -1,0 +1,95 @@
+/* dark-theme.css */
+.split-pane {
+    -fx-background-color: #2b2b2b;
+    -fx-box-border: transparent;
+}
+
+.code-area {
+    -fx-background-color: #2b2b2b;
+    -fx-font-size: 14px;
+}
+
+.code-area .text {
+    -fx-fill: #a9b7c6;
+}
+
+.code-area .lineno {
+    -fx-background-color: #313335;
+    -fx-text-fill: #606366;
+    -fx-padding: 0 5px;
+    -fx-border-width: 0 1px 0 0;
+    -fx-border-color: #3b3b3b;
+}
+
+/* Coloration syntaxique */
+.code-area .keyword {
+    -fx-fill: #cc7832;  /* Orange pour les mots-clés */
+    -fx-font-weight: bold;
+}
+
+.code-area .string {
+    -fx-fill: #6a8759;  /* Vert pour les chaînes */
+}
+
+.code-area .comment {
+    -fx-fill: #808080;  /* Gris pour les commentaires */
+    -fx-font-style: italic;
+}
+
+.code-area .number {
+    -fx-fill: #6897bb;  /* Bleu clair pour les nombres */
+}
+
+.code-area .operator {
+    -fx-fill: #a9b7c6;  /* Blanc cassé pour les opérateurs */
+}
+
+.text-area {
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: #a9b7c6;
+    -fx-font-family: 'Consolas';
+    -fx-font-size: 13px;
+}
+
+.text-area .content {
+    -fx-background-color: #2b2b2b;
+}
+
+.split-pane:vertical > .split-pane-divider {
+    -fx-padding: 0 1px;
+    -fx-background-color: #3b3b3b;
+}
+
+.menu-bar {
+    -fx-background-color: #3c3f41;
+}
+
+.tool-bar {
+    -fx-background-color: #3c3f41;
+}
+
+.button {
+    -fx-background-color: #4c5052;
+    -fx-text-fill: #a9b7c6;
+}
+
+/* Styles des menus */
+.menu-bar .label {
+    -fx-text-fill: #a9b7c6;
+}
+
+.menu-item {
+    -fx-background-color: #3c3f41;
+}
+
+.menu-item .label {
+    -fx-text-fill: #a9b7c6;
+}
+
+.context-menu {
+    -fx-background-color: #3c3f41;
+}
+
+.virtual-flow {
+    -fx-background-color: #2b2b2b;
+}

@@ -1,0 +1,6 @@
+class error_indice_type{ 
+    main {
+    boolean t = true;
+    int tableau[t];
+    }
+}

@@ -1,0 +1,2 @@
+ERROR TypeChecker  : Type mismatch Cannot assign BOOLEAN to Ident of type INT (ligne 23, colonne 15)
+ERROR TypeChecker  : Type mismatch Cannot assign INT to Ident of type BOOLEAN (ligne 27, colonne 19)

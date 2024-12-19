@@ -1,0 +1,12 @@
+class error {
+
+    void sum(){
+        return 0;
+    };
+
+    main {
+        int a = sum();
+
+    }
+
+}
