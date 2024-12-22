@@ -1,0 +1,83 @@
+\begin{chapter}[beamerthemesrc/assets/background_negative]{}{Différents types de tests}
+    \begin{itemize}
+          \item Tests unitaires
+          \item Tests d'acceptations
+          \item Résultats tests
+    \end{itemize}
+\end{chapter}
+
+\begin{frame}{Tests unitaires}
+    \begin{block}{Classes testées unitairement}
+        \begin{itemize}
+            \item Memory
+            \item SymbolTable
+            \item Stack
+            \item Heap
+            \item \dots
+        \end{itemize}
+    \end{block}
+    \begin{block}{Types de tests effectués}
+        \begin{itemize}
+            \item Boîte-blanche
+            \item Boîte-noire
+        \end{itemize}
+    \end{block}
+
+\end{frame}
+
+\begin{frame}{Tests d'acceptations}
+    \begin{block}{}
+        \centering
+        Création d'une base de programme MiniJaja
+    \end{block}
+    \begin{block}{Classes testées paramétriquement}
+        \begin{itemize}
+            \item Parseur \& Lexeur génerer par JavaCC
+            \item Interpreteur MiniJaja \& JajaCode
+            \item Compilateur
+        \end{itemize}
+    \end{block}
+    \begin{block}{}
+        Utilisation des programmes MiniJaja pour les tester un par un 
+        pour chacune des classes.
+    \end{block}
+\end{frame}
+
+% 2973 / 6676 & 3703 / 6676
+
+\begin{frame}{Résultats des tests}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{tikzpicture}[scale=0.7] % Ajustez la valeur de scale selon vos besoins
+                \pie[color={red, green}]{
+                    41.2/,
+                    58.8/
+                }
+            \end{tikzpicture} \\ 
+            \begin{tikzpicture}
+                \fill[red] (0,0) rectangle (0.2,0.2);
+            \end{tikzpicture} Lignes non couvertes \\
+            \begin{tikzpicture}
+                \fill[green] (0,0) rectangle (0.2,0.2);
+            \end{tikzpicture} Lignes couvertes
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \vspace{-10mm}
+            \begin{block}{Résultats chiffrés}
+                \begin{itemize}
+                    \item 7026 lignes à couvrir
+                    \item 3934 lignes couvertes avec les tests
+                    \item 1211 tests au total
+                    \item 48.6\% $\rightarrow$ module Analyzer
+                    \item 82.3\% $\rightarrow$ module Compiler
+                    \item 66\% $\rightarrow$ module Interpreter
+                    \item 88.5\% $\rightarrow$ module Memory 
+                \end{itemize}    
+            \end{block}
+
+            \begin{block}{Observation}
+                Beaucoup de lignes non couvertes $\rightarrow$ fichier générer par JavaCC 
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}

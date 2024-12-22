@@ -1,0 +1,53 @@
+\documentclass[utf8]{beamer}
+
+\input{header.tex}
+
+%-------------title here--------------------
+\title{Projet développement Agile de machines virtuelles}
+\course{Master 1 Informatique}
+\author{Hugo ROUGETET, Léo LEUTHARDT, Vital FOCHEUX, Malak MAJDOUB, \\Ali MOHAMED CHEHEM, Younes BENHAMROURA}
+\date{19 décembre 2024}
+%--------------begin document--------------------
+\begin{document}
+\maketitle
+
+\footlinecolor{maincolor}
+\begin{frame}
+    \frametitle{Table des matières}
+    \tableofcontents
+\end{frame}
+
+\section{Présentation du projet}
+\input{contents/Presentation.tex}
+
+\section{Agilité}
+\input{contents/Agilite.tex}
+
+\section{L'analyseur syntaxique}
+\input{contents/Analyseur.tex}
+
+\section{Interprétation, Compilation \& Mémoire}
+\input{contents/Interpretation.tex}
+
+\section{Le contrôleur de type}
+\input{contents/Typechecker.tex}
+
+\section{Les tests}
+\input{contents/Test.tex}
+
+\section*{Conclusion}
+\input{contents/Conclusion.tex}
+
+\begingroup
+  \themecolor{main}
+  \begin{frame}[c]
+    \centering
+    \begin{minipage}{\textwidth}
+      \usebeamercolor[fg]{normal text}
+      \centering
+      \Huge \textsl{Merci de votre attention ! } \\
+      \Huge \textsl{Des questions ?}
+    \end{minipage}
+  \end{frame}
+\endgroup
+\end{document}

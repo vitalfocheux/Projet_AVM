@@ -1,0 +1,37 @@
+\begin{chapter}[beamerthemesrc/assets/background_negative]{}{Le contrôleur de type}
+    \begin{itemize}
+          \item Fonctionnement
+          \item Contrôle de type
+          \item Journalisation des erreurs
+    \end{itemize}
+\end{chapter}
+
+\begin{frame}{Fonctionnement}
+    \begin{block}{}
+        \begin{itemize}
+            \item Parcours de l'AST $\rightarrow$ MiniJajaVisitor
+            \item Gestion portées \& définitions $\rightarrow$ la table des symbôles
+            \item Journalisation des erreurs pour les consigner
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Contrôle de type}
+    \begin{block}{Contrôle de type statique}
+        \begin{itemize}
+            \item Pré-déclaration : variables, méthodes
+            \item Paramètre : nombre \& type
+            \item Opérateur spécifique : booléen \& entier
+            \item Valeur des expressions : return, condition
+        \end{itemize}
+    \end{block}
+
+\end{frame}
+\begin{frame}{Journalisation des erreurs}
+    \begin{block}{}
+        \begin{itemize}
+            \item Autorisation du débogage \& de la détection des erreurs
+            \item Exécution par un Listener et dans un fichier
+        \end{itemize}
+    \end{block}
+\end{frame}

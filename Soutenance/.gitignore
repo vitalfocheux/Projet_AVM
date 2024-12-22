@@ -1,0 +1,13 @@
+# Ignorer tous les fichiers par défaut
+*
+
+# Ne pas ignorer les fichiers .tex et .pdf
+!*.tex
+!*.pdf
+!.gitignore
+
+# Ne pas ignorer les fichiers dans les répertoires contents et beamerthemesrc
+!contents/
+!contents/**
+!beamerthemesrc/
+!beamerthemesrc/**
